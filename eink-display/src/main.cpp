@@ -14,6 +14,7 @@
 #include <GxIO/GxIO.h>
 
 #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
+#include <ESPmDNS.h>
  
 
 GxIO_Class io(SPI,  EPD_CS, EPD_DC,  EPD_RSET);
@@ -60,6 +61,23 @@ void setup() {
     SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
     display.init(); // enable diagnostic output on Serial
     displayIP(WiFi.localIP());
+
+    while (mdns_init() != ESP_OK)
+    {
+        delay(1000);
+        Serial.println("Starting MDNS...");
+    }
+
+    IPAddress serverIp;
+
+    while (serverIp.toString() == "0.0.0.0")
+    {
+        Serial.println("Resolving host...");
+        delay(250);
+        serverIp = MDNS.queryHost("DESKTOP-F5S3BUS");
+    }
+    Serial.println(serverIp.toString());
+
 }
 
 void displayIP(IPAddress ip) {
