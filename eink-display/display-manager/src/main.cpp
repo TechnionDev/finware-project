@@ -22,12 +22,16 @@ GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
 
 void LilyGo_logo();
 void displayIP(IPAddress ip);
+void displaymsg(char * msg);
 
 
 void setup() {
     WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
     // it is a good practice to make sure your code sets wifi mode how you want it.
- 
+
+    SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
+    display.init(); // enable diagnostic output on Serial
+    
     // put your setup code here, to run once:
     Serial.begin(115200);
     
@@ -58,8 +62,6 @@ void setup() {
     }
     Serial.println(spi_flash_get_chip_size());
 
-    SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
-    display.init(); // enable diagnostic output on Serial
     displayIP(WiFi.localIP());
 
     while (mdns_init() != ESP_OK)
@@ -90,8 +92,17 @@ void displayIP(IPAddress ip) {
     display.update();
 }
 
+void displaymsg(char* msg) {
+    display.setRotation(1);
+    display.fillScreen(GxEPD_WHITE);
+    display.setTextColor(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold18pt7b);
+    display.setCursor(0, 45);
+    display.println(msg);
+    display.update();
+}
+
 void loop()
 {
-    
 }
 
