@@ -1,0 +1,22 @@
+{
+  "name": "finware-project",
+  "version": "1.0.0",
+  "description": "1. The small \"Keyes\" thingymajigy is called a [KY-018 Photoresistor](https://arduinomodules.info/ky-018-photoresistor-module/). As the name suggests, it is a light sensor of sorts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechnionDev/finware-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TechnionDev/finware-project/issues"
+  },
+  "homepage": "https://github.com/TechnionDev/finware-project#readme",
+  "dependencies": {
+    "ble-host": "^1.0.3"
+  }
+}
