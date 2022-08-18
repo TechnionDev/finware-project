@@ -1,5 +1,10 @@
 "use strict";
-function sum(num1, num2) {
-    return num1 + num2;
-}
-console.log(sum(8, 4));
+const express = require("express");
+const PORT = process.env.PORT || 3001;
+const app = express();
+app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+});
+app.get("/api", (req, res) => {
+    res.json({ message: "Hello from server!" });
+});
