@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     "target": "es5",
     "lib": [
       "dom",

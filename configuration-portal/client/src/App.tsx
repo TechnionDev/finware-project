@@ -1,6 +1,11 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+
+import { Routes, Route } from "react-router-dom";
+import LandingPortal from './pages/LandingPortal'
+import ConfigPage from './pages/Configuration'
+import BluetoothPage from './pages/Bluetooth'
+import WifiPage from './pages/Wifi'
+
 
 function App() {
   const [data, setData] = React.useState(null);
@@ -12,13 +17,16 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{!data ? "Loading..." : data}</p>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/">
+        <Route index element={<LandingPortal>{data}</LandingPortal>} />
+        <Route path="bluetooth" element={<BluetoothPage />} />
+        <Route path="config" element={<ConfigPage />} />
+        <Route path="wifi" element={<WifiPage />} />
+      </Route>
+    </Routes>
   );
 }
 
 export default App;
+
