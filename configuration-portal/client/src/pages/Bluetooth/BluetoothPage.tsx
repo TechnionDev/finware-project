@@ -37,6 +37,7 @@ function BluetoothPage() {
       <div className="bt-inner-wrapper">
         <section className="bt-current-state">
           <p>{btState.advertising}</p>
+          <p>{btState.advertising}</p>
         </section>
         <section>2</section>
         <section>3</section>

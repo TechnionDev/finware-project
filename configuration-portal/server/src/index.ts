@@ -1,11 +1,11 @@
 const express = require("express");
 import services from './services.json';
-// import BluetoothManager from './BluetoothManager';
+import BluetoothManager from './BluetoothManager';
 
-// const btManager = new BluetoothManager();
-// btManager.init('myDevice', services, (pincode) => {
-//   return Promise.resolve(0);
-// });
+const btManager = new BluetoothManager();
+btManager.init('myDevice', services, (pincode) => {
+  return Promise.resolve(0);
+});
 
 const PORT = process.env.PORT || 3001;
 
