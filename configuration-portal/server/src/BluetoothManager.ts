@@ -30,7 +30,7 @@ export default class BluetoothManager {
             setTimeout(this.startAdvertising, 10000);
             return;
         }
-        conn.on('disconnect', ()=>{console.log("disconnected");}); // restart advertising after disconnect
+        conn.on('disconnect', ()=>{this.startAdvertising()}); // restart advertising after disconnect
 
         console.log('Connection established!');
         console.log('Security: ', conn.smp.currentEncryptionLevel);
