@@ -37,25 +37,41 @@ export default class BluetoothManager {
             setTimeout(this.startAdvertising, 10000);
             return;
         }
-        
+
         this.connectionStatus = Connection.PAIRING;
         this.btConnection = conn;
         conn.on('disconnect', () => {
             this.btConnection = null; this.startAdvertising()
         }); // restart advertising after disconnect
-        
+
         console.log('Connection established!');
         console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
         console.log(JSON.stringify(conn, null, 4));
-        
+
         const IOCapabilities = NodeBleHost.IOCapabilities;
         const AssociationModels = NodeBleHost.AssociationModels;
         const SmpErrors = NodeBleHost.SmpErrors;
 
-        conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
+        if (conn.smp.hasLtk) {
+            conn.smp.startEncryption();
+        } else {
+            conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
+        }
+
+        conn.smp.on('encrypt', (status, currentEncryptionLevel) => {
+            if (status != HciErrors.SUCCESS) {
+                console.log('Could not start encryption due to ' + HciErrors.toString(status));
+                return;
+            }
+            this.connectionStatus = Connection.CONNECTED;
+            console.log('The encryption process is now complete!');
+            console.log('MITM protection: ' + currentEncryptionLevel.mitm);
+            console.log('LE Secure Connections used: ' + currentEncryptionLevel.sc);
+            console.log(JSON.stringify(conn, null, 4));
+        });
 
         // Without this event handler the I/O capabilities will be no input, no output
-        conn.smp.on('pairingRequest', function (req, callback) {
+        conn.smp.on('pairingRequest', (req, callback) => {
             console.log("Pairing request");
             callback({ ioCap: IOCapabilities.DISPLAY_YES_NO, bondingFlags: 1, mitm: true });
         });
@@ -83,7 +99,7 @@ export default class BluetoothManager {
             // Put logic here, e.g. read a protected characteristic
         });
 
-        conn.smp.on('pairingFailed', function (reason, isErrorFromRemote) {
+        conn.smp.on('pairingFailed', (reason, isErrorFromRemote) => {
             console.log('Pairing failed with reason ' + SmpErrors.toString(reason));
         });
 
