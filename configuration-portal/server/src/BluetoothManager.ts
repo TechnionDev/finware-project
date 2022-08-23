@@ -46,7 +46,7 @@ export default class BluetoothManager {
         
         console.log('Connection established!');
         console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
-        console.log(JSON.stringify(conn), null, 4);
+        console.log(JSON.stringify(conn, null, 4));
         
         const IOCapabilities = NodeBleHost.IOCapabilities;
         const AssociationModels = NodeBleHost.AssociationModels;
@@ -56,6 +56,7 @@ export default class BluetoothManager {
 
         // Without this event handler the I/O capabilities will be no input, no output
         conn.smp.on('pairingRequest', function (req, callback) {
+            console.log("Pairing request");
             callback({ ioCap: IOCapabilities.DISPLAY_YES_NO, bondingFlags: 1, mitm: true });
         });
 
