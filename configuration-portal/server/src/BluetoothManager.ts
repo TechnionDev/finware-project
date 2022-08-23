@@ -32,22 +32,22 @@ export default class BluetoothManager {
     }
 
     private newPairingHandler(status, conn) {
-        console.log(conn);
         if (status != HciErrors.SUCCESS) {
             // Advertising could not be started for some controller-specific reason, try again after 10 seconds
             setTimeout(this.startAdvertising, 10000);
             return;
         }
-
+        
         this.connectionStatus = Connection.PAIRING;
         this.btConnection = conn;
         conn.on('disconnect', () => {
             this.btConnection = null; this.startAdvertising()
         }); // restart advertising after disconnect
-
+        
         console.log('Connection established!');
-        console.log('Security: ', conn.smp.currentEncryptionLevel);
-
+        console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
+        console.log(JSON.stringify(conn));
+        
         const IOCapabilities = NodeBleHost.IOCapabilities;
         const AssociationModels = NodeBleHost.AssociationModels;
         const SmpErrors = NodeBleHost.SmpErrors;
