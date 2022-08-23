@@ -4,6 +4,8 @@ import BluetoothManager from './BluetoothManager';
 
 const btManager = new BluetoothManager();
 btManager.init('myDevice', services, (pincode) => {
+  console.log("BT initialized");
+  btManager.startAdvertising();
   return Promise.resolve(0);
 });
 

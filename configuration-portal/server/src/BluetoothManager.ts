@@ -92,7 +92,7 @@ export default class BluetoothManager {
                 }
                 manager.gattDb.addServices(services);
                 this.initAdvData(manager, services);
-                manager.setDeviceName(deviceName);
+                manager.gattDb.setDeviceName(deviceName);
                 this.manager = manager;
 
                 resolve("SUCCESS");
@@ -104,6 +104,7 @@ export default class BluetoothManager {
 
     public startAdvertising() {
         this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler);
+        console.log("Started advertising");
     }
 
     public stopAdvertising() {
