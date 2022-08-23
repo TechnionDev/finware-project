@@ -32,6 +32,7 @@ export default class BluetoothManager {
     }
 
     private newPairingHandler(status, conn) {
+        console.log(conn);
         if (status != HciErrors.SUCCESS) {
             // Advertising could not be started for some controller-specific reason, try again after 10 seconds
             setTimeout(this.startAdvertising, 10000);
