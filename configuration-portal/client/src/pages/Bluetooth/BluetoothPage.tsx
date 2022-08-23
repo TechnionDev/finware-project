@@ -5,23 +5,24 @@ import './BluetoothPage.css';
 const BT_STATE_ENDOINT = "/api/bt-state";
 const POLLING_INTERVAL = 1000;
 const DEFAULT_BT_STATE: BTState = {
-  advertising: "IDLE"
+  connection: null
 }
 
 interface BTState {
-  advertising: "ACTIVE" | "IDLE"
+  connection: "CONNECTED" | "ADVERTISING" | null
 };
 
 function useBtState() {
   const [btState, setBtState] = useState<BTState>(DEFAULT_BT_STATE);
 
   useEffect(() => {
-    const int = setInterval(() => {
+    function updateBtState() {
       fetch(BT_STATE_ENDOINT)
         .then((response) => { return response.json(); })
         .then((data) => { setBtState(data); });
-    }, POLLING_INTERVAL);
-
+    }
+    updateBtState();
+    const int = setInterval(updateBtState, POLLING_INTERVAL);
     return () => clearInterval(int);
   }, []);
 
@@ -35,9 +36,8 @@ function BluetoothPage() {
   return (
     <div className="bt-wrapper">
       <div className="bt-inner-wrapper">
-        <section className="bt-current-state">
-          <p>{btState.advertising}</p>
-          <p>{btState.advertising}</p>
+        <section className="bt-connection-status">
+          <div>Current connection status: {btState.connection}</div>
         </section>
         <section>2</section>
         <section>3</section>

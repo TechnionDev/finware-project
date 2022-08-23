@@ -32,7 +32,7 @@
     height: 100%;
     background-size: cover;
     background-position: center;
-    filter: blur(2px) brightness(0.9)
+    filter: blur(0.4px) brightness(0.8);
 }
 
 .portal-entry-title {

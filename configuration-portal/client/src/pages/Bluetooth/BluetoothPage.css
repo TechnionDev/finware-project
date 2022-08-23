@@ -1,13 +1,6 @@
 .bt-wrapper {
-    margin-top: 1em;
     display: flex;
     justify-content: center;
     margin: auto;
-}
-
-.bt-wrapper {
-    margin-top: 1em;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+    margin-top: 2.5em;
 }

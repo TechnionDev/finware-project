@@ -1,5 +1,6 @@
 const express = require("express");
 import services from './services.json';
+// /*
 import BluetoothManager from './BluetoothManager';
 
 const btManager = new BluetoothManager();
@@ -11,6 +12,7 @@ btManager.init('myDevice', services, (pincode) => {
   console.log("BT initialized");
   btManager.startAdvertising();
 });
+// */
 
 const PORT = process.env.PORT || 3001;
 
@@ -25,5 +27,6 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/bt-state", (req, res) => {
-  res.json({ advertising: "ACTIVE" });
+  res.json({ connection: btManager.connectionStatus})
+  // res.json({ connection: "ADVERTISING" });
 });
