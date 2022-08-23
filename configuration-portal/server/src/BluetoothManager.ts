@@ -7,6 +7,9 @@ const BleManager = NodeBleHost.BleManager;
 const AdvertisingDataBuilder = NodeBleHost.AdvertisingDataBuilder;
 const HciErrors = NodeBleHost.HciErrors;
 const AttErrors = NodeBleHost.AttErrors;
+const IOCapabilities = NodeBleHost.IOCapabilities;
+const AssociationModels = NodeBleHost.AssociationModels;
+const SmpErrors = NodeBleHost.SmpErrors;
 
 enum Connection {
     CONNECTED = "CONNECTED",
@@ -38,25 +41,16 @@ export default class BluetoothManager {
             return;
         }
 
-        this.connectionStatus = Connection.PAIRING;
         this.btConnection = conn;
         conn.on('disconnect', () => {
             this.btConnection = null; this.startAdvertising()
         }); // restart advertising after disconnect
 
         console.log('Connection established!');
-        console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
-        console.log(conn);
+        console.log(JSON.stringify(conn, null, 4));
 
-        const IOCapabilities = NodeBleHost.IOCapabilities;
-        const AssociationModels = NodeBleHost.AssociationModels;
-        const SmpErrors = NodeBleHost.SmpErrors;
-
-        if (conn.smp.hasLtk) {
-            conn.smp.startEncryption();
-        } else {
-            conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
-        }
+        this.connectionStatus = Connection.PAIRING;
+        conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
 
         conn.smp.on('encrypt', (status, currentEncryptionLevel) => {
             if (status != HciErrors.SUCCESS) {
