@@ -6,7 +6,7 @@ const BT_STATE_ENDOINT = "/api/bt-state";
 const POLLING_INTERVAL = 1000;
 const DEFAULT_BT_STATE: BTState = {
   connection: null,
-  passcode: 
+  passcode: null
 }
 
 enum Connection {
@@ -17,7 +17,7 @@ enum Connection {
 
 interface BTState {
   connection: Connection | null,
-  passcode: string
+  passcode: string | null
 };
 
 function useBtState() {
@@ -48,9 +48,9 @@ function BluetoothPage() {
           <div>Current connection status: {btState && btState.connection}</div>
           <div>
             {btState && btState.connection == Connection.PAIRING ?
-              <div>Passcode: {btState.passcode}</div> :
-              <></>
-            }
+            <div>Passcode: {btState.passcode}</div> :
+            <></>
+          }
           </div>
         </section>
         <section>2</section>
