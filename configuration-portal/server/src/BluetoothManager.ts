@@ -78,6 +78,7 @@ export default class BluetoothManager {
     public init(deviceName: string, services: object[], passcodeHandler: (pinCode: string) => Promise<any>,) {
         this.deviceName = deviceName;
         this.passcodeHandler = passcodeHandler;
+        console.log(passcodeHandler, typeof(passcodeHandler));
 
         var transport = new HciSocket(); // connects to the first hci device on the computer, for example hci0
         var options = {
@@ -104,7 +105,7 @@ export default class BluetoothManager {
 
     public startAdvertising() {
         this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler);
-        console.log("Started advertising");
+        console.log("Started advertising")
     }
 
     public stopAdvertising() {
