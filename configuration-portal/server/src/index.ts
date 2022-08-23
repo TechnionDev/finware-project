@@ -27,6 +27,6 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/bt-state", (req, res) => {
-  res.json({ connection: btManager.connectionStatus})
+  res.json({ connection: btManager.connectionStatus, passcode: btManager.passcode});
   // res.json({ connection: "ADVERTISING" });
 });

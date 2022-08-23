@@ -22,7 +22,8 @@ export default class BluetoothManager {
     private deviceName: string = null;
     private passcodeHandler: Function = null;
     private btConnection = null;
-
+    
+    public passcode: string = null;
     public connectionStatus: Connection = null
 
     private initAdvData(manager, services) {
@@ -43,7 +44,8 @@ export default class BluetoothManager {
 
         this.btConnection = conn;
         conn.on('disconnect', () => {
-            this.btConnection = null; this.startAdvertising()
+            this.btConnection = null;
+            this.startAdvertising()
         }); // restart advertising after disconnect
 
         console.log('Connection established!');
@@ -75,6 +77,7 @@ export default class BluetoothManager {
 
             if (associationModel == AssociationModels.NUMERIC_COMPARISON) {
                 console.log(`NUMERIC_COMPARISON got code: ${passcode}:`);
+                this.passcode = passcode;
                 this.passcodeHandler(passcode)
                     .then(() => {
                         callback();
