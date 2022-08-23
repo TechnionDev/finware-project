@@ -4,9 +4,12 @@ import BluetoothManager from './BluetoothManager';
 
 const btManager = new BluetoothManager();
 btManager.init('myDevice', services, (pincode) => {
+  console.log(`Received pincode in index.ts: ${pincode}`)
+  return Promise.resolve(0);
+}).then(() => {
+
   console.log("BT initialized");
   btManager.startAdvertising();
-  return Promise.resolve(0);
 });
 
 const PORT = process.env.PORT || 3001;
