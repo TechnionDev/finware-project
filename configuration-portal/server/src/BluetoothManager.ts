@@ -25,7 +25,6 @@ export default class BluetoothManager {
     }
 
     private newPairingHandler(status, conn) {
-        const self = this;
         if (status != HciErrors.SUCCESS) {
             // Advertising could not be started for some controller-specific reason, try again after 10 seconds
             setTimeout(this.startAdvertising, 10000);
@@ -49,11 +48,12 @@ export default class BluetoothManager {
 
         conn.smp.on('passkeyExchange', (associationModel, passcode, callback) => {
             console.log('Security in passkeyExchange: ', conn.smp.currentEncryptionLevel);
+
             if (associationModel == AssociationModels.NUMERIC_COMPARISON) {
                 console.log(`NUMERIC_COMPARISON got code: ${passcode}:`);
-                self.passcode = passcode;
-                console.log("self:", self);
-                self.passcodeHandler(passcode)
+                this.passcode = passcode;
+                console.log("this:", this);
+                this.passcodeHandler(passcode)
                     .then(() => {
                         callback();
                     })
@@ -79,6 +79,7 @@ export default class BluetoothManager {
     public init(deviceName: string, services: object[], passcodeHandler: (pinCode: string) => Promise<any>,) {
         this.deviceName = deviceName;
         this.passcodeHandler = passcodeHandler;
+        console.log("BLA:", passcodeHandler, typeof (passcodeHandler));
 
         var transport = new HciSocket(); // connects to the first hci device on the computer, for example hci0
         var options = {
@@ -104,7 +105,7 @@ export default class BluetoothManager {
     }
 
     public startAdvertising() {
-        this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler);
+        this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler.bind(this));
         console.log("Started advertising")
     }
 
