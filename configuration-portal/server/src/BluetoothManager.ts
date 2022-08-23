@@ -46,7 +46,7 @@ export default class BluetoothManager {
         
         console.log('Connection established!');
         console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
-        console.log(JSON.stringify(conn));
+        console.log(JSON.stringify(conn), null, 4);
         
         const IOCapabilities = NodeBleHost.IOCapabilities;
         const AssociationModels = NodeBleHost.AssociationModels;
@@ -118,7 +118,7 @@ export default class BluetoothManager {
     public startAdvertising() {
         this.connectionStatus = Connection.ADVERTISING;
         this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler.bind(this));
-        console.log("Started advertising")
+        console.log("Started advertising");
     }
 
     public stopAdvertising() {
