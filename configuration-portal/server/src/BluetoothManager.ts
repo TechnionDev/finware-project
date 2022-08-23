@@ -46,7 +46,7 @@ export default class BluetoothManager {
 
         console.log('Connection established!');
         console.log('Security: ', conn.smp.currentEncryptionLevel, conn.smp.isEncrypted);
-        console.log(JSON.stringify(conn, null, 4));
+        console.log(conn);
 
         const IOCapabilities = NodeBleHost.IOCapabilities;
         const AssociationModels = NodeBleHost.AssociationModels;
