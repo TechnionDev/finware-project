@@ -52,6 +52,7 @@ export default class BluetoothManager {
             if (associationModel == AssociationModels.NUMERIC_COMPARISON) {
                 console.log(`NUMERIC_COMPARISON got code: ${passcode}:`);
                 this.passcode = passcode;
+                console.log("this:", this);
                 this.passcodeHandler(passcode)
                     .then(() => {
                         callback();
@@ -78,7 +79,7 @@ export default class BluetoothManager {
     public init(deviceName: string, services: object[], passcodeHandler: (pinCode: string) => Promise<any>,) {
         this.deviceName = deviceName;
         this.passcodeHandler = passcodeHandler;
-        console.log(passcodeHandler, typeof(passcodeHandler));
+        console.log("BLA:", passcodeHandler, typeof(passcodeHandler));
 
         var transport = new HciSocket(); // connects to the first hci device on the computer, for example hci0
         var options = {
