@@ -53,8 +53,7 @@ function BluetoothPage() {
           }
           </div>
         </section>
-        <section>2</section>
-        <section>3</section>
+        <section>Section: reset bluetooth</section>
       </div>
     </div>
   );

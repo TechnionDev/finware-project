@@ -49,7 +49,6 @@ export default class BluetoothManager {
         }); // restart advertising after disconnect
 
         console.log('Connection established!');
-        console.log(JSON.stringify(conn, null, 4));
 
         this.connectionStatus = Connection.PAIRING;
         conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
@@ -63,7 +62,6 @@ export default class BluetoothManager {
             console.log('The encryption process is now complete!');
             console.log('MITM protection: ' + currentEncryptionLevel.mitm);
             console.log('LE Secure Connections used: ' + currentEncryptionLevel.sc);
-            console.log(JSON.stringify(conn, null, 4));
         });
 
         // Without this event handler the I/O capabilities will be no input, no output
