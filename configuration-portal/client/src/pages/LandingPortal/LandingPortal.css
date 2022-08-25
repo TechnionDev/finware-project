@@ -20,10 +20,11 @@
 .portal-entry {
     position: relative;
     height: clamp(3.5em, 16vh, 7em);
-    border: 1px solid #908575;
+    border: 1px solid #2c2c2c;
     width: clamp(0px, 80vw, 20em);
-    margin: 0.7em 0;
-    font-size: 33px;
+    margin: 0.6em 0;
+    font-size: 2rem;
+    box-shadow: 0px 0px 4px 1px #000000;
 }
 
 .portal-entry-bg-img {
@@ -32,17 +33,16 @@
     height: 100%;
     background-size: cover;
     background-position: center;
-    filter: blur(0.4px) brightness(0.8);
+    filter: blur(0.4px) brightness(0.7);
 }
 
 .portal-entry-title {
     position: relative;
     padding: 0.7em 1em;
-    /* background-color: #000000aa; */
-    color: #e9e9ff;
-    font-family: system-ui;
+    color: white;
     text-shadow: 0px 0px 7px black;
     text-align: center;
+    font-size: 0.9em;
 }
 
 .portal-entry-inner-wrapper {

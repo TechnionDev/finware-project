@@ -1,5 +1,6 @@
 const express = require("express");
 import services from './services.json';
+import bankTest from './CreditCardsManager';
 // /*
 import BluetoothManager from './BluetoothManager';
 
@@ -28,5 +29,16 @@ app.get("/api", (req, res) => {
 
 app.get("/api/bt-state", (req, res) => {
   res.json({ connection: btManager.connectionStatus, passcode: btManager.passcode});
-  // res.json({ connection: "ADVERTISING" });
+  // res.json({ connection: "ADVERTISING", passcode: null });
+});
+
+app.post("/api/bt/reset", (req, res) => {
+  btManager.resetConnection();
+  res.json({ status: "SUCCESS" });
+});
+
+app.get("/api/credit-cards", (req, res) => {
+  bankTest((scrapeResult, total) => {
+    res.json({ ...scrapeResult, "total": total });
+  });
 });

@@ -22,7 +22,7 @@ export default class BluetoothManager {
     private deviceName: string = null;
     private passcodeHandler: Function = null;
     private btConnection = null;
-    
+
     public passcode: string = null;
     public connectionStatus: Connection = null
 
@@ -128,9 +128,11 @@ export default class BluetoothManager {
     }
 
     public startAdvertising() {
-        this.connectionStatus = Connection.ADVERTISING;
-        this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler.bind(this));
-        console.log("Started advertising");
+        if (this.connectionStatus != Connection.ADVERTISING) {
+            this.connectionStatus = Connection.ADVERTISING;
+            this.manager.startAdvertising({ /*options*/ }, this.newPairingHandler.bind(this));
+            console.log("Started advertising");
+        }
     }
 
     public stopAdvertising() {
@@ -140,6 +142,11 @@ export default class BluetoothManager {
     public disconnect() {
         this.btConnection && this.btConnection.disconnect(); // This will also start readvertising
         this.btConnection = null;
+    }
+
+    public resetConnection() {
+        this.disconnect();
+        this.startAdvertising();
     }
 
 }

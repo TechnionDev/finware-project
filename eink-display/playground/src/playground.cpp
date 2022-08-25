@@ -23,6 +23,7 @@
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 
 #include <iostream>
+#include <bits/stdc++.h>
 
 void displaymsg(const char *msg);
 void blockUnillAccept() {
@@ -63,7 +64,7 @@ class MySecurity : public BLESecurityCallbacks {
     Serial.printf("onConfirmPIN \n");
     Serial.printf("The passkey YES/NO number:%d", pass_key);
 
-    sprintf(buf, "Passcode: %d", pass_key);
+    sprintf(buf, "Passkey: %06d", pass_key);
     displaymsg(buf);
     blockUnillAccept();
     return true;

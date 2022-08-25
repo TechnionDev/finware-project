@@ -1,8 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url(https://fonts.googleapis.com/css?family=Quicksand);
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+
 html,
 body,
 #root {
   position: relative;
   height: 100%;
+  font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -12,7 +21,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #181a1b;
+  background-color: #131923;
   color: white;
 }
 
@@ -25,4 +34,25 @@ a {
   text-decoration: none;
   color: inherit;
   outline: 0;
+}
+
+.content-wrapper {
+  margin-top: 1.5em;
+}
+
+
+.sub-desc {
+  font-size: 0.7em;
+  color: rgb(153 153 153);
+}
+
+
+.title {
+  text-align: center;
+  font-size: clamp(0px, 6vw, 30px);
+}
+
+
+.font-quicksand {
+  font-family: 'Quicksand', sans-serif;
 }
