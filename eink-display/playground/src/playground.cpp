@@ -79,6 +79,7 @@ class MySecurity : public BLESecurityCallbacks {
       ESP_LOGI(LOG_TAG, "remote BD_ADDR:");
       esp_log_buffer_hex(LOG_TAG, auth_cmpl.bd_addr, sizeof(auth_cmpl.bd_addr));
       ESP_LOGI(LOG_TAG, "address type = %d", auth_cmpl.addr_type);
+      displaymsg("Connected");
     }
     ESP_LOGI(LOG_TAG, "pair status = %s",
              auth_cmpl.success ? "success" : "fail");
@@ -185,7 +186,7 @@ void setup() {
   // Retrieve a Scanner and set the callback we want to use to be informed when
   // we have detected a new device.  Specify that we want active scanning and
   // start the scan to run for 30 seconds.
-  displaymsg("");
+  displaymsg("Press button to start scanning");
   blockUnillAccept();
   BLEScan *pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
@@ -200,8 +201,6 @@ void loop() {
     if (connectToServer(*pServerAddress)) {
       Serial.println("We are now connected to the BLE Server.");
       connected = true;
-
-      remove_all_bonded_devices();
     } else {
       Serial.println(
           "We have failed to connect to the server; there is nothin more we "

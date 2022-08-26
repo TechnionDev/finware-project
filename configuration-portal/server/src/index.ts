@@ -45,6 +45,7 @@ app.post("/api/bt/reset", (req, res) => {
 
 app.post("/api/bt/accept", (req, res) => {
   resolvePairingRequest();
+  btManager.resetConnection();
   res.json({ status: "SUCCESS" });
 });
 
