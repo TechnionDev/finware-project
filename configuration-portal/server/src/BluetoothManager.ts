@@ -20,10 +20,10 @@ enum Connection {
 export default class BluetoothManager {
     private manager: any = null;
     private deviceName: string = null;
-    private passcodeHandler: Function = null;
+    private passkeyHandler: Function = null;
     private btConnection = null;
 
-    public passcode: string = null;
+    public passkey: string = null;
     public connectionStatus: Connection = null
 
     private initAdvData(manager, services) {
@@ -70,13 +70,13 @@ export default class BluetoothManager {
             callback({ ioCap: IOCapabilities.DISPLAY_YES_NO, bondingFlags: 1, mitm: true });
         });
 
-        conn.smp.on('passkeyExchange', (associationModel, passcode, callback) => {
+        conn.smp.on('passkeyExchange', (associationModel, passkey, callback) => {
             console.log('Security in passkeyExchange: ', conn.smp.currentEncryptionLevel);
 
             if (associationModel == AssociationModels.NUMERIC_COMPARISON) {
-                console.log(`NUMERIC_COMPARISON got code: ${passcode}:`);
-                this.passcode = passcode;
-                this.passcodeHandler(passcode)
+                console.log(`NUMERIC_COMPARISON got code: ${passkey}:`);
+                this.passkey = passkey;
+                this.passkeyHandler(passkey)
                     .then(() => {
                         callback();
                     })
@@ -100,9 +100,9 @@ export default class BluetoothManager {
 
     }
 
-    public init(deviceName: string, services: object[], passcodeHandler: (pinCode: string) => Promise<any>,) {
+    public init(deviceName: string, services: object[], passkeyHandler: (pinCode: string) => Promise<any>,) {
         this.deviceName = deviceName;
-        this.passcodeHandler = passcodeHandler;
+        this.passkeyHandler = passkeyHandler;
 
         var transport = new HciSocket(); // connects to the first hci device on the computer, for example hci0
         var options = {

@@ -5,9 +5,15 @@ import bankTest from './CreditCardsManager';
 import BluetoothManager from './BluetoothManager';
 
 const btManager = new BluetoothManager();
+let resolvePairingRequest;
+let rejectPairingRequest;
+
 btManager.init('myDevice', services, (pincode) => {
   console.log(`Received pincode in index.ts: ${pincode}`)
-  return Promise.resolve(0);
+  return new Promise((resolve, reject) => {
+    resolvePairingRequest = resolve;
+    rejectPairingRequest = reject;
+  });
 }).then(() => {
 
   console.log("BT initialized");
@@ -28,12 +34,22 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/bt-state", (req, res) => {
-  res.json({ connection: btManager.connectionStatus, passcode: btManager.passcode});
+  res.json({ connection: btManager.connectionStatus, passkey: btManager.passcode});
   // res.json({ connection: "ADVERTISING", passcode: null });
 });
 
 app.post("/api/bt/reset", (req, res) => {
   btManager.resetConnection();
+  res.json({ status: "SUCCESS" });
+});
+
+app.post("/api/bt/accept", (req, res) => {
+  resolvePairingRequest();
+  res.json({ status: "SUCCESS" });
+});
+
+app.post("/api/bt/reject", (req, res) => {
+  rejectPairingRequest();
   res.json({ status: "SUCCESS" });
 });
 
