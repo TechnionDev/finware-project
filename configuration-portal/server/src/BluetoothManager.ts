@@ -78,9 +78,11 @@ export default class BluetoothManager {
                 this.passkey = passkey;
                 this.passkeyHandler(passkey)
                     .then(() => {
+                        console.log("Numeric comparison has passed successfuly at the RPi")
                         callback();
                     })
                     .catch(() => {
+                        console.log("Numeric comparison failed at the RPi")
                         conn.smp.sendPairingFailed(COMPARISON_FAILED);
                     });
             }
