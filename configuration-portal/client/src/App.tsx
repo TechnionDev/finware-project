@@ -8,7 +8,7 @@ import Navbar from './shared/components/Navbar';
 import LandingPortal from './pages/landing-portal'
 import ConfigPage from './pages/configuration'
 import BluetoothPage from './pages/bluetooth'
-import WifiPage from './pages/Wifi'
+import WifiPage from './pages/wifi'
 import {
   FinanceAccountList,
   EditFinanceAccount
