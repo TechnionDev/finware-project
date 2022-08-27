@@ -151,5 +151,8 @@ export default class BluetoothManager {
         this.startAdvertising();
     }
 
+    public updateCharacteristic(serviceUUID, characteristicUUID) {
+        this.manager.
+    }
 }
 

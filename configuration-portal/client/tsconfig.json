@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
+    "noImplicitAny": false, /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     "target": "es5",
     "lib": [
       "dom",
@@ -20,8 +20,5 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
-  },
-  "include": [
-    "src"
-, "public/js/flowbite.js"  ]
+  }
 }

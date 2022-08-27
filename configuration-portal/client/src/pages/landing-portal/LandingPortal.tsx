@@ -15,7 +15,7 @@ function LandingPortal(props) {
         <div className="sub-desc">Please select a menu item to continue</div>
       </div>
       <div className="portal-entries-wrapper">
-        <PortalEntry title="Credit Cards" location="credit-cards" background={creditCardBG} />
+        <PortalEntry title="Credit Cards" location="finance-accounts" background={creditCardBG} />
         <PortalEntry title="General Config" location="config" background={configBG} />
         <PortalEntry title="Bluetooth" location="bluetooth" background={btBG} />
         <PortalEntry title="RaspberryPi WiFi" location="wifi" background={wifiBG} />

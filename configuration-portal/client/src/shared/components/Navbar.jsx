@@ -1,6 +1,6 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Navbar } from "flowbite-react";
-import FinwareLogo from '../../assets/finware-logo.png'
+// import FinwareLogo from '../../assets/finware-logo.png'
 
 function NavbarLink({ to, ...props }) {
     return <Link to={to} className="block py-2 pr-4 pl-3 md:p-0 border-b border-gray-100  text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:border-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-white">
@@ -9,8 +9,6 @@ function NavbarLink({ to, ...props }) {
 }
 
 export default function MyNavbar() {
-    const location = useLocation();
-
     return <Navbar fluid={true} rounded={true}>
         <Link to="/">
             <div className="flex items-center">
@@ -27,24 +25,9 @@ export default function MyNavbar() {
         <Navbar.Toggle />
         <Navbar.Collapse>
             <NavbarLink to="/">Home</NavbarLink>
-            <NavbarLink to="credit-cards">Credit Cards</NavbarLink>
+            <NavbarLink to="finance-accounts">Credit Cards</NavbarLink>
             <NavbarLink to="config">General Config</NavbarLink>
             <NavbarLink to="wifi">WiFi</NavbarLink>
-            {/* <Navbar.Link href="/" active={location.pathname == "/"} >
-                Home
-            </Navbar.Link>
-            <Navbar.Link href="/navbars">
-
-            </Navbar.Link>
-            <Navbar.Link href="/navbars">
-                <Link to="/bluetooth">Bluetooth</Link>
-            </Navbar.Link>
-            <Navbar.Link href="/navbars">
-                Pricing
-            </Navbar.Link>
-            <Navbar.Link href="/navbars">
-                Contact
-            </Navbar.Link> */}
         </Navbar.Collapse>
     </Navbar>
 

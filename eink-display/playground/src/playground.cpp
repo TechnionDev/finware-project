@@ -214,6 +214,8 @@ void loop() {
     Serial.println("Setting new characteristic value to \"" + newValue + "\"");
 
     pRemoteCharacteristic->writeValue(newValue.c_str(), newValue.length());
+    std::string totalValue = pRemoteCharacteristic->readValue();
+    displaymsg(totalValue.c_str());
     delay(100000);
   }
 

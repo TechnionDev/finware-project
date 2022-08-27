@@ -5,11 +5,14 @@ import { Flowbite } from "flowbite-react";
 import Theme from "./shared/theme.json";
 
 import Navbar from './shared/components/Navbar';
-import LandingPortal from './pages/LandingPortal'
-import ConfigPage from './pages/Configuration'
-import BluetoothPage from './pages/Bluetooth'
+import LandingPortal from './pages/landing-portal'
+import ConfigPage from './pages/configuration'
+import BluetoothPage from './pages/bluetooth'
 import WifiPage from './pages/Wifi'
-import CreditCards from './pages/CreditCards'
+import {
+  FinanceAccountList,
+  EditFinanceAccount
+} from './pages/finance-accounts'
 
 
 function App() {
@@ -18,18 +21,22 @@ function App() {
       <Flowbite theme={Theme}>
       </Flowbite>
       <Navbar></Navbar>
-      <div className="content-wrapper">
+      <div className="content-wrapper flex justify-center">
         <Routes>
           <Route path="/">
             <Route index element={<LandingPortal></LandingPortal>} />
-            <Route path="credit-cards" element={<CreditCards />} />
-            <Route path="config" element={<ConfigPage />} />
-            <Route path="bluetooth" element={<BluetoothPage />} />
-            <Route path="wifi" element={<WifiPage />} />
+            <Route path="finance-accounts">
+              <Route index element={<FinanceAccountList />} />
+              <Route path="create" element={<EditFinanceAccount />} />
+              <Route path="edit/:id" element={<EditFinanceAccount />} />
+            </Route>
           </Route>
+          <Route path="config" element={<ConfigPage />} />
+          <Route path="bluetooth" element={<BluetoothPage />} />
+          <Route path="wifi" element={<WifiPage />} />
         </Routes>
       </div>
-    </div>
+    </div >
 
   );
 }
