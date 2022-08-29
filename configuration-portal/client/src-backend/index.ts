@@ -19,7 +19,7 @@ const SERVICES = [
           "read"
         ],
         onRead: function(connection, callback) {
-          callback(AttErrors.SUCCESS, totalAmount);
+          callback(AttErrors.SUCCESS, totalAmount.toString());
         }
       }
     ]
