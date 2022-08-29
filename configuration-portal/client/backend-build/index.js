@@ -16,7 +16,7 @@ const express = require("express");
 const mongoose_1 = __importDefault(require("mongoose"));
 const controllers_1 = require("./controllers");
 const path_1 = __importDefault(require("path"));
-mongoose_1.default.connect('mongodb://localhost/finware');
+mongoose_1.default.connect('mongodb://127.0.0.1:27017/finware');
 let totalAmount = 0;
 const SERVICES = [
     {

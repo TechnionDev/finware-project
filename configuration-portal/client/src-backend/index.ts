@@ -6,7 +6,7 @@ import { CreditCardCtl } from "./controllers"
 import FinancialBE from "./models/FinancialBE";
 import path from "path";
 
-mongoose.connect('mongodb://localhost/finware');
+mongoose.connect('mongodb://127.0.0.1:27017/finware');
 
 let totalAmount = 0;
 const SERVICES = [
