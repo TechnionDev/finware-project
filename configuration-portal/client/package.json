@@ -27,9 +27,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "mystart": "react-scripts --max_old_space_size=512 build && npx tsc && node ./backend-build/index.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "mybuild": "react-scripts --max_old_space_size=512 build && npx tsc",
+    "myrun": "node ./backend-build/index.js"
   },
   "eslintConfig": {
     "extends": [
