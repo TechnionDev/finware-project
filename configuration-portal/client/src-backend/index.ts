@@ -19,7 +19,7 @@ const SERVICES = [
           "read"
         ],
         onRead: function(connection, callback) {
-          callback(totalAmount);
+          callback(AttErrors.SUCCESS, totalAmount);
         }
       }
     ]
@@ -28,6 +28,9 @@ const SERVICES = [
 
 // /*
 import BluetoothManager from './managers/BluetoothManager';
+const NodeBleHost = require('ble-host');
+const AttErrors = NodeBleHost.AttErrors;
+
 
 const btManager = new BluetoothManager();
 let resolvePairingRequest;

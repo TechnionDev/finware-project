@@ -17,7 +17,7 @@ export default async function scrapeAccount(credentials, company): Promise<[any,
             verbose: true,
             startDate: date,
             combineInstallments: false,
-            showBrowser: true
+            showBrowser: false
         };
 
         const scraper = createScraper(options);
