@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001",
   "dependencies": {
     "@types/node": "^16.11.49",
     "@types/react": "^18.0.17",
@@ -17,11 +16,18 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "tailwindcss": "^3.1.8",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "ble-host": "^1.0.3",
+    "express": "^4.18.1",
+    "install": "^0.13.0",
+    "israeli-bank-scrapers": "^1.14.4",
+    "mongoose": "^6.5.3",
+    "npm": "^8.18.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "mystart": "react-scripts build && npx tsc && node ./backend-build/index.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
