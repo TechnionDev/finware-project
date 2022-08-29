@@ -33,7 +33,7 @@ const btManager = new BluetoothManager();
 let resolvePairingRequest;
 let rejectPairingRequest;
 
-btManager.init('myDevice', services, (pincode) => {
+btManager.init('myDevice', SERVICES, (pincode) => {
   console.log(`Received pincode in index.ts: ${pincode}`)
   return new Promise((resolve, reject) => {
     resolvePairingRequest = resolve;
