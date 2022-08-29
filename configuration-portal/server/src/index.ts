@@ -26,6 +26,7 @@ const SERVICES = [
   }
 ]
 
+/*
 import BluetoothManager from './managers/BluetoothManager';
 
 const btManager = new BluetoothManager();
@@ -42,6 +43,7 @@ btManager.init('myDevice', services, (pincode) => {
   console.log("BT initialized");
   btManager.startAdvertising();
 });
+*/
 
 const PORT = process.env.PORT || 3001;
 
@@ -63,23 +65,23 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/bt-state", (req, res) => {
-  res.json({ connection: btManager.connectionStatus, passkey: btManager.passkey });
-  // res.json({ connection: "ADVERTISING", passcode: null });
+  // res.json({ connection: btManager.connectionStatus, passkey: btManager.passkey });
+  res.json({ connection: "ADVERTISING", passcode: null });
 });
 
 app.post("/api/bt/reset", (req, res) => {
-  btManager.resetConnection();
+  // btManager.resetConnection();
   res.json({ status: "SUCCESS" });
 });
 
 app.post("/api/bt/accept", (req, res) => {
-  resolvePairingRequest();
+  // resolvePairingRequest();
   res.json({ status: "SUCCESS" });
 });
 
 app.post("/api/bt/reject", (req, res) => {
-  rejectPairingRequest();
-  btManager.resetConnection();
+  // rejectPairingRequest();
+  // btManager.resetConnection();
   res.json({ status: "SUCCESS" });
 });
 
