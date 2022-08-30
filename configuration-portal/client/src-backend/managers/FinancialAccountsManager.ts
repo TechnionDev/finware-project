@@ -28,8 +28,8 @@ export default async function scrapeAccount(credentials, company): Promise<[any,
             scrapeResult.accounts.forEach((account) => {
                 console.log(`found ${account.txns.length} transactions for account number ${account.accountNumber}`);
                 account.txns.forEach((txn) => {
-                    totalAmount += txn.originalAmount;
-                    console.log(`Transaction ${txn.description}, with amount: ${txn.originalAmount} is ${txn.status}`);
+                    totalAmount += txn.chargedAmount;
+                    console.log(`Transaction ${txn.description}, with amount: ${txn.chargedAmount} is ${txn.status}`);
                 })
             });
         } else {
