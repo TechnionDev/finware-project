@@ -6,9 +6,11 @@ import { CreditCardCtl } from "./controllers"
 import FinancialBE from "./models/FinancialBE";
 import path from "path";
 
-mongoose.connect('mongodb://localhost/finware');
+mongoose.connect('mongodb://127.0.0.1:27017/finware');
 
 let totalAmount = 0;
+
+/*
 const SERVICES = [
   {
     "uuid": "22222222-3333-4444-5555-666666666666",
@@ -19,21 +21,23 @@ const SERVICES = [
           "read"
         ],
         onRead: function(connection, callback) {
-          callback(totalAmount);
+          callback(AttErrors.SUCCESS, totalAmount.toString());
         }
       }
     ]
   }
 ]
 
-/*
 import BluetoothManager from './managers/BluetoothManager';
+const NodeBleHost = require('ble-host');
+const AttErrors = NodeBleHost.AttErrors;
+
 
 const btManager = new BluetoothManager();
 let resolvePairingRequest;
 let rejectPairingRequest;
 
-btManager.init('myDevice', services, (pincode) => {
+btManager.init('myDevice', SERVICES, (pincode) => {
   console.log(`Received pincode in index.ts: ${pincode}`)
   return new Promise((resolve, reject) => {
     resolvePairingRequest = resolve;
@@ -49,7 +53,7 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, '../../client/build')));
+app.use(express.static(path.resolve(__dirname, '../build')));
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
@@ -95,5 +99,5 @@ app.post("/api/financial-account/create", CreditCardCtl.createFinancialAccount);
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../client/build/', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../build/', 'index.html'));
 });
