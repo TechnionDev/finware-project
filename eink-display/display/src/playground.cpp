@@ -97,7 +97,8 @@ void setup() {
 void loop() {
 	pageManager manager(display);
 	Serial.println("req print:");
-	manager.showSumPage(1,1,1);
+	//manager.showSumPage(9999,1,10000);
+	manager.showCardSpendingPage({});
 	delay(100000);
 //	BluetoothManager blm;
 //	// If the flag "doConnect" is true then we have scanned for and found the desired

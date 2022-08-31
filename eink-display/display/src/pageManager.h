@@ -39,18 +39,21 @@
 
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
+#include <map>
 class pageManager {
   private:
 	GxEPD_Class display;
 	short currentCourser = 0;
 	void setupPageMenu(int pageNum, int totalPages);
-	void printTitle(const std::string& title);
 	void printDaysLeft(int daysLeft);
 	void printTotalSum(int totalSum);
+	void printProgressBar(int totalSum, int monthlyGoal);
+	void printMonthlyGoal(int monthlyGoal);
+	void printCardSpending(const std::map<std::string,int>& cardMap);
   public:
 	explicit pageManager(GxEPD_Class& display);
 	void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
-	void showCardSpendingPage();
+	void showCardSpendingPage(const std::map<std::string,int>& cardMap);
 	void showTopFivePurchase();
 
 
