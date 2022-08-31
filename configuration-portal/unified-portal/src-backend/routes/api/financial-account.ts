@@ -1,11 +1,12 @@
 import express from "express";
-import { FinanceAccountsController } from "../../controllers";
+import { FinancialAccountsController } from "../../controllers";
 
-export default function financialRouterFactory(financeAccountsController: FinanceAccountsController) {
-  const financeAccountsRouter = express.Router();
+export default function financialRouterFactory(financialAccountsController: FinancialAccountsController) {
+  const financialAccountsRouter = express.Router();
 
-  financeAccountsRouter.get("/", financeAccountsController.fetchCreditCards.bind(financeAccountsController));
-  financeAccountsRouter.post("/scrape", financeAccountsController.scrape.bind(financeAccountsController));
+  financialAccountsRouter.get("/", financialAccountsController.fetchCreditCards.bind(financialAccountsController));
+  financialAccountsRouter.post("/create", financialAccountsController.createFinancialAccount.bind(financialAccountsController))
+  financialAccountsRouter.post("/scrape", financialAccountsController.scrape.bind(financialAccountsController));
 
-  return financeAccountsRouter;
+  return financialAccountsRouter;
 };

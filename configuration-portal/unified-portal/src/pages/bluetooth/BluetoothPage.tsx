@@ -6,6 +6,7 @@ import './BluetoothPage.css';
 import ResetModal from "./ResetModal";
 import PasskeyConfirmation from './PasskeyConfirmation';
 import { useInput } from "../../shared/hooks/useInput";
+import { Spinner } from 'flowbite-react';
 
 const BT_STATE_ENDOINT = "/api/bluetooth/current-state";
 const BT_RESET_ENDPOINT = "/api/bluetooth/reset";
@@ -42,14 +43,14 @@ function useBtState() {
   return btState;
 }
 
-function resetBTConnection() {
-  fetch(BT_RESET_ENDPOINT, {
+async function resetBTConnection() {
+  return fetch(BT_RESET_ENDPOINT, {
     method: 'POST'
   });
 }
 
-function acceptPairing(passkey) {
-  fetch(BT_ACCEPT_PAIRING_ENDPOINT, {
+async function acceptPairing(passkey) {
+  return fetch(BT_ACCEPT_PAIRING_ENDPOINT, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -59,14 +60,15 @@ function acceptPairing(passkey) {
   });
 }
 
-function rejectPairing() {
-  fetch(BT_REJECT_PAIRING_ENDPOINT, {
+async function rejectPairing() {
+  return fetch(BT_REJECT_PAIRING_ENDPOINT, {
     method: 'POST'
   });
 }
 
 function BluetoothPage() {
   const btState = useBtState();
+  const [loading, setLoading] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const { value: passkey, bind: passkeyBind } = useInput();
 
@@ -107,7 +109,7 @@ function BluetoothPage() {
           <div className="mt-2">
             <ResetModal show={isOpen}
               onOpen={() => { setOpen(true) }}
-              onAccept={() => { setOpen(false); resetBTConnection(); }}
+              onAccept={async () => { setOpen(false); setLoading(true); await resetBTConnection(); setLoading(false); }}
               onClose={() => { setOpen(false) }} />
           </div>
         </div>
@@ -115,8 +117,15 @@ function BluetoothPage() {
       <PasskeyConfirmation
         btConnection={btState?.connection}
         passkeyBind={passkeyBind}
-        onAccept={acceptPairing.bind(null, passkey)}
-        onDecline={rejectPairing} />
+        onAccept={async () => { setLoading(true); await acceptPairing(passkey); setLoading(false); }}
+        onDecline={async () => { setLoading(true); await rejectPairing(); setLoading(false) }}
+        loading={loading} />
+
+      {loading &&
+        <div className="text-center mt-3">
+          <Spinner color="info" />
+        </div>
+      }
     </div>
   );
 }

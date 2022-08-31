@@ -25,7 +25,7 @@ export default function MyNavbar() {
         <Navbar.Toggle />
         <Navbar.Collapse>
             <NavbarLink to="/">Home</NavbarLink>
-            <NavbarLink to="finance-accounts">Credit Cards</NavbarLink>
+            <NavbarLink to="financial-account">Credit Cards</NavbarLink>
             <NavbarLink to="config">General Config</NavbarLink>
             <NavbarLink to="wifi">WiFi</NavbarLink>
         </Navbar.Collapse>

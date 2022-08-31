@@ -1,14 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Button, TextInput, Label } from "flowbite-react";
+import { Button, TextInput } from "flowbite-react";
 import { Connection } from "./BluetoothPage";
 
-function PasskeyConfirmation({ btConnection, onDecline, onAccept, passkeyBind }) {
-
+function PasskeyConfirmation({ btConnection, onDecline, onAccept, passkeyBind, loading }) {
     return (
         <>
-            {/* {btConnection === Connection.PAIRING ? */}
-            {true ?
+            {btConnection === Connection.PAIRING ?
                 <section className={classNames("my-8", "flex", "justify-center")}>
                     <div className="max-w-[85%] py-4 px-7" style={{ border: "1px solid #60687687" }}>
                         <div className="text-4xl">
@@ -23,16 +21,18 @@ function PasskeyConfirmation({ btConnection, onDecline, onAccept, passkeyBind })
                                 Do not share or enter the passkey in any other device
                             </div>
                         </div>
-                        <div className="mt-5 flex justify-center">
-                            <Button.Group>
-                                <Button color="success" onClick={onAccept}>
-                                    Pair
-                                </Button>
-                                <Button color="gray" onClick={onDecline}>
-                                    Reject
-                                </Button>
-                            </Button.Group>
-                        </div>
+                        {!loading &&
+                            <div className="mt-5 flex justify-center">
+                                <Button.Group>
+                                    <Button color="success" onClick={onAccept}>
+                                        Pair
+                                    </Button>
+                                    <Button color="gray" onClick={onDecline}>
+                                        Reject
+                                    </Button>
+                                </Button.Group>
+                            </div>
+                        }
                     </div>
                 </section>
                 : <></>}

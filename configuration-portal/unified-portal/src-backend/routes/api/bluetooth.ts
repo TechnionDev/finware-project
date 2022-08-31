@@ -5,7 +5,7 @@ export default function bluetoothRouterFactory(bluetoothController: BluetoothCon
   const bluetoothRouter = express.Router();
 
   bluetoothRouter.get("/current-state", bluetoothController.fetchState.bind(bluetoothController));
-  bluetoothRouter.post("/reset", bluetoothController.fetchState.bind(bluetoothController));
+  bluetoothRouter.post("/reset", bluetoothController.reset.bind(bluetoothController));
   bluetoothRouter.post("/accept", bluetoothController.acceptPairing.bind(bluetoothController));
   bluetoothRouter.post("/reject", bluetoothController.rejectPairing.bind(bluetoothController));
 

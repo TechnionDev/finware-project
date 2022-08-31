@@ -10,9 +10,9 @@ import ConfigPage from './pages/configuration'
 import BluetoothPage from './pages/bluetooth'
 import WifiPage from './pages/wifi'
 import {
-  FinanceAccountList,
-  EditFinanceAccount
-} from './pages/finance-accounts'
+  FinancialAccountsList,
+  EditFinancialAccount
+} from './pages/financial-accounts'
 
 
 function App() {
@@ -25,10 +25,10 @@ function App() {
         <Routes>
           <Route path="/">
             <Route index element={<LandingPortal></LandingPortal>} />
-            <Route path="finance-accounts">
-              <Route index element={<FinanceAccountList />} />
-              <Route path="create" element={<EditFinanceAccount />} />
-              <Route path="edit/:id" element={<EditFinanceAccount />} />
+            <Route path="financial-account">
+              <Route index element={<FinancialAccountsList />} />
+              <Route path="create" element={<EditFinancialAccount />} />
+              <Route path="edit/:id" element={<EditFinancialAccount />} />
             </Route>
           </Route>
           <Route path="config" element={<ConfigPage />} />

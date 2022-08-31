@@ -4,13 +4,13 @@ import mongoose from "mongoose";
 import routerFactory from "./routes";
 
 import FinancialBE from "./models/FinancialBE";
-import { FinanceAccountsController } from "./controllers"
+import { FinancialAccountsController } from "./controllers"
 import { BluetoothController } from "./controllers"
 
 
 
 const bluetoothController = new BluetoothController();
-const financeAccountsController = new FinanceAccountsController(bluetoothController);
+const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
 mongoose.connect("mongodb://127.0.0.1:27017/finware");
 
@@ -26,9 +26,6 @@ app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
-
-
-
 
 // All other GET requests not handled before will return our React app
 app.get("*", (req, res) => {
