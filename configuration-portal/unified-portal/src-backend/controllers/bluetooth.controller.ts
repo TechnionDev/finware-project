@@ -20,7 +20,7 @@ class BluetoothController {
                         "properties": [
                             "read"
                         ],
-                        onRead: function (connection, callback) {
+                        onRead: (connection, callback) => {
                             callback(AttErrors.SUCCESS, this.totalAmount.toString());
                         }
                     }
