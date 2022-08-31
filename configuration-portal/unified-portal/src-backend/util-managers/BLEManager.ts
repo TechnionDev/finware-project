@@ -17,14 +17,14 @@ enum Connection {
     ADVERTISING = "ADVERTISING"
 }
 
-export default class BluetoothManager {
-    private manager: any = null;
-    private deviceName: string = null;
-    private passkeyHandler: Function = null;
-    private btConnection = null;
+export default class BLEManager {
+    private manager: any;
+    private deviceName: string;
+    private passkeyHandler: Function;
+    private btConnection;
 
-    public passkey: string = null;
-    public connectionStatus: Connection = null
+    public passkey: string;
+    public connectionStatus: Connection;
 
     private initAdvData(manager, services) {
         const advDataBuffer = new AdvertisingDataBuilder()

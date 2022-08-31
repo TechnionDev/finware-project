@@ -5,10 +5,10 @@ import './BluetoothPage.css';
 import ResetModal from "./ResetModal";
 import PasskeyConfirmation from './PasskeyConfirmation';
 
-const BT_STATE_ENDOINT = "/api/bt-state";
-const BT_RESET_ENDPOINT = "/api/bt/reset";
-const BT_ACCEPT_PAIRING_ENDPOINT = "/api/bt/accept";
-const BT_REJECT_PAIRING_ENDPOINT = "/api/bt/reject";
+const BT_STATE_ENDOINT = "/api/bluetooth/current-state";
+const BT_RESET_ENDPOINT = "/api/bluetooth/reset";
+const BT_ACCEPT_PAIRING_ENDPOINT = "/api/bluetooth/accept";
+const BT_REJECT_PAIRING_ENDPOINT = "/api/bluetooth/reject";
 
 const POLLING_INTERVAL = 1000;
 

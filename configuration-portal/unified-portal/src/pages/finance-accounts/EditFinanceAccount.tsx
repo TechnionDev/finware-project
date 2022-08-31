@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react'
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
-import FinanceAccountForm from './FinanceAccountForm';
+// import { useEffect, useState } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
+// import FinanceAccountForm from './FinanceAccountForm';
 import { useInput } from "../../shared/hooks/useInput";
 import { Button, Label, Select, TextInput } from "flowbite-react";
 import { SCRAPERS } from "./scraper-definitions";
@@ -54,7 +54,7 @@ async function handleSubmit(id: string | undefined, ev: FormEvent<HTMLFormElemen
 function EditFinanceAccount() {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { value: company, bind, reset } = useInput();
+    const { value: company, bind } = useInput();
     console.log(company && SCRAPERS[company].loginFields.map(compName => <option value={compName}>{ }</option>));
 
     return (
