@@ -5,7 +5,7 @@ export default function financialRouterFactory(financeAccountsController: Financ
   const financeAccountsRouter = express.Router();
 
   financeAccountsRouter.get("/", financeAccountsController.fetchCreditCards);
-  financeAccountsRouter.post("scrape", financeAccountsController.scrape);
+  financeAccountsRouter.post("/scrape", financeAccountsController.scrape);
 
   return financeAccountsRouter;
 };
