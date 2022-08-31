@@ -1,3 +1,4 @@
+import React from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 
 function FinanceAccountForm({bind}) {

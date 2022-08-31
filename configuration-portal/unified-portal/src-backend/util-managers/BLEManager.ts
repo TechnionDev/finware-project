@@ -67,7 +67,7 @@ export default class BLEManager {
         // Without this event handler the I/O capabilities will be no input, no output
         conn.smp.on('pairingRequest', (req, callback) => {
             console.log("Pairing request");
-            callback({ ioCap: IOCapabilities.DISPLAY_YES_NO, bondingFlags: 1, mitm: true });
+            callback({ ioCap: IOCapabilities.KEYBOARD_ONLY, bondingFlags: 1, mitm: true });
         });
 
         conn.smp.on('passkeyExchange', (associationModel, passkey, callback) => {
@@ -78,11 +78,24 @@ export default class BLEManager {
                 this.passkey = passkey;
                 this.passkeyHandler(passkey)
                     .then(() => {
-                        console.log("Numeric comparison has passed successfuly at the RPi")
+                        console.log("Numeric comparison has passed successfuly at the RPi");
                         callback();
                     })
                     .catch(() => {
-                        console.log("Numeric comparison failed at the RPi")
+                        console.log("Numeric comparison failed at the RPi");
+                        conn.smp.sendPairingFailed(COMPARISON_FAILED);
+                    });
+            }
+            if (associationModel == AssociationModels.PASSKEY_ENTRY_RSP_INPUTS) {
+                console.log(`PASSKEY_ENTRY_RSP_INPUTS got code: ${passkey}:`);
+                this.passkey = passkey;
+                this.passkeyHandler()
+                    .then((passkey) => {
+                        console.log("passkey entry returned to blemanager, now calling callback(passkey)");
+                        callback(passkey);
+                    })
+                    .catch(() => {
+                        console.log("PASS_KEY entry failed at the RPi");
                         conn.smp.sendPairingFailed(COMPARISON_FAILED);
                     });
             }

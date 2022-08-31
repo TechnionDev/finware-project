@@ -29,8 +29,19 @@ class BluetoothController {
         ]
         this.bleManager = new BLEManager();
 
-        this.bleManager.init("myDevice", SERVICES, (pincode) => {
-            console.log(`Received pincode in index.ts: ${pincode}`)
+        // this.bleManager.init("myDevice", SERVICES, (pincode) => {
+        //     console.log(`Received pincode in index.ts: ${pincode}`)
+        //     return new Promise((resolve, reject) => {
+        //         this.resolvePairingRequest = resolve;
+        //         this.rejectPairingRequest = reject;
+        //     });
+        // }).then(() => {
+        //     console.log("BT initialized");
+        //     this.bleManager.startAdvertising();
+        // });
+
+        this.bleManager.init("myDevice", SERVICES, () => {
+            console.log(`passcodeHandler Invoked`);
             return new Promise((resolve, reject) => {
                 this.resolvePairingRequest = resolve;
                 this.rejectPairingRequest = reject;
@@ -51,7 +62,7 @@ class BluetoothController {
     }
 
     acceptPairing(req, res) {
-        this.resolvePairingRequest();
+        this.resolvePairingRequest(req.body.passkey);
         res.json({ status: "SUCCESS" });
     }
 
