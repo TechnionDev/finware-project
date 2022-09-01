@@ -79,6 +79,7 @@ class BluetoothController {
     constructor({ bankInfo, refreshRate, goal, daysLeft }) {
         this.gattInformation = new GATTInformation({ bankInfo, refreshRate, goal, daysLeft });
         const SERVICES = this.gattInformation.getServices();
+        console.log(SERVICES);
 
         this.bleManager = new BLEManager();
         this.bleManager.init("FinwareServer", SERVICES, this.passkeyHandler.bind(this)).then(() => {
