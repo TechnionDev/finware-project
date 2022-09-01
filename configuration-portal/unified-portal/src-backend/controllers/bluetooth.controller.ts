@@ -7,7 +7,7 @@ enum UUIDS {
     CHAR_BANK_INFO = "5b278f16-4460-47e1-919e-2d50d7d0a55d",
     CHAR_REFRESH_RATE = "49dc2b22-2dc4-4a66-afee-d7782b9b81cd",
     CHAR_GOAL = "8f71bd04-89f7-4290-b90f-ac1265f5f127",
-    CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d0"
+    CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"
 };
 
 class GATTInformation {
