@@ -26,14 +26,14 @@ interface BTState {
   passkey: string | null
 };
 
-function useBtState() {
+function useBtState(setLoading) {
   const [btState, setBtState] = useState<BTState>();
 
   useEffect(() => {
     function updateBtState() {
       fetch(BT_STATE_ENDOINT)
         .then((response) => { return response.json(); })
-        .then((data) => { setBtState(data); });
+        .then((data) => { setBtState(data); setLoading(false); });
     }
     updateBtState();
     const int = setInterval(updateBtState, POLLING_INTERVAL);
@@ -67,8 +67,8 @@ async function rejectPairing() {
 }
 
 function BluetoothPage() {
-  const btState = useBtState();
   const [loading, setLoading] = useState(false);
+  const btState = useBtState(setLoading);
   const [isOpen, setOpen] = useState(false);
   const { value: passkey, bind: passkeyBind } = useInput();
 
@@ -109,7 +109,7 @@ function BluetoothPage() {
           <div className="mt-2">
             <ResetModal show={isOpen}
               onOpen={() => { setOpen(true) }}
-              onAccept={async () => { setOpen(false); setLoading(true); await resetBTConnection(); setLoading(false); }}
+              onAccept={async () => { setOpen(false); setLoading(true); await resetBTConnection(); }}
               onClose={() => { setOpen(false) }} />
           </div>
         </div>
@@ -117,8 +117,8 @@ function BluetoothPage() {
       <PasskeyConfirmation
         btConnection={btState?.connection}
         passkeyBind={passkeyBind}
-        onAccept={async () => { setLoading(true); await acceptPairing(passkey); setLoading(false); }}
-        onDecline={async () => { setLoading(true); await rejectPairing(); setLoading(false) }}
+        onAccept={async () => { setLoading(true); await acceptPairing(passkey); }}
+        onDecline={async () => { setLoading(true); await rejectPairing(); }}
         loading={loading} />
 
       {loading &&
