@@ -73,19 +73,6 @@ export default class BLEManager {
         conn.smp.on('passkeyExchange', (associationModel, passkey, callback) => {
             console.log('Security in passkeyExchange: ', conn.smp.currentEncryptionLevel);
 
-            if (associationModel == AssociationModels.NUMERIC_COMPARISON) {
-                console.log(`NUMERIC_COMPARISON got code: ${passkey}:`);
-                this.passkey = passkey;
-                this.passkeyHandler(passkey)
-                    .then(() => {
-                        console.log("Numeric comparison has passed successfuly at the RPi");
-                        callback();
-                    })
-                    .catch(() => {
-                        console.log("Numeric comparison failed at the RPi");
-                        conn.smp.sendPairingFailed(COMPARISON_FAILED);
-                    });
-            }
             if (associationModel == AssociationModels.PASSKEY_ENTRY_RSP_INPUTS) {
                 console.log(`PASSKEY_ENTRY_RSP_INPUTS got code: ${passkey}:`);
                 this.passkey = passkey;

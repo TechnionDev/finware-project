@@ -1,11 +1,11 @@
-import scrapeAccount from "../util-managers/FinanceAccountsManager";
+import scrapeFinancialBE from "../util-managers/FinanceAccountsManager";
 import FinancialBE from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 
 class FinanceAccountsController {
-    private bluetoothController;
+    private bluetoothController: BluetoothController;
 
-    constructor(bluetoothController: BluetoothController) {
+    constructor(bluetoothController) {
         this.bluetoothController = bluetoothController;
     }
 
@@ -15,24 +15,34 @@ class FinanceAccountsController {
     }
 
     async createFinancialAccount(req, res) {
-        console.log(req.body);
         await FinancialBE.create({
             ...req.body
         });
+        // TODO: update finances information?
+        res.json({ status: "SUCCESS" });
+    }
+
+    async removeFinancialAccount(req, res) {
+        await FinancialBE.findOneAndDelete({ _id: req.params.id });
+        // TODO: update finances information?
         res.json({ status: "SUCCESS" });
     }
 
     async scrape(req, res, next) {
-        const accounts = await FinancialBE.find({});
-        let total = 0;
-        for (const account of accounts) {
-            console.log(account);
-            const [accountScrapeResult, accountTotal]: [any, number] = await scrapeAccount(account, account.company);
-            total += accountTotal;
-        }
-        this.bluetoothController.totalAmount = total;
-        console.log("Total amount: ", total);
-        res.json({ amount: total });
+        try {
+            const accounts = await FinancialBE.find({});
+            let total = 0;
+            for (const account of accounts) {
+                console.log("Found account: ", account);
+                const [accountScrapeResult, accountTotal]: [any, number] = await scrapeFinancialBE(account, account.company);
+                total += accountTotal;
+            }
+
+            this.bluetoothController.gattInformation.bankInfo = total;
+
+            console.log("Total amount: ", total);
+            res.json({ amount: total });
+        } catch (err) { next(err) };
     }
 }
 

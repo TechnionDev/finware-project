@@ -5,7 +5,7 @@ import PortalEntry from './PortalEntry';
 import btBG from '../../assets/bluetooth-background.jpg';
 import wifiBG from '../../assets/wifi-background.jpg';
 import configBG from '../../assets/config-background.jpg';
-import creditCardBG from '../../assets/credit-cards-background.jpeg';
+import creditCardBG from "../../assets/credit-cards-background.jpeg";
 
 function LandingPortal(props) {
   return (

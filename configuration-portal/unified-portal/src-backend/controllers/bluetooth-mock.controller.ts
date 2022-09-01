@@ -6,7 +6,7 @@ class BluetoothController {
     public totalAmount: number = 0;
 
 
-    constructor() {
+    constructor({ bankInfo, refreshRate, goal, daysLeft }) {
 
     }
 

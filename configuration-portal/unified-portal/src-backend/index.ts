@@ -9,7 +9,7 @@ import { BluetoothController } from "./controllers"
 
 
 
-const bluetoothController = new BluetoothController();
+const bluetoothController = new BluetoothController({ bankInfo: 500, refreshRate: 1000, goal: 5150, daysLeft: 15 }); // TODO: populate with actual data
 const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
 mongoose.connect("mongodb://127.0.0.1:27017/finware");
@@ -31,3 +31,11 @@ app.listen(PORT, () => {
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../build/", "index.html"));
 });
+
+app.use((err: Error, req, res, next) => {
+  if (res.headersSent) {
+    return next(err)
+  }
+  res.status(500)
+  res.json({ error: err.stack });
+})

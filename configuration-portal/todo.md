@@ -1,6 +1,5 @@
-* add loading to "ADVERTISING"...?
 * download font 
-* add loading to accept or decline
+* Add logos to credit cards
 
 
 

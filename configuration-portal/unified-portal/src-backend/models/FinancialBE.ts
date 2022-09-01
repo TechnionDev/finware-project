@@ -6,7 +6,6 @@ interface IFinancialBackend {
     username?: string;
     userCode?: string;
     password?: string;
-    id?: string;
     nationalId?: string;
     card6Digits?: string;
 }
@@ -29,10 +28,6 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
         required: false
     },
     password: {
-        type: String,
-        required: false
-    },
-    id: {
         type: String,
         required: false
     },

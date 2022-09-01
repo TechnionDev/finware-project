@@ -1,12 +1,12 @@
 import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
 
-export default async function scrapeAccount(credentials, company): Promise<[any, number]> {
+export default async function scrapeFinancialBE(credentials, company): Promise<[any, number]> {
     function getFirstDayOfMonth(year, month) {
         return new Date(year, month, 1);
     }
 
     try {
-        var date = new Date(); // TODO: where is this from? I dont think this scrapes a full month as inteded
+        var date = new Date(); // TODO: Where is this from? I dont think this scrapes a full month as intended (because of local timezones vs UTC)
         date = getFirstDayOfMonth(
             date.getFullYear(),
             date.getMonth(),
