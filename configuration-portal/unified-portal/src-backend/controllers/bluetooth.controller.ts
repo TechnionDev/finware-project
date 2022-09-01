@@ -82,7 +82,7 @@ class BluetoothController {
         console.log(SERVICES);
 
         this.bleManager = new BLEManager();
-        this.bleManager.init("FinwareServer", SERVICES, this.passkeyHandler.bind(this)).then(() => {
+        this.bleManager.init("Finware", SERVICES, this.passkeyHandler.bind(this)).then(() => {
             this.bleManager.startAdvertising();
             console.log("BLE initialized");
         });
