@@ -1,6 +1,7 @@
 import scrapeFinancialBE from "../util-managers/FinanceAccountsManager";
 import FinancialBE from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
+import Settings from "../models/Settings";
 
 class FinanceAccountsController {
     private bluetoothController: BluetoothController;
@@ -28,21 +29,52 @@ class FinanceAccountsController {
         res.json({ status: "SUCCESS" });
     }
 
-    async scrape(req, res, next) {
+    async scrape() {
+        console.log('Scraping started for financial backends');
         try {
-            const accounts = await FinancialBE.find({});
+
+            // 
+            let [settings, accounts] = await Promise.all([Settings.findOne({}), FinancialBE.find({})]);
+            let cycle_start_date = new Date();
+            cycle_start_date.setDate(settings.month_cycle_start_day);
+            const now = new Date();
+
             let total = 0;
-            for (const account of accounts) {
+            let scrapeJobs = [];
+            let scrapeAccounts = [];
+            for (let account of accounts) {
+                // Check the difference in time (rounded up)
+                let hours_sinse_last_scrape = Math.ceil((now.getTime() - account.last_scrape.getTime()) / 1000 / 60 / 60);
+                if (hours_sinse_last_scrape < settings.scrape_frequency_hours) {
+                    console.log('Account ', account.name, ' was recently scraped. Skipping.');
+                    continue;
+                }
                 console.log("Found account: ", account);
-                const [accountScrapeResult, accountTotal]: [any, number] = await scrapeFinancialBE(account, account.company);
-                total += accountTotal;
+                scrapeFinancialBE(account, account.company, cycle_start_date).then((result) => {
+                    // Update account
+                    let scrapeResult = result[0];
+                    account.last_scrape = now;
+                    account.scrape_result = scrapeResult;
+                    account.save();
+                });
+                scrapeJobs.push();
+                scrapeAccounts.push(account);
             }
+            let results = await Promise.all(scrapeJobs);
+            // for (let i = 0; i < scrapeAccounts.length; i++) {
 
-            this.bluetoothController.gattInformation.bankInfo = total;
+            // }
+            // let 
 
-            console.log("Total amount: ", total);
-            res.json({ amount: total });
-        } catch (err) { next(err) };
+            // if (process.platform == 'linux') { TODO: Make alternative (query from the bluetooth listener the DB)
+            //     this.bluetoothController.gattInformation.bankInfo = total;
+            // }
+
+            console.log("Total amount: ", results);
+            // res.json({ amount: total }); // TODO: This is broken. Fix me!
+        } catch (err) {
+            console.log('There was an error while scraping: ', err);
+        };
     }
 }
 

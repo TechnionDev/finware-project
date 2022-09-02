@@ -3,14 +3,20 @@ import path from "path";
 import mongoose from "mongoose";
 import routerFactory from "./routes";
 
-import FinancialBE from "./models/FinancialBE";
 import { FinancialAccountsController } from "./controllers"
 import { BluetoothController } from "./controllers"
-
+import { CronJob } from 'cron';
 
 
 const bluetoothController = new BluetoothController({ bankInfo: 500, refreshRate: 1000, goal: 5150, daysLeft: 15 }); // TODO: populate with actual data
 const financeAccountsController = new FinancialAccountsController(bluetoothController);
+
+new CronJob(
+  '0 */15 * * * *',
+  financeAccountsController.scrape.bind(financeAccountsController),
+  null,
+  true
+);
 
 mongoose.connect("mongodb://127.0.0.1:27017/finware").then(() => {
   console.log('MongoDB database connected successfully');
@@ -40,4 +46,4 @@ app.use((err: Error, req, res, next) => {
   }
   res.status(500)
   res.json({ error: err.stack });
-})
+});

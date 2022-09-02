@@ -1,4 +1,7 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model } from 'mongoose';
+import SettingsModel from './Settings';
+import { FinancialAccountsController } from '../controllers';
+
 
 interface IFinancialBackend {
     name: string;
@@ -9,6 +12,8 @@ interface IFinancialBackend {
     id?: string;
     nationalId?: string;
     card6Digits?: string;
+    last_scrape: Date;
+    scrape_result: object;
 }
 
 const financialBackendSchema = new Schema<IFinancialBackend>({
@@ -43,10 +48,38 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
     card6Digits: {
         type: String,
         required: false
-    }
+    },
+    last_scrape: {
+        type: Date,
+        default: new Date(0),
+        required: true
+    },
+    scrape_result: {
+        type: Object,
+        required: true
+    },
+
 }, { timestamps: true });
 
-const FinancialBE = model<IFinancialBackend>('FinancialBE', financialBackendSchema);
+// Before returning result, add 'outdated' field
+financialBackendSchema.post('save', function (doc) {
+    // TODO: scrape in an async manner
+    // Get scrape frequency from settings
+    SettingsModel.findOne({}, (err, settings) => {
+        if (err) {
+            console.log("Failed to find settings object");
+            return;
+        }
+        const now = new Date();
+        if ((now.getTime() - this.last_scrape.getTime()) / 1000 / 60 / 60 > settings.scrape_frequency_hours) {
+            
+        }
 
+    });
+    // // Check if 'last_scrape' is older than 'scrape_frequency_hours' hours
+    // this.outdated = (now.getTime() - this.last_scrape.getTime()) / 1000 / 60 / 60 > this.scrape_frequency_hours;
+    // next();
+});
+const FinancialBE = model<IFinancialBackend>('FinancialBE', financialBackendSchema);
 
 export default FinancialBE;

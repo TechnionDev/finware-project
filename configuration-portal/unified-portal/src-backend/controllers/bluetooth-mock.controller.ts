@@ -4,6 +4,7 @@ class BluetoothController {
     private bleManager;
 
     public totalAmount: number = 0;
+    public gattInformation = { 'bankInfo': 0 };
 
 
     constructor({ bankInfo, refreshRate, goal, daysLeft }) {

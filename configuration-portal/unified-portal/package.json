@@ -11,6 +11,7 @@
     "autoprefixer": "^10.4.8",
     "ble-host": "^1.0.3",
     "classnames": "^2.3.1",
+    "cron": "^2.1.0",
     "express": "^4.18.1",
     "flowbite": "^1.5.2",
     "flowbite-react": "^0.1.10",
