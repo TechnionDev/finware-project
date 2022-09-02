@@ -12,9 +12,11 @@ import { BluetoothController } from "./controllers"
 const bluetoothController = new BluetoothController({ bankInfo: 500, refreshRate: 1000, goal: 5150, daysLeft: 15 }); // TODO: populate with actual data
 const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
-mongoose.connect("mongodb://127.0.0.1:27017/finware");
-
-
+mongoose.connect("mongodb://127.0.0.1:27017/finware").then(() => {
+  console.log('MongoDB database connected successfully');
+}).catch(err => {
+  console.log('Failed to connect to MongoDB:\n', err);
+});
 
 const PORT = process.env.PORT || 3001;
 
