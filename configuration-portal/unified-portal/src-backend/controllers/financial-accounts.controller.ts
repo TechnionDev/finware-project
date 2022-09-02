@@ -35,6 +35,7 @@ class FinanceAccountsController {
 
             // 
             let [settings, accounts] = await Promise.all([Settings.findOne({}), FinancialBE.find({})]);
+            console.log('User settings are: ', settings);
             let cycle_start_date = new Date();
             cycle_start_date.setDate(settings.month_cycle_start_day);
             const now = new Date();
