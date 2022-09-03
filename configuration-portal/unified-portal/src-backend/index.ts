@@ -3,39 +3,48 @@ import path from "path";
 import mongoose from "mongoose";
 import routerFactory from "./routes";
 
-import FinancialBE from "./models/FinancialBE";
 import { FinancialAccountsController } from "./controllers"
 import { BluetoothController } from "./controllers"
+import { CronJob } from 'cron';
 
 
+mongoose.connect("mongodb://127.0.0.1:27017/finware").then(() => {
+  console.log('MongoDB database connected successfully');
+  
 
-const bluetoothController = new BluetoothController({ bankInfo: 500, refreshRate: 1000, goal: 5150, daysLeft: 15 }); // TODO: populate with actual data
-const financeAccountsController = new FinancialAccountsController(bluetoothController);
+  const bluetoothController = new BluetoothController({ bankInfo: 500, refreshRate: 1000, goal: 5150, daysLeft: 15 }); // TODO: populate with actual data
+  const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
-mongoose.connect("mongodb://127.0.0.1:27017/finware");
+  new CronJob(
+    '0 * * * * *',
+    financeAccountsController.updateFinancialData.bind(financeAccountsController),
+    null,
+    true
+  );
 
+  const PORT = process.env.PORT || 3001;
 
+  const app = express();
+  app.use(express.json());
+  app.use(express.static(path.resolve(__dirname, "../build")));
+  app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
 
-const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+  });
 
-const app = express();
-app.use(express.json());
-app.use(express.static(path.resolve(__dirname, "../build")));
-app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
+  // All other GET requests not handled before will return our React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../build/", "index.html"));
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
+  app.use((err: Error, req, res, next) => {
+    if (res.headersSent) {
+      return next(err)
+    }
+    res.status(500)
+    res.json({ error: err.stack });
+  });
+}).catch(err => {
+  console.log('Failed to connect to MongoDB:\n', err);
 });
-
-// All other GET requests not handled before will return our React app
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../build/", "index.html"));
-});
-
-app.use((err: Error, req, res, next) => {
-  if (res.headersSent) {
-    return next(err)
-  }
-  res.status(500)
-  res.json({ error: err.stack });
-})

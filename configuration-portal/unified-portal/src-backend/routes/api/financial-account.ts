@@ -6,7 +6,6 @@ export default function financialRouterFactory(financialAccountsController: Fina
 
   financialAccountsRouter.get("/", financialAccountsController.fetchCreditCards.bind(financialAccountsController));
   financialAccountsRouter.post("/create", financialAccountsController.createFinancialAccount.bind(financialAccountsController))
-  financialAccountsRouter.post("/scrape", financialAccountsController.scrape.bind(financialAccountsController));
   financialAccountsRouter.post("/:id/delete", financialAccountsController.removeFinancialAccount.bind(financialAccountsController));
 
   return financialAccountsRouter;

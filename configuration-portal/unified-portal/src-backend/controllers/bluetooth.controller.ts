@@ -11,7 +11,7 @@ enum UUIDS {
 };
 
 class GATTInformation {
-    public bankInfo; // TODO: add type here
+    public bankInfo: object;
     public refreshRate: number;
     public goal: number;
     public daysLeft: number;
@@ -27,7 +27,7 @@ class GATTInformation {
         {
             "uuid": UUIDS.SERVICE_MAIN,
             "characteristics": [
-                this.defineCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"), // TODO: change to json object
+                this.defineCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
                 this.defineCharacteristic(UUIDS.CHAR_REFRESH_RATE, "refreshRate", "number"),
                 this.defineCharacteristic(UUIDS.CHAR_GOAL, "goal", "number"),
                 this.defineCharacteristic(UUIDS.CHAR_DAYS_LEFT, "daysLeft", "number")

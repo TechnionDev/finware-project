@@ -63,6 +63,7 @@ function EditFinancialAccount() {
                     navigate("../");
                 }}>
                 <div className="text-2xl mb-4"> Add a new credit card account: </div>
+                <div>Note that it can take up to an hour for the information to update</div>
                 <div id="comp-select">
                     <Select name="company" {...bind}>
                         <option value="">

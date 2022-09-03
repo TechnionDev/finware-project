@@ -3,7 +3,7 @@
   "compilerOptions": {
     "noImplicitAny": false, /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     "strictNullChecks": false,                         /* When type checking, take into account 'null' and 'undefined'. */
-    "target": "es2016",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",

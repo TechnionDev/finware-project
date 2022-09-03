@@ -3,7 +3,6 @@ import { Schema, model } from 'mongoose';
 interface IDisplay {
     name: string;
     id: string;
-    update_frequency_minutes: number;
     last_refresh: Date;
 }
 
@@ -15,10 +14,6 @@ const displaySchema = new Schema<IDisplay>({
     },
     id: {
         type: String,
-        required: true
-    },
-    update_frequency_minutes: {
-        type: Number,
         required: true
     },
     last_refresh: {
