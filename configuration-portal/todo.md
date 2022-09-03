@@ -1,5 +1,7 @@
-* download font 
-* Add logos to credit cards
+* Download font 
+* Add logos to credit cards cards
+* Add indicator for successfuly connected credit card accounts, and those that we failed to scrape (for example if the user entered a wrong password...)
+* Add bank info mongoose schematics, save data into them when scraping, and correctly output the data from there to the blemanager characteristics
 
 
 
