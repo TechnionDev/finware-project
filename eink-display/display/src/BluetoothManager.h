@@ -9,8 +9,9 @@
 #include <BLEScan.h>
 #include <BLEAdvertisedDevice.h>
 #include <Arduino.h>
+#include <ArduinoJson.h>
 // The remote service we wish to connect to.
-static BLEUUID serviceUUID("22222222-3333-4444-5555-666666666666");
+static BLEUUID serviceUUID("E9C7E078-863C-B4E8-79A9-A1066C46D625");
 // The characteristic of the remote service we are interested in.
 static BLEUUID charUUID("22222222-3333-4444-5555-666666666667");
 
@@ -25,7 +26,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 	  * Called for each advertising BLE server.
 	  */
 	void onResult(BLEAdvertisedDevice advertisedDevice) {
-		Serial.print("Dani BLE Advertised Device found: ");
+		Serial.print("BLE Advertised Device found: ");
 		Serial.println(advertisedDevice.toString().c_str());
 
 		// We have found a device, let us now see if it contains the service we are looking for.
@@ -72,16 +73,18 @@ class MySecurity : public BLESecurityCallbacks {
 	}
 };
 
-class cardArray{
-	//TODO:: fill class
-};
+typedef std::map<std::string, int> cardsSpending;
+
 class BluetoothManager {
 	//TODO:: Implement class using the code in the cpp file
+	std::string requestService(const std::string& serviceName);
+
   public:
 	BluetoothManager();
-	int getTotalSpending();
-	cardArray getSpendingPerCard();
-	cardArray getTopFivePurchase();
+	cardsSpending getBankInfo();
+	int getRefreshRate();
+	int getGoal();
+	int getDaysLeft();
 	bool connectToServer(BLEAddress pAddress);
 };
 

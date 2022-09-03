@@ -1,0 +1,3 @@
+[submodule "eink-display/display/third-party/ArduinoJson"]
+	path = eink-display/display/third-party/ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
