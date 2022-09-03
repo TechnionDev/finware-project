@@ -9,11 +9,12 @@
 #include <BLEScan.h>
 #include <BLEAdvertisedDevice.h>
 #include <Arduino.h>
+#include "pageManager.h"
 #include <ArduinoJson.h>
 // The remote service we wish to connect to.
-static BLEUUID serviceUUID("E9C7E078-863C-B4E8-79A9-A1066C46D625");
+static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 // The characteristic of the remote service we are interested in.
-static BLEUUID charUUID("22222222-3333-4444-5555-666666666667");
+static BLEUUID charUUID("5b278f16-4460-47e1-919e-2d50d7d0a55d");
 
 static BLEAddress *pServerAddress;
 static boolean doConnect = false;
@@ -51,6 +52,7 @@ class MySecurity : public BLESecurityCallbacks {
 	void onPassKeyNotify(uint32_t pass_key) {
 		Serial.printf("onPassKeyNotify \n");
 		ESP_LOGE(LOG_TAG, "The passkey Notify number:%d", pass_key);
+		manager.showPassKey(pass_key);
 	}
 	bool onConfirmPIN(uint32_t pass_key) {
 		Serial.printf("onConfirmPIN \n");

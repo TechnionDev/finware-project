@@ -2,26 +2,23 @@
 			Based on Neil Kolban example for IDF: https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleScan.cpp
 			Ported to Arduino ESP32 by Evandro Copercini
 */
-#include <numeric>
 #include "pageManager.h"
 #include "BluetoothManager.h"
-GxIO_Class io(SPI, EPD_CS, EPD_DC, EPD_RSET);
-GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
-pageManager manager(display);
+
 BluetoothManager blm;
 
 void setup() {
 	Serial.begin(115200);
 	Serial.println("Starting Arduino BLE Client application...");
-//	BLEDevice::init("");
-//
-//	// Retrieve a Scanner and set the callback we want to use to be informed when we
-//	// have detectesd a new device.  Specify that we want active scanning and start the
-//	// scan to run for 30 seconds.
-//	BLEScan *pBLEScan = BLEDevice::getScan();
-//	pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-//	pBLEScan->setActiveScan(true);
-//	pBLEScan->start(30);
+	BLEDevice::init("");
+
+	// Retrieve a Scanner and set the callback we want to use to be informed when we
+	// have detectesd a new device.  Specify that we want active scanning and start the
+	// scan to run for 30 seconds.
+	BLEScan *pBLEScan = BLEDevice::getScan();
+	pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+	pBLEScan->setActiveScan(true);
+	pBLEScan->start(30);
 
 #if defined(LILYGO_EPD_DISPLAY_102)
 	pinMode(EPD_POWER_ENABLE, OUTPUT);
@@ -43,6 +40,7 @@ void setup() {
 // This is the Arduino main loop function.
 void loop() {
 	Serial.println("in loop");
+	//manager.showPassKey(145199);
 	// If the flag "doConnect" is true then we have scanned for and found the desired
 	// BLE Server with which we wish to connect.  Now we connect to it.  Once we are
 	// connected we set the connected flag to be true.

@@ -36,10 +36,14 @@ class pageManager {
 	void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
 	void showCardSpendingPage(const std::map<std::string,int>& cardMap);
 	void showTopFivePurchase();
-
+	void showPassKey(uint32_t pass_key);
 
 };
 
 
+static GxIO_Class io(SPI, EPD_CS, EPD_DC, EPD_RSET);
+static GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
+
+static pageManager manager(display);
 
 #endif //DISPLAY_SRC_PAGEMANAGER_H_

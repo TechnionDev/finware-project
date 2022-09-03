@@ -115,6 +115,18 @@ void pageManager::showCardSpendingPage(const std::map<std::string, int> &cardMap
 	display.update();
 	Serial.println("end update");
 }
+void pageManager::showPassKey(uint32_t pass_key) {
+	Serial.println("Hi im showing the passkey");
+	display.setRotation(1);
+	display.fillScreen(GxEPD_WHITE);
+	display.setTextColor(GxEPD_BLACK);
+	display.setBackgroundColor(GxEPD_WHITE);
+	display.setFont(&FreeMonoBold12pt7b);
+	display.setCursor(0,15);
+	display.println("Enter this passkey in configuration portal:");
+	display.println(pass_key);
+	display.update();
+}
 
 
 
