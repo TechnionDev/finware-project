@@ -1,7 +1,7 @@
 import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
 import { ScaperScrapingResult } from 'israeli-bank-scrapers/lib/scrapers/base-scraper';
 
-export default async function scrapeFinancialBE(account, company: String, startDate: Date): Promise<[any, number]> {
+export default async function scrapeFinancialBE(account, company: String, startDate: Date): Promise<ScaperScrapingResult> {
     try {
         const options = {
             'companyId': company as CompanyTypes,
@@ -15,10 +15,6 @@ export default async function scrapeFinancialBE(account, company: String, startD
         let scrapeResult: ScaperScrapingResult;
         const scraper = createScraper(options);
         scrapeResult = await scraper.scrape(account);
-        // if (credentials.outdated) {
-        // } else {
-        //     scrapeResult = credentials.scrape_result;
-        // }
         var totalAmount = 0;
         if (scrapeResult.success) {
             console.log(scrapeResult.accounts);
@@ -34,7 +30,7 @@ export default async function scrapeFinancialBE(account, company: String, startD
         }
         console.log('Total for ', account.name, ' is ', totalAmount);
 
-        return [scrapeResult, totalAmount];
+        return scrapeResult;
     } catch (e: any) {
         console.error(`scraping failed for the following reason: ${e.message}`);
     }

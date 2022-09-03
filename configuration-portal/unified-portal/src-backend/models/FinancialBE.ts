@@ -56,6 +56,7 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
     },
     scrape_result: {
         type: Object,
+        default: {},
         required: true
     },
 
