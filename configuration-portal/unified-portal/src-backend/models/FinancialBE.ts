@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import SettingsModel from './Settings';
 import { FinancialAccountsController } from '../controllers';
+import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
 
 
 interface IFinancialBackend {
@@ -13,7 +14,7 @@ interface IFinancialBackend {
     nationalId?: string;
     card6Digits?: string;
     last_scrape: Date;
-    scrape_result: object;
+    scrape_result: ScaperScrapingResult;
 }
 
 const financialBackendSchema = new Schema<IFinancialBackend>({

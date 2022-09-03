@@ -4,11 +4,14 @@ class BluetoothController {
     private bleManager;
 
     public totalAmount: number = 0;
-    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, daysLeft: 0 }
+    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, cycleStartDate: 0 }
 
 
-    constructor({ bankInfo, refreshRate, goal, daysLeft }) {
-
+    constructor({ refreshRate, goal, cycleStartDate }) {
+        this.gattInformation.refreshRate = refreshRate;
+        this.gattInformation.goal = goal;
+        this.gattInformation.cycleStartDate = cycleStartDate;
+        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     fetchState(req, res) {

@@ -14,28 +14,33 @@ class GATTInformation {
     public bankInfo: object;
     public refreshRate: number;
     public goal: number;
-    public daysLeft: number;
+    public cycleStartDate: Date;
 
-    constructor({ bankInfo, refreshRate, goal, daysLeft }) {
-        this.bankInfo = bankInfo;
+    constructor({ refreshRate, goal, cycleStartDate }) {
         this.refreshRate = refreshRate;
         this.goal = goal;
-        this.daysLeft = daysLeft;
+        this.cycleStartDate = cycleStartDate;
     }
 
     private services = [
         {
             "uuid": UUIDS.SERVICE_MAIN,
             "characteristics": [
-                this.defineCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
-                this.defineCharacteristic(UUIDS.CHAR_REFRESH_RATE, "refreshRate", "number"),
-                this.defineCharacteristic(UUIDS.CHAR_GOAL, "goal", "number"),
-                this.defineCharacteristic(UUIDS.CHAR_DAYS_LEFT, "daysLeft", "number")
+                this.computeCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
+                this.computeCharacteristic(UUIDS.CHAR_REFRESH_RATE, "refreshRate", "number"),
+                this.computeCharacteristic(UUIDS.CHAR_GOAL, "goal", "number"),
+                {
+                    "uuid": UUIDS.CHAR_DAYS_LEFT,
+                    "properties": ["read"],
+                    onRead: (_, callback) => {
+                        return this.cycleStartDate; // todo this is super wrong... fix to correctly diff the next cycle with current date
+                    }
+                }
             ]
         }
     ];
 
-    defineCharacteristic(uuid, propertyName, propType) {
+    computeCharacteristic(uuid, propertyName, propType) {
         let onRead;
         switch (propType) {
             case "string":
@@ -44,9 +49,8 @@ class GATTInformation {
                 }
                 break;
             case "number":
-                // TODO: send something better (must be a buffer though)
                 onRead = (_, callback) => {
-                    callback(AttErrors.SUCCESS, this[propertyName].toString());
+                    callback(AttErrors.SUCCESS, JSON.stringify({ value: this[propertyName] }));
                 }
                 break;
             case "object":
@@ -76,8 +80,8 @@ class BluetoothController {
     public gattInformation: GATTInformation;
     public totalAmount: number = 0;
 
-    constructor({ bankInfo, refreshRate, goal, daysLeft }) {
-        this.gattInformation = new GATTInformation({ bankInfo, refreshRate, goal, daysLeft });
+    constructor({ refreshRate, goal, cycleStartDate }) {
+        this.gattInformation = new GATTInformation({ refreshRate, goal, cycleStartDate });
         const SERVICES = this.gattInformation.getServices();
         console.log(SERVICES);
 

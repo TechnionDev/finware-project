@@ -35,7 +35,7 @@ function FinancialAccountsList() {
             {
                 FAState.map((financialAccount: any) => {
                     return (
-                        <div key={financialAccount._id} className="relative p-3 mb-3 credit-card-container">
+                        <div key={financialAccount._id} className="relative p-3 min-w-[200px] mb-3 credit-card-container">
                             <XCircleIcon onClick={() => deleteFA(financialAccount._id)} className="absolute top-1 right-2 h-8 w-8 text-red-700" />
                             <div className="font-bold text-center text-2xl"> {financialAccount.name} </div>
                             <div className="text-center capitalize text-md text-gray-500 dark:text-gray-700"> {financialAccount.company} </div>
