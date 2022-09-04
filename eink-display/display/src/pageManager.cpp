@@ -122,10 +122,13 @@ void pageManager::showPassKey(uint32_t pass_key) {
 	display.setTextColor(GxEPD_BLACK);
 	display.setBackgroundColor(GxEPD_WHITE);
 	display.setFont(&FreeMonoBold12pt7b);
-	display.setCursor(0,15);
-	display.println("Enter this passkey in configuration portal:");
+	display.setCursor(30,15);
+	display.println("Enter passkey:");
+	display.setFont(&FreeMonoBold18pt7b);
+	display.setCursor(60,70);
 	display.println(pass_key);
 	display.update();
+	delay(500);
 }
 
 

@@ -12,14 +12,13 @@
 #include "pageManager.h"
 #include <ArduinoJson.h>
 // The remote service we wish to connect to.
+
 static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 // The characteristic of the remote service we are interested in.
-static BLEUUID charUUID("5b278f16-4460-47e1-919e-2d50d7d0a55d");
 
 static BLEAddress *pServerAddress;
 static boolean doConnect = false;
 static boolean connected = false;
-static BLERemoteCharacteristic *pRemoteCharacteristic;
 static char *LOG_TAG = "INFO";
 
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
@@ -78,9 +77,14 @@ class MySecurity : public BLESecurityCallbacks {
 typedef std::map<std::string, int> cardsSpending;
 
 class BluetoothManager {
-	//TODO:: Implement class using the code in the cpp file
+	BLERemoteService *pRemoteService{};
 	std::string requestService(const std::string& serviceName);
-
+	std::map<std::string, std::string> ServiceName2ServiceUuid {
+		{"BankInfo", "5b278f16-4460-47e1-919e-2d50d7d0a55d"},
+		{"RefreshRate", "49dc2b22-2dc4-4a66-afee-d7782b9b81cd"},
+		{"Goal", "8f71bd04-89f7-4290-b90f-ac1265f5f127"},
+		{"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"}
+	};
   public:
 	BluetoothManager();
 	cardsSpending getBankInfo();

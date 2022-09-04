@@ -34,8 +34,8 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 	Serial.println(" - Connected to server");
 
 	// Obtain a reference to the service we are after in the remote BLE server.
-	BLERemoteService *pRemoteService = pClient->getService(serviceUUID);
-	if (pRemoteService == nullptr) {
+	this->pRemoteService = pClient->getService(serviceUUID);
+	if (this->pRemoteService == nullptr) {
 		Serial.print("Failed to find our service UUID: ");
 		Serial.println(serviceUUID.toString().c_str());
 		return false;
@@ -44,33 +44,27 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 
 
 	// Obtain a reference to the characteristic in the service of the remote BLE server.
-	pRemoteCharacteristic = pRemoteService->getCharacteristic(charUUID);
-	if (pRemoteCharacteristic == nullptr) {
-		Serial.print("Failed to find our characteristic UUID: ");
-		Serial.println(charUUID.toString().c_str());
-		return false;
+	for (const auto &it: this->ServiceName2ServiceUuid) {
+		BLERemoteCharacteristic *pRemoteCharacteristic = this->pRemoteService->getCharacteristic(BLEUUID(it.second));
+		if (pRemoteCharacteristic == nullptr) {
+			Serial.print("Failed to find our characteristic UUID: ");
+			Serial.println(it.second.c_str());
+			return false;
+		}
+		Serial.println((" - Found this characteristic: " + it.first).c_str());
 	}
-	Serial.println(" - Found our characteristic");
-
-	// Read the value of the characteristic.
-	std::string value = pRemoteCharacteristic->readValue();
-	Serial.print("The characteristic value was: ");
-	Serial.println(value.c_str());
+	Serial.println("Found all characteristics!");
 	return true;
 }
 /**
  * Scan for BLE servers and find the first one that advertises the service we are looking for.
  */
 
-BluetoothManager::BluetoothManager() {
-
-}
+BluetoothManager::BluetoothManager() = default;
 
 cardsSpending BluetoothManager::getBankInfo() {
 	DynamicJsonDocument doc(200);
 	auto output = requestService("BankInfo");
-	//TODO:: remove json
-	output = "{\"hapoalim\": 5000,\"max\": 7000}";
 	DeserializationError error = deserializeJson(doc, output);
 	if (error) {
 		Serial.print("deserializeJson() failed: ");
@@ -79,40 +73,32 @@ cardsSpending BluetoothManager::getBankInfo() {
 	}
 	cardsSpending bankInfo;
 	JsonObject root = doc.as<JsonObject>();
-	for (JsonPair kv : root) {
+	for (JsonPair kv: root) {
 		bankInfo[kv.key().c_str()] = kv.value().as<int>();
 	}
 	return bankInfo;
 }
 
 int BluetoothManager::getRefreshRate() {
-//	int refreshRate = std::stoi(requestService("RefreshRate"));
-	int refreshRate = 100000;
+	int refreshRate = std::stoi(requestService("RefreshRate"));
 	return refreshRate;
 }
 int BluetoothManager::getGoal() {
-//	int Goal = std::stoi(requestService("Goal"));//TODO:: uncomment
-	int Goal = 15000;//TODO:: remove
+	int Goal = std::stoi(requestService("Goal"));
 	return Goal;
 }
 int BluetoothManager::getDaysLeft() {
 	Serial.println("getDaysLeft");
-	//int DaysLeft = std::stoi(requestService("DaysLeft"));//TODO:: uncomment
+	int DaysLeft = std::stoi(requestService("DaysLeft"));
 	Serial.println("out of getDaysLeft");
-	int DaysLeft = 15;//TODO:: remove
 	return DaysLeft;
 }
 
 std::string BluetoothManager::requestService(const std::string &serviceName) {
-	std::map<std::string, std::string> ServiceName2ServiceUuid {
-		{"BankInfo", "5b278f16-4460-47e1-919e-2d50d7d0a55d"},
-		{"RefreshRate", "49dc2b22-2dc4-4a66-afee-d7782b9b81cd"},
-		{"Goal", "8f71bd04-89f7-4290-b90f-ac1265f5f127"},
-		{"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"}
-	};
 	auto serviceUuid = ServiceName2ServiceUuid[serviceName];
-	//TODO::complete ble call for service
+	BLERemoteCharacteristic *pRemoteCharacteristic = this->pRemoteService->getCharacteristic(BLEUUID(serviceUuid));
+	auto res =  pRemoteCharacteristic->readValue();
 
 
-	return "";
+	return res;
 }

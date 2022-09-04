@@ -40,7 +40,6 @@ void setup() {
 // This is the Arduino main loop function.
 void loop() {
 	Serial.println("in loop");
-	//manager.showPassKey(145199);
 	// If the flag "doConnect" is true then we have scanned for and found the desired
 	// BLE Server with which we wish to connect.  Now we connect to it.  Once we are
 	// connected we set the connected flag to be true.
@@ -57,10 +56,6 @@ void loop() {
 	// If we are connected to a peer BLE Server, update the characteristic each time we are reached
 	// with the current time since boot.
 	if (connected) {
-		String newValue = "Time since boot: " + String(millis() / 1000);
-		Serial.println("Setting new characteristic value to \"" + newValue + "\"");
-		// Set the characteristic's value to be the array of bytes that is actually a string.
-		pRemoteCharacteristic->writeValue(newValue.c_str(), newValue.length());
 		int totalSum = 0;
 		for (const auto& it: blm.getBankInfo()) {
 			totalSum += it.second;
