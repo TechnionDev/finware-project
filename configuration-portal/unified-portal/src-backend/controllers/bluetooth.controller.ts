@@ -33,7 +33,7 @@ class GATTInformation {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
                     onRead: (_, callback) => {
-                        return this.cycleStartDate; // todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, this.cycleStartDate);// todo this is super wrong... fix to correctly diff the next cycle with current date
                     }
                 }
             ]
@@ -91,7 +91,7 @@ class BluetoothController {
             console.log("BLE initialized");
         });
 
-        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 15000);
+        setInterval(() => console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     private passkeyHandler() {
