@@ -43,7 +43,8 @@ export default class BLEManager {
         }
 
         this.btConnection = conn;
-        conn.on('disconnect', () => {
+        conn.on('disconnect', (errorCode) => {
+            console.log("Bluetooth was disconnected ")
             this.btConnection = null;
             this.startAdvertising()
         }); // restart advertising after disconnect

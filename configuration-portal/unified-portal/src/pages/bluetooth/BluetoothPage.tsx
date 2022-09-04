@@ -33,7 +33,12 @@ function useBtState(setLoading) {
     function updateBtState() {
       fetch(BT_STATE_ENDOINT)
         .then((response) => { return response.json(); })
-        .then((data) => { setBtState(data); setLoading(false); });
+        .then((data) => {
+          setBtState(data);
+          if (data.connection != btState?.connection) {
+            setLoading(false);
+          }
+        });
     }
     updateBtState();
     const int = setInterval(updateBtState, POLLING_INTERVAL);
