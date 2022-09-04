@@ -33,7 +33,7 @@ class GATTInformation {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
                     onRead: (_, callback) => {
-                        callback(AttErrors.SUCCESS, this.cycleStartDate);// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: this.cycleStartDate }));// todo this is super wrong... fix to correctly diff the next cycle with current date
                     }
                 }
             ]
