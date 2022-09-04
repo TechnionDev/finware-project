@@ -34,10 +34,10 @@ function useBtState(setLoading) {
       fetch(BT_STATE_ENDOINT)
         .then((response) => { return response.json(); })
         .then((data) => {
-          setBtState(data);
           if (data.connection != btState?.connection) {
             setLoading(false);
           }
+          setBtState(data);
         });
     }
     updateBtState();
