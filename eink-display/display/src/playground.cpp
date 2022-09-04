@@ -60,8 +60,11 @@ void loop() {
 		for (const auto& it: blm.getBankInfo()) {
 			totalSum += it.second;
 		}
+		//manager.showCardSpendingPage(blm.getBankInfo());
 		manager.showSumPage(totalSum,blm.getDaysLeft(), blm.getGoal());
+		delay(blm.getRefreshRate()); // Delay a second between loops.
 	}
-
-	delay(blm.getRefreshRate()); // Delay a second between loops.
+	if (!connected){
+		delay(100000);
+	}
 } // End of loop

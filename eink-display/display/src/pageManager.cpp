@@ -106,6 +106,7 @@ void pageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
 }
 void pageManager::showCardSpendingPage(const std::map<std::string, int> &cardMap) {
 	Serial.println("Starting printing spending page");
+	display.setRotation(1);
 	display.fillScreen(GxEPD_WHITE);
 	display.setTextColor(GxEPD_BLACK);
 	display.setBackgroundColor(GxEPD_WHITE);
@@ -128,9 +129,9 @@ void pageManager::showPassKey(uint32_t pass_key) {
 	display.setCursor(60,70);
 	display.println(pass_key);
 	display.update();
-	delay(500);
+	delay(30000);
+	//TODO::CALL BLOCKFUNC
 }
-
 
 
 

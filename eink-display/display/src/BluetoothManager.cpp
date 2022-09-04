@@ -23,7 +23,10 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 	BLEDevice::setSecurityCallbacks(new MySecurity());
 
 	BLESecurity *pSecurity = new BLESecurity();
-	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
+	//TODO::SWITCH TO BOND
+//	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM);
+
 	pSecurity->setCapability(ESP_IO_CAP_OUT);
 	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 	BLEClient *pClient = BLEDevice::createClient();
@@ -74,31 +77,70 @@ cardsSpending BluetoothManager::getBankInfo() {
 	cardsSpending bankInfo;
 	JsonObject root = doc.as<JsonObject>();
 	for (JsonPair kv: root) {
-		bankInfo[kv.key().c_str()] = kv.value().as<int>();
+		Serial.println("hiiiii");
+		bankInfo[kv.key().c_str()] = -kv.value().as<int>();
+	}
+
+	for (const auto& it : bankInfo){
+		Serial.println(it.first.c_str());
+		Serial.println(it.second);
 	}
 	return bankInfo;
 }
 
 int BluetoothManager::getRefreshRate() {
-	int refreshRate = std::stoi(requestService("RefreshRate"));
+	Serial.println("RefreshRate");
+	DynamicJsonDocument doc(200);
+	auto output = requestService("RefreshRate");
+	DeserializationError error = deserializeJson(doc, output);
+	if (error) {
+		Serial.print("deserializeJson() failed: ");
+		Serial.println(error.c_str());
+		return {};
+	}
+	int refreshRate = doc["value"];
+	Serial.println(refreshRate);
+	Serial.println("out of RefreshRate");
 	return refreshRate;
 }
 int BluetoothManager::getGoal() {
-	int Goal = std::stoi(requestService("Goal"));
+	Serial.println("getGoal");
+	DynamicJsonDocument doc(200);
+	auto output = requestService("Goal");
+	DeserializationError error = deserializeJson(doc, output);
+	if (error) {
+		Serial.print("deserializeJson() failed: ");
+		Serial.println(error.c_str());
+		return {};
+	}
+	int Goal = doc["value"];
+	Serial.println("out of Goal");
+
 	return Goal;
 }
+
 int BluetoothManager::getDaysLeft() {
 	Serial.println("getDaysLeft");
-	int DaysLeft = std::stoi(requestService("DaysLeft"));
+	DynamicJsonDocument doc(200);
+	auto output = requestService("DaysLeft");
+	DeserializationError error = deserializeJson(doc, output);
+	if (error) {
+		Serial.print("deserializeJson() failed: ");
+		Serial.println(error.c_str());
+		return {};
+	}
+	int DaysLeft = doc["value"];
 	Serial.println("out of getDaysLeft");
 	return DaysLeft;
 }
 
 std::string BluetoothManager::requestService(const std::string &serviceName) {
+	Serial.println(("requesting this service " + serviceName + ": ").c_str());
 	auto serviceUuid = ServiceName2ServiceUuid[serviceName];
 	BLERemoteCharacteristic *pRemoteCharacteristic = this->pRemoteService->getCharacteristic(BLEUUID(serviceUuid));
 	auto res =  pRemoteCharacteristic->readValue();
 
-
+	Serial.println(("this is the " + serviceName + ": ").c_str());
+	Serial.println(res.c_str());
 	return res;
 }
