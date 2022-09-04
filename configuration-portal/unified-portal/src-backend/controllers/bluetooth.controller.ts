@@ -90,6 +90,8 @@ class BluetoothController {
             this.bleManager.startAdvertising();
             console.log("BLE initialized");
         });
+
+        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     private passkeyHandler() {
