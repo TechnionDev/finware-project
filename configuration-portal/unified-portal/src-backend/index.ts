@@ -44,7 +44,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
         res.sendFile(path.resolve(__dirname, "../build/", "index.html"));
     });
 
-    app.use((err: Error, req, res, next) => {
+    app.use((err: Error, _req, res, next) => {
         if (res.headersSent) {
             return next(err)
         }

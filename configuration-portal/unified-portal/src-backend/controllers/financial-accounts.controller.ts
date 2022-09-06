@@ -12,12 +12,17 @@ class FinanceAccountsController {
     }
 
     async fetchCreditCards(_req, res) {
-        const all = await FinancialBE.find({}).select({ "name": 1, "company": 1 });
-        res.json(all);
+        try {
+            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1 });
+            res.json(all);
+        } catch (err) {
+            console.log('Error while fetching credit cards: ', err);
+            res.json({ status: "ERROR", message: err });
+        }
     }
 
     async createFinancialAccount(req, res) {
-        await FinancialBE.create({
+        FinancialBE.create({
             ...req.body,
         }).then((_result) => {
             this.updateFinancialData(true);
@@ -30,7 +35,7 @@ class FinanceAccountsController {
 
     async removeFinancialAccount(req, res) {
         FinancialBE.findOneAndDelete({ _id: req.params.id }).then((_result) => {
-            this.updateFinancialData(true);
+            this.updateFinancialData();
             res.json({ status: "SUCCESS" });
         }).catch((err) => {
             console.log('Error while removing a financialBE: ', err);
@@ -38,7 +43,7 @@ class FinanceAccountsController {
         });
     }
 
-    async updateFinancialData(forceUpdate=false) {
+    async updateFinancialData(forceUpdate = false) {
         console.log('Scraping started for financial backends');
         try {
             let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
@@ -51,24 +56,32 @@ class FinanceAccountsController {
             for (let fbe of fbes) {
                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
-                if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
+                if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours && fbe.scrape_result.success) {
                     console.log('Account ', fbe.name, ' was recently updated. Skipping.');
                     continue;
                 }
                 console.log("Scraping for account: ", fbe.name, "from start date: ", cycle_start_date);
                 scrapeJobs.push(
                     scrapeFinancialBE(fbe, fbe.company, cycle_start_date).then((scrapeResult: ScaperScrapingResult) => {
+                        console.log('Scraping done for', fbe.name);
                         // Update account
-                        fbe.last_scrape = now;
-                        fbe.scrape_result = scrapeResult;
-                        fbe.save();
-                        console.log('Scrape results for ', fbe.name, ': ', scrapeResult);
+                        if (scrapeResult.success) {
+                            fbe.last_scrape = now;
+                            fbe.scrape_result = scrapeResult;
+                            fbe.save();
+                            console.log('results: ', scrapeResult);
+                        } else {
+                            console.log('failed with: ', scrapeResult);
+                        }
                     })
                 );
             }
             await Promise.all(scrapeJobs);
             let bankInfo = {};
             for (const fbe of fbes) {
+                if (fbe.scrape_result.success == false) {
+                    continue;
+                }
                 bankInfo[fbe.company] = fbe.scrape_result.accounts.reduce((companySum, account) => {
                     return companySum + account.txns.reduce((accountSum, txn) => {
                         return accountSum + txn.originalAmount;
