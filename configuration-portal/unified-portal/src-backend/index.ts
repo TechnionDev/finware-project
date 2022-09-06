@@ -11,7 +11,8 @@ import Settings from "./models/Settings";
 
 mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     console.log('MongoDB database connected successfully');
-    let settings = await Settings.findOne({});
+    // Get current settings document (create one if missing)
+    let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
 
 
     const bluetoothController = new BluetoothController({ refreshRate: settings.display_refresh_frequency_minutes, goal: settings.expense_budget, cycleStartDate: settings.month_cycle_start_day }); // TODO: populate with actual data

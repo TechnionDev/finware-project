@@ -41,7 +41,7 @@ class FinanceAccountsController {
     async updateFinancialData(forceUpdate=false) {
         console.log('Scraping started for financial backends');
         try {
-            let [settings, fbes] = await Promise.all([Settings.findOne({}), FinancialBE.find({})]);
+            let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             let cycle_start_date = new Date();
             cycle_start_date.setDate(settings.month_cycle_start_day);
             cycle_start_date.setMonth(cycle_start_date.getMonth() - 1);
