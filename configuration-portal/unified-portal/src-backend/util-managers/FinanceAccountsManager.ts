@@ -14,7 +14,7 @@ export default async function scrapeFinancialBE(account, company: String, startD
         // Scrape is existing results are outdated
         let scrapeResult: ScaperScrapingResult;
         const scraper = createScraper(options);
-        scrapeResult = await scraper.scrape(account);
+        scrapeResult = await scraper.scrape(account); // TODO: if this fails the code crashes ...
         var totalAmount = 0;
         if (scrapeResult.success) {
             console.log(scrapeResult.accounts);

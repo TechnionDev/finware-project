@@ -33,11 +33,13 @@ function useBtState(setLoading) {
     function updateBtState() {
       fetch(BT_STATE_ENDOINT)
         .then((response) => { return response.json(); })
-        .then((data) => {
-          if (data.connection != btState?.connection) {
-            setLoading(false);
-          }
-          setBtState(data);
+        .then((data: BTState) => {
+          setBtState((lastBTState: any) => {
+            if (data.connection !== lastBTState?.connection || lastBTState?.connection === Connection.ADVERTISING) {
+              setLoading(false);
+            }
+            return data;
+          });
         });
     }
     updateBtState();
@@ -75,7 +77,7 @@ function BluetoothPage() {
   const [loading, setLoading] = useState(false);
   const btState = useBtState(setLoading);
   const [isOpen, setOpen] = useState(false);
-  const { value: passkey, bind: passkeyBind } = useInput();
+  const { value: passkey, setValue: setPasskey, bind: passkeyBind } = useInput();
 
   useEffect(() => {
     function setClosed() {
@@ -122,8 +124,8 @@ function BluetoothPage() {
       <PasskeyConfirmation
         btConnection={btState?.connection}
         passkeyBind={passkeyBind}
-        onAccept={async () => { setLoading(true); await acceptPairing(passkey); }}
-        onDecline={async () => { setLoading(true); await rejectPairing(); }}
+        onAccept={async () => { setLoading(true); acceptPairing(passkey); setPasskey(""); }}
+        onDecline={async () => { setLoading(true); rejectPairing(); }}
         loading={loading} />
 
       {loading &&

@@ -24,7 +24,7 @@ function PasskeyConfirmation({ btConnection, onDecline, onAccept, passkeyBind, l
                         {!loading &&
                             <div className="mt-5 flex justify-center">
                                 <Button.Group>
-                                    <Button color="success" onClick={onAccept}>
+                                    <Button color="success" onClick={(e) => { onAccept();}}>
                                         Pair
                                     </Button>
                                     <Button color="gray" onClick={onDecline}>
