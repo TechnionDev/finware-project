@@ -57,30 +57,20 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
     },
     scrape_result: {
         type: Object,
-        default: {},
+        default: { success: true, accounts: [] },
         required: true
     },
 
 }, { timestamps: true });
 
 // Before returning result, add 'outdated' field
-financialBackendSchema.post('save', function (doc) {
+financialBackendSchema.pre('save', function (next) {
     // TODO: scrape in an async manner
     // Get scrape frequency from settings
-    SettingsModel.findOne({}, (err, settings) => {
-        if (err) {
-            console.log("Failed to find settings object");
-            return;
-        }
-        const now = new Date();
-        if ((now.getTime() - this.last_scrape.getTime()) / 1000 / 60 / 60 > settings.scrape_frequency_hours) {
-            
-        }
-
-    });
-    // // Check if 'last_scrape' is older than 'scrape_frequency_hours' hours
-    // this.outdated = (now.getTime() - this.last_scrape.getTime()) / 1000 / 60 / 60 > this.scrape_frequency_hours;
-    // next();
+    if (!this.scrape_result) {
+        this.scrape_result = { success: false, accounts: [] };
+    }
+    next();
 });
 const FinancialBE = model<IFinancialBackend>('FinancialBE', financialBackendSchema);
 
