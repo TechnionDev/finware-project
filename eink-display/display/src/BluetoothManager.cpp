@@ -20,7 +20,7 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 	Serial.println(pAddress.toString().c_str());
 
 	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT_MITM);
-	BLEDevice::setSecurityCallbacks(new MySecurity());
+	BLEDevice::setSecurityCallbacks(new MySecurity(pageManager));
 
 	BLESecurity *pSecurity = new BLESecurity();
 	//TODO::SWITCH TO BOND
@@ -63,7 +63,7 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
  * Scan for BLE servers and find the first one that advertises the service we are looking for.
  */
 
-BluetoothManager::BluetoothManager() = default;
+BluetoothManager::BluetoothManager(PageManager& pageManager): pageManager(pageManager){}
 
 cardsSpending BluetoothManager::getBankInfo() {
 	DynamicJsonDocument doc(200);
