@@ -24,7 +24,7 @@ void setup() {
 
   GraphBuilder gb(display, u8g2);
   float data[] = {350, 500, 310, 400, 200, 300, 250, 260, 700};
-  gb.DrawGraph(30, 24, 215, 77, 100, 600, "Spending Graph", data, 9, true, false);  
+  gb.DrawGraph(30, 24, 215, 77, 250, 700, "Spending Graph", data, 9, true, false);  
   display.update();
 
   return;

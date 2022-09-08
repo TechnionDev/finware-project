@@ -161,7 +161,8 @@ void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
   drawRect(x_pos, y_pos, gwidth + 3, gheight + 2, Grey);
   drawString(x_pos - 20 + gwidth / 2, y_pos - 18, title, CENTER);
   for (int gx = 0; gx < readings; gx++) {
-    x2 = x_pos + gx * gwidth / (readings - 1) -
+    // x2 = x_pos + gx * gwidth / (readings - 1) -
+    x2 = x_pos + gx * gwidth / (20 - 1) - // TODO: change the "20" to be a parameter or something for days in month, this chooses how much of the width of the graph is used
          1;  // max_readings is the global variable that sets the maximum data
              // that can be plotted
     y2 = y_pos +
