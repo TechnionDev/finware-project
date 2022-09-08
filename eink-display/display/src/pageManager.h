@@ -1,13 +1,13 @@
-#include <Arduino.h>
-#include <U8g2_for_Adafruit_GFX.h>
 #ifndef DISPLAY_SRC_PAGEMANAGER_H_
 #define DISPLAY_SRC_PAGEMANAGER_H_
 #define LILYGO_T5_V213
 
+#include <Arduino.h>
 #include <GxDEPG0213BN/GxDEPG0213BN.h>  // 2.13" b/w  form DKE GROUP
 #include <GxEPD.h>
 #include <GxIO/GxIO.h>
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
+#include <U8g2_for_Adafruit_GFX.h>
 #include <boards.h>
 
 // FreeFonts from Adafruit_GFX
@@ -21,8 +21,8 @@
 
 class PageManager {
  private:
-  GxEPD_Class display;
-  U8G2_FOR_ADAFRUIT_GFX u8g2;
+  GxEPD_Class& display;
+  U8G2_FOR_ADAFRUIT_GFX& u8g2;
   short currentCourser = 0;
   void printPageMenu(int pageNum, int totalPages);
   void printDaysLeft(int daysLeft);

@@ -2,10 +2,13 @@
 
 PageManager::PageManager(U8G2_FOR_ADAFRUIT_GFX &u8g2_, GxDEPG0213BN &display_)
     : u8g2(u8g2_), display(display_) {
+  Serial.println("Initializing display");
   SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
   display.init();  // enable diagnostic output on Serial
+  display.fillScreen(GxEPD_WHITE);
   display.setRotation(1);
   u8g2.begin(display);
+  u8g2.setFont(u8g2_font_9x15_tr);            // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
   u8g2.setFontMode(1);       // use u8g2 transparent mode (this is default)
   u8g2.setFontDirection(0);  // left to right (this is default)
   u8g2.setForegroundColor(GxEPD_BLACK);  // apply Adafruit GFX color
@@ -122,7 +125,7 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
     u8g2.setBackgroundColor(GxEPD_WHITE);
 
   } else {
-  u8g2.setFont(u8g2_font_7x13_tr);
+    u8g2.setFont(u8g2_font_7x13_tr);
     int warningY = barY - 8;
     int warningHeight = 11 + barSize;
     display.fillTriangle(progIndicatorX, warningY - 2, progIndicatorX - 10,

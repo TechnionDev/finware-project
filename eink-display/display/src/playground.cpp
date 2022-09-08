@@ -19,6 +19,15 @@ void setup() {
   Serial.begin(115200);
   pinMode(GPIO_NUM_39, INPUT);
   Serial.println("Starting Arduino BLE Client application...");
+  delay(1000);
+  // pageManager.showSumPage(100, 100, 100);
+
+  GraphBuilder gb(display, u8g2);
+  float data[] = {350, 500, 310, 400, 200, 300, 250, 260, 700};
+  gb.DrawGraph(30, 24, 215, 77, 100, 600, "Spending Graph", data, 9, true, false);  
+  display.update();
+
+  return;
 
   /*
   *** This is a working hebrew printing
@@ -58,6 +67,7 @@ void setup() {
 
 // This is the Arduino main loop function.
 void loop() {
+  return;
   Serial.println("in loop");
   // If the flag "doConnect" is true then we have scanned for and found the
   // desired BLE Server with which we wish to connect.  Now we connect to it.
