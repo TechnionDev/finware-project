@@ -12,7 +12,7 @@ class BluetoothController {
         this.gattInformation.refreshRate = refreshRate;
         this.gattInformation.goal = goal;
         this.gattInformation.cycleStartDate = cycleStartDate;
-        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 15000);
+        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 30000);
     }
 
     fetchState(req, res) {

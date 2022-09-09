@@ -1,15 +1,22 @@
-import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
+import { CompanyTypes, createScraper, ScraperOptions } from 'israeli-bank-scrapers';
 import { ScaperScrapingResult } from 'israeli-bank-scrapers/lib/scrapers/base-scraper';
 
 export default async function scrapeFinancialBE(account, company: String, startDate: Date): Promise<ScaperScrapingResult> {
     try {
-        const options = {
+        let options: ScraperOptions;
+        options = {
             'companyId': company as CompanyTypes,
             'verbose': true,
             'startDate': startDate,
             'combineInstallments': false,
-            'showBrowser': false
+            'showBrowser': process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase().indexOf('dev') != -1
         };
+
+        if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase().indexOf('dev') != -1) {
+            console.log('environment is dev, showing browser and saving screenshot');
+            options.showBrowser = true;
+            options.storeFailureScreenShotPath = './failureScreenshot.png';
+        }
 
         // Scrape is existing results are outdated
         let scrapeResult: ScaperScrapingResult;
@@ -26,12 +33,13 @@ export default async function scrapeFinancialBE(account, company: String, startD
                 })
             });
         } else {
-            throw new Error(scrapeResult.errorType);
+            throw scrapeResult;
         }
         console.log('Total for ', account.name, ' is ', totalAmount);
 
         return scrapeResult;
     } catch (e: any) {
         console.error(`scraping failed for the following reason: ${e.message}`);
+        throw e;
     }
 }
