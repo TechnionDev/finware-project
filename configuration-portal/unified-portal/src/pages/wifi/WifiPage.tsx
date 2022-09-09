@@ -1,7 +1,7 @@
 import React from 'react'
 import "./WifiPage.css";
 
-const WIFI_CONFIG_PORT = 8080;
+const WIFI_CONFIG_PORT = 80;
 
 
 function WifiPage() {

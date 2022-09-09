@@ -40,9 +40,10 @@
     position: relative;
     padding: 0.7em 1em;
     color: white;
-    text-shadow: 0px 0px 7px black;
+    text-shadow: 0 0 1px #272d2d, 0px 0px 5px #392b2b;
+    font-weight: bold;
     text-align: center;
-    font-size: 0.9em;
+    font-size: 1.5em;
 }
 
 .portal-entry-inner-wrapper {
