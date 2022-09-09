@@ -2,6 +2,9 @@ import express from "express";
 import path from "path";
 import mongoose from "mongoose";
 import routerFactory from "./routes";
+// Import https and fs
+import https from "https";
+import fs from "fs";
 
 import { FinancialAccountsController } from "./controllers"
 import { BluetoothController } from "./controllers"
@@ -19,7 +22,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
     new CronJob(
-        '0 * * * *',
+        '0 */15 * * *',
         financeAccountsController.updateFinancialData.bind(financeAccountsController),
         null,
         true, /* start */
@@ -35,12 +38,23 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     app.use(express.static(path.resolve(__dirname, "../build")));
     app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
 
-    app.listen(PORT, () => {
-        console.log(`Server listening on ${PORT}`);
-    });
+    const httpsOptions = {
+        key: fs.readFileSync(path.resolve(__dirname, '../security/cert.key')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../security/cert.pem'))
+    }
+    const server = https.createServer(httpsOptions, app)
+        .listen(PORT, () => {
+            console.log('server running at ' + PORT)
+            console.log('Env is:', process.env.NODE_ENV);
+        })
+        ;
+
+    // app.listen(PORT, () => {
+    //     console.log(`Server listening on ${PORT}`);
+    // });
 
     // All other GET requests not handled before will return our React app
-    app.get("*", (req, res) => {
+    app.get("*", (_req, res) => {
         res.sendFile(path.resolve(__dirname, "../build/", "index.html"));
     });
 
