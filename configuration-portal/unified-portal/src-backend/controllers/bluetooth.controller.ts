@@ -1,5 +1,6 @@
 import BLEManager from "../util-managers/BLEManager";
 import NodeBleHost from "ble-host";
+import { getCycleStartDate, getCycleEndDate, getCycleDayCount } from "./utils"
 const AttErrors = NodeBleHost.AttErrors;
 
 enum UUIDS {
@@ -7,19 +8,21 @@ enum UUIDS {
     CHAR_BANK_INFO = "5b278f16-4460-47e1-919e-2d50d7d0a55d",
     CHAR_REFRESH_RATE = "49dc2b22-2dc4-4a66-afee-d7782b9b81cd",
     CHAR_GOAL = "8f71bd04-89f7-4290-b90f-ac1265f5f127",
-    CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"
+    CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09",
+    CHAR_GRAPH_DATA = "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"
 };
 
 class GATTInformation {
     public bankInfo: object;
     public refreshRate: number;
     public goal: number;
-    public cycleStartDate: Date;
+    public cycleStartDay: number;
+    public graphData: object;
 
-    constructor({ refreshRate, goal, cycleStartDate }) {
+    constructor({ refreshRate, goal, cycleStartDay }) {
         this.refreshRate = refreshRate;
         this.goal = goal;
-        this.cycleStartDate = cycleStartDate;
+        this.cycleStartDay = cycleStartDay;
     }
 
     private services = [
@@ -33,7 +36,17 @@ class GATTInformation {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
                     onRead: (_, callback) => {
-                        callback(AttErrors.SUCCESS, JSON.stringify({ value: this.cycleStartDate }));// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: this.cycleStartDay }));// todo this is super wrong... fix to correctly diff the next cycle with current date
+                    }
+                },
+                {
+                    "uuid": UUIDS.CHAR_GRAPH_DATA,
+                    "properties": ["read"],
+                    onRead: (_, callback) => {
+                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["daysInCycle"] = getCycleDayCount(this.cycleStartDay);
+                        callback(AttErrors.SUCCESS, JSON.stringify(this.graphData));
                     }
                 }
             ]
@@ -80,8 +93,8 @@ class BluetoothController {
     public gattInformation: GATTInformation;
     public totalAmount: number = 0;
 
-    constructor({ refreshRate, goal, cycleStartDate }) {
-        this.gattInformation = new GATTInformation({ refreshRate, goal, cycleStartDate });
+    constructor({ refreshRate, goal, cycleStartDay }) {
+        this.gattInformation = new GATTInformation({ refreshRate, goal, cycleStartDay });
         const SERVICES = this.gattInformation.getServices();
         console.log(SERVICES);
 

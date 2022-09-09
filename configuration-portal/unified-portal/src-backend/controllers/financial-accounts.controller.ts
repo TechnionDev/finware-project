@@ -3,6 +3,7 @@ import FinancialBE from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 import Settings from "../models/Settings";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
+import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle } from "./utils";
 
 class FinanceAccountsController {
     private bluetoothController: BluetoothController;
@@ -25,7 +26,7 @@ class FinanceAccountsController {
         FinancialBE.create({
             ...req.body,
         }).then((_result) => {
-            this.updateFinancialData(true);
+            this.updateFinancialData();
             res.json({ status: "SUCCESS" });
         }).catch((err) => {
             console.log('Error while adding a financialBE: ', err);
@@ -47,10 +48,8 @@ class FinanceAccountsController {
         console.log('Scraping started for financial backends');
         try {
             let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
-            let cycle_start_date = new Date();
-            cycle_start_date.setDate(settings.month_cycle_start_day);
-            cycle_start_date.setMonth(cycle_start_date.getMonth() - 1);
             const now = new Date();
+            const cycleStartDate = getCycleStartDate(settings.month_cycle_start_day);
 
             let scrapeJobs = [];
             for (let fbe of fbes) {
@@ -60,9 +59,9 @@ class FinanceAccountsController {
                     console.log('Account ', fbe.name, ' was recently updated. Skipping.');
                     continue;
                 }
-                console.log("Scraping for account: ", fbe.name, "from start date: ", cycle_start_date);
+                console.log("Scraping for account: ", fbe.name, "from start date: ", cycleStartDate);
                 scrapeJobs.push(
-                    scrapeFinancialBE(fbe, fbe.company, cycle_start_date).then((scrapeResult: ScaperScrapingResult) => {
+                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate).then((scrapeResult: ScaperScrapingResult) => {
                         console.log('Scraping done for', fbe.name);
                         // Update account
                         if (scrapeResult.success) {
@@ -78,6 +77,7 @@ class FinanceAccountsController {
             }
             await Promise.all(scrapeJobs);
             let bankInfo = {};
+            let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
             for (const fbe of fbes) {
                 if (fbe.scrape_result.success == false) {
                     continue;
@@ -87,9 +87,19 @@ class FinanceAccountsController {
                         return accountSum + txn.originalAmount;
                     }, 0);
                 }, 0);
+
+                for (let account of fbe.scrape_result.accounts) {
+                    for (let txn of account.txns) {
+                        const txnCycleIndex = getDateIndexInCycle(cycleStartDate, new Date(txn.date));
+                        graphData.data[txnCycleIndex] += txn.chargedAmount;
+                    }
+                }
             }
+            graphData.data = graphData.data.map((sum => value => sum += value)(0));
             console.log("Settings bank info to: ", bankInfo)
+            console.log("Settings graphData to: ", graphData);
             this.bluetoothController.gattInformation.bankInfo = bankInfo;
+            this.bluetoothController.gattInformation.graphData = graphData;
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };

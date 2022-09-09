@@ -5,14 +5,14 @@ class BluetoothController {
     private connection = "PAIRING";
 
     public totalAmount: number = 0;
-    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, cycleStartDate: 0 }
+    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, cycleStartDay: 0, graphData: {}};
 
 
-    constructor({ refreshRate, goal, cycleStartDate }) {
+    constructor({ refreshRate, goal, cycleStartDay }) {
         this.gattInformation.refreshRate = refreshRate;
         this.gattInformation.goal = goal;
-        this.gattInformation.cycleStartDate = cycleStartDate;
-        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 30000);
+        this.gattInformation.cycleStartDay = cycleStartDay;
+        setInterval(()=>console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     fetchState(req, res) {

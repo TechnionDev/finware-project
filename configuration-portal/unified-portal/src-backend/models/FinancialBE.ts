@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import SettingsModel from './Settings';
-import { FinancialAccountsController } from '../controllers';
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
 
 
