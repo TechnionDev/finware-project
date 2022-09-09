@@ -1,0 +1,6 @@
+.bt-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    margin-top: 2.5em;
+}
