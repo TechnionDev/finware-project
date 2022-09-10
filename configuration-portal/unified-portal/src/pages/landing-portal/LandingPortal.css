@@ -1,0 +1,56 @@
+.landing-portal-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.portal-entries-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    align-content: center;
+    flex-direction: column;
+}
+
+.portal-entry {
+    position: relative;
+    height: clamp(3.5em, 16vh, 7em);
+    border: 1px solid #2c2c2c;
+    width: clamp(0px, 80vw, 20em);
+    margin: 0.6em 0;
+    font-size: 2rem;
+    box-shadow: 0px 0px 4px 1px #000000;
+}
+
+.portal-entry-bg-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(0.4px) brightness(0.7);
+}
+
+.portal-entry-title {
+    position: relative;
+    padding: 0.7em 1em;
+    color: white;
+    text-shadow: 0 0 1px #272d2d, 0px 0px 5px #392b2b;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.portal-entry-inner-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}

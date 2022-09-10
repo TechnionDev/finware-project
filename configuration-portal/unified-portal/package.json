@@ -1,0 +1,62 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://localhost:3001",
+  "dependencies": {
+    "@heroicons/react": "^2.0.10",
+    "@types/node": "^16.11.49",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "autoprefixer": "^10.4.8",
+    "ble-host": "^1.0.3",
+    "classnames": "^2.3.1",
+    "cron": "^2.1.0",
+    "express": "^4.18.1",
+    "flowbite": "^1.5.2",
+    "flowbite-react": "^0.1.10",
+    "install": "^0.13.0",
+    "israeli-bank-scrapers": "^1.14.4",
+    "mongoose": "^6.5.3",
+    "npm": "^8.18.0",
+    "postcss": "^8.4.16",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.1.8",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "mybuild": "react-scripts --max_old_space_size=512 build && npx tsc",
+    "mystart": "node ./backend-build/index.js",
+    "car": "react-scripts --max_old_space_size=512 build && npx tsc && node ./backend-build/index.js",
+    "cbar": "npx tsc && node ./backend-build/index.js",
+    "dev": "concurrently --kill-others \"react-scripts start\" \"NODE_ENV=development ts-node-dev ./src-backend/index.ts\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^7.3.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}

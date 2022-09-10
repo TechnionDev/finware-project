@@ -1,0 +1,19 @@
+[req]
+distinguished_name = FinwareSDG
+x509_extensions = v3_req
+prompt = no
+[FinwareSDG]
+C = IL
+L = Haifa
+O = Finware LTD
+OU = Web Portal
+CN = raspberrypi.local
+[v3_req]
+keyUsage = critical, digitalSignature, keyAgreement
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = raspberrypi.local
+DNS.2 = localhost
+DNS.3 = localhost.local
+
