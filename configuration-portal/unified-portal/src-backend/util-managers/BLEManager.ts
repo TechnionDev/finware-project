@@ -51,6 +51,7 @@ export default class BLEManager {
 
         console.log('Connection established!');
         console.log(conn);
+        console.log(conn.smp);
 
         this.connectionStatus = Connection.PAIRING;
         conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);

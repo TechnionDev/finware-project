@@ -35,6 +35,7 @@ class GATTInformation {
                 {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
                     onRead: (_, callback) => {
                         callback(AttErrors.SUCCESS, JSON.stringify({ value: this.cycleStartDay }));// todo this is super wrong... fix to correctly diff the next cycle with current date
                     }
@@ -42,9 +43,10 @@ class GATTInformation {
                 {
                     "uuid": UUIDS.CHAR_GRAPH_DATA,
                     "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
                     onRead: (_, callback) => {
-                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, {month: "short", day: "numeric"});
-                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, {month: "short", day: "numeric"});
+                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
                         this.graphData["daysInCycle"] = getCycleDayCount(this.cycleStartDay);
                         callback(AttErrors.SUCCESS, JSON.stringify(this.graphData));
                     }
@@ -76,6 +78,7 @@ class GATTInformation {
         return {
             "uuid": uuid,
             "properties": ["read"],
+            "readPerm": "encrypted-mitm-sc",
             onRead
         };
     }
