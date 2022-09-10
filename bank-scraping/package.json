@@ -1,8 +1,0 @@
-{
-  "name": "Finware",
-  "type": "module",
-  "version": "1.0.0",
-  "dependencies": {
-    "israeli-bank-scrapers": "^1.14.4"
-  }
-}
