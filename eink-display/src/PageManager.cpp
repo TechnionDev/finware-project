@@ -1,14 +1,17 @@
 #include "pageManager.h"
 
-PageManager::PageManager(U8G2_FOR_ADAFRUIT_GFX &u8g2_, GxDEPG0213BN &display_)
-    : u8g2(u8g2_), display(display_) {
+PageManager::PageManager(U8G2_FOR_ADAFRUIT_GFX &u8g2_, GxDEPG0213BN &display_,
+                         GraphBuilder &gb_)
+    : u8g2(u8g2_), display(display_), gb(gb_) {
   Serial.println("Initializing display");
   SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
   display.init();  // enable diagnostic output on Serial
   display.fillScreen(GxEPD_WHITE);
   display.setRotation(1);
   u8g2.begin(display);
-  u8g2.setFont(u8g2_font_9x15_tr);            // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  u8g2.setFont(
+      u8g2_font_9x15_tr);    // select u8g2 font from here:
+                             // https://github.com/olikraus/u8g2/wiki/fntlistall
   u8g2.setFontMode(1);       // use u8g2 transparent mode (this is default)
   u8g2.setFontDirection(0);  // left to right (this is default)
   u8g2.setForegroundColor(GxEPD_BLACK);  // apply Adafruit GFX color
@@ -20,12 +23,8 @@ void PageManager::printPageMenu(int pageNum, int totalPages) {
   short y = 9;
   for (int i = 0; i < totalPages; ++i) {
     if (pageNum == i) {
-      // display.drawBitmap(fullCircle, x, y, circleSize, circleSize,
-      // GxEPD_BLACK, 0);
       display.fillCircle(x, y, 8, GxEPD_BLACK);
     } else {
-      // display.drawBitmap(emptyCircle, x, y, circleSize, circleSize,
-      // GxEPD_BLACK, 0);
       display.drawCircle(x, y, 8, GxEPD_BLACK);
     }
     x += 21;
@@ -57,37 +56,6 @@ void PageManager::printTotalSum(int totalSum) {
   u8g2.setCursor(HCENTER(display.width(), String(totalSum)),
                  VCENTER(display.height(), String(totalSum)) - 5);
   u8g2.print((std::to_string(totalSum)).c_str());
-  u8g2.print("₪");
-}
-
-void PageManager::printProgressBar(int totalSum, int monthlyGoal) {
-  display.drawRoundRect(5, 90, 150, 30, 6, GxEPD_BLACK);
-  int ratio = 0;
-  if (totalSum >= monthlyGoal) {
-    ratio = 12;
-  } else {
-    ratio = floor(((double(totalSum) / monthlyGoal) * 12));
-  }
-  Serial.println(std::to_string(ratio).c_str());
-  int x = 9;
-  for (int i = 0; i < ratio; i++) {
-    display.fillRect(x, 92, 10, 26, GxEPD_BLACK);
-    x += 10 + 2;
-  }
-}
-
-void PageManager::printMonthlyGoal(int monthlyGoal) {
-  display.setFont(&FreeMono9pt7b);
-  display.setCursor(180, 95);
-  display.print("Goal");
-  display.drawFastHLine(173, 99, 54, GxEPD_BLACK);
-  if (monthlyGoal < 1000) {
-    display.setCursor(186, 115);
-    display.print(std::to_string(monthlyGoal).c_str());
-  } else {
-    display.setCursor(173, 115);
-    display.print(std::to_string(monthlyGoal).c_str());
-  }
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
@@ -150,13 +118,17 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
 }
 
 void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
-  int y = 44;
-  display.setFont(&FreeMonoBold12pt7b);
+  u8g2.setFont(u8g2_font_9x15_tr);
+  u8g2.setCursor(HCENTER(display.width(), String("Credit Cards")), 15);
+  u8g2.print("Credit Cards");
+
+  u8g2.setFont(u8g2_font_10x20_tr);
+  int y = 42;
   for (const auto &it : cardMap) {
-    display.setCursor(3, y);
-    display.println((it.first + ":").c_str());
-    display.setCursor(150, y);
-    display.println(std::to_string(it.second).c_str());
+    u8g2.setCursor(3, y);
+    u8g2.println((it.first + ":").c_str());
+    u8g2.setCursor(180, y);
+    u8g2.println(std::to_string(it.second).c_str());
     y += 25;
   }
 }
@@ -167,40 +139,54 @@ void resetDisplay(GxDEPG0213BN &display) {
 }
 
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
-  Serial.println("Starting printing first page");
+  Serial.println("Printing Total Sum page");
   resetDisplay(display);
   printPageMenu(0, 3);
   printDaysLeft(daysLeft);
   printTotalSum(totalSum);
   printProgressAndGoal(totalSum, monthlyGoal);
-  //   printProgressBar(totalSum, monthlyGoal);
-  //   printMonthlyGoal(monthlyGoal);
-  Serial.println("end print");
   display.update();
-  Serial.println("end update");
 }
 
 void PageManager::showCardSpendingPage(
     const std::map<std::string, int> &cardMap) {
-  Serial.println("Starting printing spending page");
+  Serial.println("Printing Card Spending page");
   resetDisplay(display);
   printPageMenu(1, 3);
   printCardSpending(cardMap);
-  Serial.println("end print");
   display.update();
-  Serial.println("end update");
 }
 
 void PageManager::showPassKey(uint32_t pass_key) {
-  Serial.println("Hi im showing the passkey");
+  showTitle(String(pass_key), String("Enter passkey:"));
+}
+
+void PageManager::showTitle(String title, String subtitle, int delayAfter) {
   resetDisplay(display);
-  display.setFont(&FreeMonoBold12pt7b);
-  display.setCursor(30, 15);
-  display.println("Enter passkey:");
-  display.setFont(&FreeMonoBold18pt7b);
-  display.setCursor(60, 70);
-  display.println(pass_key);
+  u8g2.setFont(u8g2_font_9x15_tr);
+  u8g2.setCursor(HCENTER(display.width(), subtitle), 20);
+  u8g2.print(subtitle.c_str());
+
+  u8g2.setFont(u8g2_font_fub20_tr);
+  u8g2.setCursor(HCENTER(display.width(), title),
+                 VCENTER(display.height(), title));
+  u8g2.print(title.c_str());
   display.update();
-  delay(30000);
-  // TODO::CALL BLOCKFUNC
+
+  delay(delayAfter);
+}
+
+#define MAX_DATA_POINTS 31
+void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,
+                                int daysInCycle, JsonArray dataPoints) {
+  Serial.println("Printing Monthly Spending Graph page");
+  resetDisplay(display);
+  printPageMenu(2, 3);
+  float dataPointsArr[MAX_DATA_POINTS];
+  copyArray(dataPoints, dataPointsArr);
+
+  gb.DrawGraph(30, 24, 215, 80, -1, -1, "Monthly Spending", dataPointsArr,
+               dataPoints.size(), daysInCycle, cycleStartDate, cycleEndDate,
+               true, true);
+  display.update();
 }
