@@ -43,8 +43,8 @@ class GATTInformation {
                     "uuid": UUIDS.CHAR_GRAPH_DATA,
                     "properties": ["read"],
                     onRead: (_, callback) => {
-                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
-                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, {month: "short", day: "numeric"});
+                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, {month: "short", day: "numeric"});
                         this.graphData["daysInCycle"] = getCycleDayCount(this.cycleStartDay);
                         callback(AttErrors.SUCCESS, JSON.stringify(this.graphData));
                     }
