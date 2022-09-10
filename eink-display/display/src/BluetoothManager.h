@@ -45,40 +45,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   }    // onResult
 };     // MyAdvertisedDeviceCallbacks
 
-class MySecurity : public BLESecurityCallbacks {
- private:
-  PageManager pageManager;
-
- public:
-  MySecurity(PageManager pageManager) : pageManager(pageManager) {}
-
-  uint32_t onPassKeyRequest() { return 123456; }
-  void onPassKeyNotify(uint32_t pass_key) {
-    Serial.printf("onPassKeyNotify \n");
-    ESP_LOGE(LOG_TAG, "The passkey Notify number:%d", pass_key);
-    pageManager.showPassKey(pass_key);
-  }
-  bool onConfirmPIN(uint32_t pass_key) {
-    Serial.printf("onConfirmPIN \n");
-    Serial.printf("The passkey YES/NO number:%d", pass_key);
-    vTaskDelay(5000);
-    return true;
-  }
-  bool onSecurityRequest() {
-    Serial.printf("onSecurityRequest \n");
-    ESP_LOGI(LOG_TAG, "Security Request");
-    return true;
-  }
-  void onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl) {
-    if (auth_cmpl.success) {
-      ESP_LOGI(LOG_TAG, "remote BD_ADDR:");
-      esp_log_buffer_hex(LOG_TAG, auth_cmpl.bd_addr, sizeof(auth_cmpl.bd_addr));
-      ESP_LOGI(LOG_TAG, "address type = %d", auth_cmpl.addr_type);
-    }
-    ESP_LOGI(LOG_TAG, "pair status = %s",
-             auth_cmpl.success ? "success" : "fail");
-  }
-};
 
 typedef std::map<std::string, int> cardsSpending;
 
@@ -90,15 +56,22 @@ class BluetoothManager {
       {"BankInfo", "5b278f16-4460-47e1-919e-2d50d7d0a55d"},
       {"RefreshRate", "49dc2b22-2dc4-4a66-afee-d7782b9b81cd"},
       {"Goal", "8f71bd04-89f7-4290-b90f-ac1265f5f127"},
-      {"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"}};
+      {"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"},
+      {"GraphData", "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"}};
 
  public:
-  BluetoothManager(PageManager& pageManager);
+  BluetoothManager(PageManager &pageManager);
   cardsSpending getBankInfo();
   int getRefreshRate();
   int getGoal();
   int getDaysLeft();
+  // String getCycleStartDate();
+  // String getCycleEndDate();
+  // int getDaysInCycle();
+  DynamicJsonDocument getGraphData();
+  // blm.getGraphDataPoints());
   bool connectToServer(BLEAddress pAddress);
 };
 
+void waitForAuth(); 
 #endif  // DISPLAY_SRC_BLUETOOTHMANAGER_H_

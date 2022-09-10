@@ -44,37 +44,27 @@ void blockUntilPress() {
   int last = 1;
   int now = digitalRead(GPIO_NUM_39);
   while (now == 1) {
-    if (now != last) {
-      Serial.printf("Now: %d, Last:%d\n", now, last);
-    }
     last = now;
     delay(1);
     now = digitalRead(GPIO_NUM_39);
   }
 }
 
-const uint8_t* currentFont = u8g2_font_8x13_tr;
-
 GraphBuilder::GraphBuilder(GxEPD_Class& display_, U8G2_FOR_ADAFRUIT_GFX& u8g2_)
     : display(display_), u8g2(u8g2_) {}
-void GraphBuilder::drawString(int x, int y, String text, alignment align) {
-  Serial.println("1.1");
-  Serial.println(text);
+
+void GraphBuilder::drawString(int x, int y, String text, alignment align,
+                              const uint8_t font[] = u8g2_font_6x10_tr) {
   int16_t x1,
       y1;  // the bounds of x,y and w and h of the variable 'text' in pixels.
   uint16_t w, h;
   display.getTextBounds(text, x, y, &x1, &y1, &w, &h);
-  Serial.println("1.2");
   if (align == RIGHT) x = x - w;
   if (align == CENTER) x = x - w / 2;
   int cursor_y = y + h;
-  Serial.println("1.3");
   u8g2.setCursor(x, cursor_y);
-  Serial.println("1.4");
-  u8g2.setFont(currentFont);
-  Serial.println("1.5");
+  u8g2.setFont(font);
   u8g2.print(text.c_str());
-  Serial.println("1.6");
 }
 
 void GraphBuilder::fillCircle(int x, int y, int r, uint16_t color) {
@@ -124,45 +114,47 @@ void GraphBuilder::setFont(const uint8_t* font) { u8g2.setFont(font); }
 void GraphBuilder::edp_update() { display.update(); }
 
 void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
-                             float Y1Min, float Y1Max, String title,
+                             int Y1Min, int Y1Max, String title,
                              float DataArray[], int readings,
-                             boolean auto_scale, boolean barchart_mode) {
+                             int max_data_points, String x_start_title,
+                             String x_end_title, boolean auto_scale,
+                             boolean barchart_mode) {
 #define auto_scale_margin \
   0  // Sets the autoscale increment, so axis steps up fter a change of e.g. 3
 #define y_minor_axis 5  // 5 y-axis division markers
-  setFont(u8g2_font_8x13_tr);
   int maxYscale = -10000;
   int minYscale = 10000;
   int last_x, last_y;
   float x2, y2;
-  Serial.println("1");
   if (auto_scale == true) {
-    for (int i = 1; i < readings; i++) {
+    for (int i = 0; i < readings; i++) {
       if (DataArray[i] >= maxYscale) maxYscale = DataArray[i];
       if (DataArray[i] <= minYscale) minYscale = DataArray[i];
     }
-    maxYscale =
-        round(maxYscale +
-              auto_scale_margin);  // Auto scale the graph and round to the
-                                   // nearest value defined, default was Y1Max
+    // Auto scale the graph and round to the
+    // nearest value defined, default was Y1Max
+    maxYscale = round(maxYscale + auto_scale_margin);
     Y1Max = round(maxYscale);
-    if (minYscale != 0)
-      minYscale =
-          round(minYscale -
-                auto_scale_margin);  // Auto scale the graph and round to the
-                                     // nearest value defined, default was Y1Min
+    // Auto scale the graph and round to the
+    // nearest value defined, default was Y1Min
+    if (minYscale != 0) {
+      minYscale = round(minYscale - auto_scale_margin);
+    }
     Y1Min = round(minYscale);
   }
+  Y1Min = Y1Min - ((int)Y1Min % 200);
+  Y1Max = Y1Max + (200 - ((int)Y1Max % 200));
 
   // Draw the graph
   last_x = x_pos + 1;
   last_y = y_pos + (Y1Max - constrain(DataArray[0], Y1Min, Y1Max)) /
                        (Y1Max - Y1Min) * gheight;
   drawRect(x_pos, y_pos, gwidth + 3, gheight + 2, Grey);
-  drawString(x_pos - 20 + gwidth / 2, y_pos - 18, title, CENTER);
+  drawString(x_pos - 20 + gwidth / 2, y_pos - 18, title, CENTER,
+             u8g2_font_9x15_tr);
   for (int gx = 0; gx < readings; gx++) {
     // x2 = x_pos + gx * gwidth / (readings - 1) -
-    x2 = x_pos + gx * gwidth / (20 - 1) - // TODO: change the "20" to be a parameter or something for days in month, this chooses how much of the width of the graph is used
+    x2 = x_pos + gx * gwidth / (max_data_points - 1) -
          1;  // max_readings is the global variable that sets the maximum data
              // that can be plotted
     y2 = y_pos +
@@ -170,7 +162,7 @@ void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
              gheight +
          1;
     if (barchart_mode) {
-      fillRect(last_x + 2, y2, (gwidth / readings) - 1,
+      fillRect(last_x + 2, y2, (gwidth / max_data_points) - 1,
                y_pos + gheight - y2 + 2, Black);
     } else {
       drawLine(last_x, last_y - 1, x2, y2 - 1,
@@ -191,34 +183,19 @@ void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
                       y_pos + (gheight * spacing / y_minor_axis),
                       gwidth / (2 * number_of_dashes), Grey);
     }
-    if ((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing) < 5) {
-      drawString(
-          x_pos - 10, y_pos + gheight * spacing / y_minor_axis - 5,
-          String(
-              (Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing + 0.01),
-              1),
-          RIGHT);
-    } else {
-      if (Y1Min < 1 && Y1Max < 10) {
-        drawString(
-            x_pos - 3, y_pos + gheight * spacing / y_minor_axis - 5,
-            String((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing +
-                    0.01),
-                   1),
-            RIGHT);
-      } else {
-        drawString(
-            x_pos - 7, y_pos + gheight * spacing / y_minor_axis - 5,
-            String((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing +
-                    0.01),
-                   0),
-            RIGHT);
-      }
-    }
+
+    drawString(
+        x_pos - 3, y_pos + ((gheight * spacing) / y_minor_axis) - 3,
+        String((int)(Y1Max - (Y1Max - Y1Min) / y_minor_axis * spacing + 0.01)),
+        RIGHT);
   }
+
+  drawString(x_pos, y_pos + gheight + 4, x_start_title, LEFT);
+  drawString(x_pos + gwidth, y_pos + gheight + 4, x_end_title, RIGHT);
+
   for (int i = 0; i < 3; i++) {
-    drawString(20 + x_pos + gwidth / 3 * i, y_pos + gheight + 10,
-               String(i) + "d", LEFT);
+    // drawString(20 + x_pos + gwidth / 3 * i, y_pos + gheight + 10,
+    //  String(i) + "d", LEFT);
     if (i < 2)
       drawFastVLine(x_pos + gwidth / 3 * i + gwidth / 3, y_pos, gheight,
                     LightGrey);
