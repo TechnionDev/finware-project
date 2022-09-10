@@ -1,29 +1,30 @@
+#ifndef BOARD_HAS_PSRAM
+#error "Please enable PSRAM !!!"
+#endif
+
 #include <Arduino.h>
-/*
-      Based on Neil Kolban example for IDF:
-   https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleScan.cpp
-      Ported to Arduino ESP32 by Evandro Copercini
-*/
-#define LILYGO_T5_V213
+#include <SD.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <esp_task_wdt.h>
 
-#include <GxDEPG0213BN/GxDEPG0213BN.h>  // 2.13" b/w  form DKE GROUP
-#include <GxEPD.h>
-#include <boards.h>
+#include "epd_driver.h"
+#include "esp_adc_cal.h"
+#include "firasans.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "logo.h"
 
-#include GxEPD_BitmapExamples
-// FreeFonts from Adafruit_GFX
 #include <BLEAdvertisedDevice.h>
 #include <BLEDevice.h>
 #include <BLEScan.h>
 #include <BLEUtils.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
-#include <Fonts/FreeMonoBold18pt7b.h>
-#include <Fonts/FreeMonoBold9pt7b.h>
-#include <GxIO/GxIO.h>
-#include <GxIO/GxIO_SPI/GxIO_SPI.h>
 
-#include <iostream>
-#include <bits/stdc++.h>
+#define BATT_PIN 36
+#define SD_MISO 12
+#define SD_MOSI 13
+#define SD_SCLK 14
+#define SD_CS 15
 
 void displaymsg(const char *msg);
 void blockUnillAccept() {
@@ -50,8 +51,6 @@ static boolean connected = false;
 static BLERemoteCharacteristic *pRemoteCharacteristic;
 static char *LOG_TAG = "INFO";
 
-GxIO_Class io(SPI, EPD_CS, EPD_DC, EPD_RSET);
-GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
 
 class MySecurity : public BLESecurityCallbacks {
   uint32_t onPassKeyRequest() { return 123456; }
@@ -158,7 +157,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
    * Called for each advertising BLE server.
    */
   void onResult(BLEAdvertisedDevice advertisedDevice) {
-    Serial.print("Dani BLE Advertised Device found: ");
+    Serial.print("BLE Advertised Device found: ");
     Serial.println(advertisedDevice.toString().c_str());
 
     // We have found a device, let us now see if it contains the service we are
@@ -177,12 +176,54 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 };     // MyAdvertisedDeviceCallbacks
 
 void setup() {
+  char buf[128];
+
   Serial.begin(115200);
+
+  /*
+   * SD Card test
+   * Only as a test SdCard hardware, use example reference
+   * https://github.com/espressif/arduino-esp32/tree/master/libraries/SD/examples
+   * * */
+  SPI.begin(SD_SCLK, SD_MISO, SD_MOSI);
+  pinMode(GPIO_NUM_39, INPUT);
+  epd_init();
+
+  framebuffer =
+      (uint8_t *)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
+  if (!framebuffer) {
+    Serial.println("alloc memory failed !!!");
+    while (1)
+      ;
+  }
+  memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
+
+  Rect_t area = {
+      .x = 230,
+      .y = 20,
+      .width = logo_width,
+      .height = logo_height,
+  };
+
+  epd_poweron();
+  epd_clear();
+  epd_poweroff();
+
+  int cursor_x = 200;
+  int cursor_y = 250;
+
+  const char *string1 = "➸ 16 color grayscale  😀 \n";
+  const char *string2 = "➸ Use with 4.7\" EPDs 😍 \n";
+  const char *string3 = "➸ High-quality font rendering ✎🙋";
+  const char *string4 = "➸ ~630ms for full frame draw 🚀\n";
+  const char *string5 = "I LOVE THE SCOOPOT";
+
+  epd_poweron();
+
+  writeln((GFXfont *)&FiraSans, string5, &cursor_x, &cursor_y, NULL);
+
   Serial.println("Starting Arduino BLE Client application...");
   BLEDevice::init("");
-  pinMode(GPIO_NUM_39, INPUT);
-  SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
-  display.init();  // enable diagnostic output on Serial
   // Retrieve a Scanner and set the callback we want to use to be informed when
   // we have detected a new device.  Specify that we want active scanning and
   // start the scan to run for 30 seconds.
@@ -223,11 +264,127 @@ void loop() {
 }
 
 void displaymsg(const char *msg) {
-  display.setRotation(1);
-  display.fillScreen(GxEPD_WHITE);
-  display.setTextColor(GxEPD_BLACK);
-  display.setFont(&FreeMonoBold12pt7b);
-  display.setCursor(0, 45);
-  display.println(msg);
-  display.update();
+
+}
+
+uint8_t *framebuffer;
+int vref = 1100;
+
+void setup() {
+  char buf[128];
+
+  Serial.begin(115200);
+
+  /*
+   * SD Card test
+   * Only as a test SdCard hardware, use example reference
+   * https://github.com/espressif/arduino-esp32/tree/master/libraries/SD/examples
+   * * */
+  SPI.begin(SD_SCLK, SD_MISO, SD_MOSI);
+  bool rlst = SD.begin(SD_CS);
+  if (!rlst) {
+    Serial.println("SD init failed");
+    snprintf(buf, 128, "➸ No detected SdCard");
+  } else {
+    snprintf(buf, 128, "➸ Detected SdCard insert:%.2f GB",
+             SD.cardSize() / 1024.0 / 1024.0 / 1024.0);
+  }
+
+  // Correct the ADC reference voltage
+  esp_adc_cal_characteristics_t adc_chars;
+  esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
+      ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+  if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
+    Serial.printf("eFuse Vref:%u mV", adc_chars.vref);
+    vref = adc_chars.vref;
+  }
+
+  epd_init();
+
+  framebuffer =
+      (uint8_t *)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
+  if (!framebuffer) {
+    Serial.println("alloc memory failed !!!");
+    while (1)
+      ;
+  }
+  memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
+
+  Rect_t area = {
+      .x = 230,
+      .y = 20,
+      .width = logo_width,
+      .height = logo_height,
+  };
+
+  epd_poweron();
+  epd_clear();
+  epd_draw_grayscale_image(area, (uint8_t *)logo_data);
+  epd_poweroff();
+
+  int cursor_x = 200;
+  int cursor_y = 250;
+
+  const char *string1 = "➸ 16 color grayscale  😀 \n";
+  const char *string2 = "➸ Use with 4.7\" EPDs 😍 \n";
+  const char *string3 = "➸ High-quality font rendering ✎🙋";
+  const char *string4 = "➸ ~630ms for full frame draw 🚀\n";
+  const char *string5 = "I LOVE THE SCOOPOT";
+
+  epd_poweron();
+
+  writeln((GFXfont *)&FiraSans, string5, &cursor_x, &cursor_y, NULL);
+  delay(500);
+  return;
+  cursor_x = 200;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, string1, &cursor_x, &cursor_y, NULL);
+  delay(500);
+  cursor_x = 200;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, string2, &cursor_x, &cursor_y, NULL);
+  delay(500);
+  cursor_x = 200;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, string3, &cursor_x, &cursor_y, NULL);
+  delay(500);
+  cursor_x = 200;
+  cursor_y += 50;
+  writeln((GFXfont *)&FiraSans, string4, &cursor_x, &cursor_y, NULL);
+  delay(500);
+
+  epd_poweroff();
+}
+
+void loop() {
+  // When reading the battery voltage, POWER_EN must be turned on
+  epd_poweron();
+  delay(10);  // Make adc measurement more accurate
+  uint16_t v = analogRead(BATT_PIN);
+  float battery_voltage = ((float)v / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
+  String voltage = "➸ Voltage: " + String(battery_voltage) + "V";
+  Serial.println(voltage);
+
+  Rect_t area = {
+      .x = 200,
+      .y = 460,
+      .width = 320,
+      .height = 50,
+  };
+
+  int cursor_x = 200;
+  int cursor_y = 500;
+  epd_clear_area(area);
+  writeln((GFXfont *)&FiraSans, (char *)voltage.c_str(), &cursor_x, &cursor_y,
+          NULL);
+
+  // There are two ways to close
+
+  // It will turn off the power of the ink screen, but cannot turn off the blue
+  // LED light. epd_poweroff();
+
+  // It will turn off the power of the entire
+  //  POWER_EN control and also turn off the blue LED light
+  epd_poweroff_all();
+  delay(1000000);
 }
