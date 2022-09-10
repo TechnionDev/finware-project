@@ -104,7 +104,8 @@ class BluetoothController {
             console.log("BLE initialized");
         });
 
-        setInterval(() => console.log("Gatt information: ", this.gattInformation), 15000);
+        // setInterval(() => console.log("Gatt information: ", this.gattInformation), 15000);
+        setTimeout(() => console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     private passkeyHandler() {

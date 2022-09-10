@@ -49,9 +49,9 @@ function FinancialAccountsList() {
                         Add Account
                     </Link>
                 </Button>
-<Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
-            Scrape Financial Accounts
-          </Button>
+                <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
+                    Scrape Financial Accounts
+                </Button>
             </div>
         </div >
     );

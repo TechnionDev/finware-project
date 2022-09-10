@@ -22,7 +22,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
     new CronJob(
-        '0 */15 * * *',
+        '0 */5 * * * *',
         financeAccountsController.updateFinancialData.bind(financeAccountsController),
         null,
         true, /* start */
