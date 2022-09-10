@@ -38,20 +38,20 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     app.use(express.static(path.resolve(__dirname, "../build")));
     app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
 
-    // const httpsOptions = {
-    //     key: fs.readFileSync(path.resolve(__dirname, '../security/cert.key')),
-    //     cert: fs.readFileSync(path.resolve(__dirname, '../security/cert.pem'))
-    // }
-    // const server = https.createServer(httpsOptions, app)
-    //     .listen(PORT, () => {
-    //         console.log('server running at ' + PORT)
-    //         console.log('Env is:', process.env.NODE_ENV);
-    //     })
-    //     ;
+    const httpsOptions = {
+        key: fs.readFileSync(path.resolve(__dirname, '../security/cert.key')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../security/cert.pem'))
+    }
+    const server = https.createServer(httpsOptions, app)
+        .listen(PORT, () => {
+            console.log('server running at ' + PORT)
+            console.log('Env is:', process.env.NODE_ENV);
+        })
+        ;
 
-    app.listen(PORT, () => {
-        console.log(`Server listening on ${PORT}`);
-    });
+    // app.listen(PORT, () => {
+    //     console.log(`Server listening on ${PORT}`);
+    // });
 
     // All other GET requests not handled before will return our React app
     app.get("*", (_req, res) => {

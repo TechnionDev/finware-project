@@ -45,11 +45,11 @@ class FinanceAccountsController {
     }
 
     async updateFinancialData(forceUpdate = false) {
-        console.log('Scraping started for financial backends');
         try {
             let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
             const cycleStartDate = getCycleStartDate(settings.month_cycle_start_day);
+            console.log(`Scraping started for financial backends. Scraping from date: ${cycleStartDate.toDateString()}`);
 
             let scrapeJobs = [];
             for (let fbe of fbes) {
