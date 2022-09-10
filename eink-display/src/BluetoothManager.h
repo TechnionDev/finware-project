@@ -30,21 +30,16 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
     Serial.print("BLE Advertised Device found: ");
     Serial.println(advertisedDevice.toString().c_str());
 
-    // We have found a device, let us now see if it contains the service we are
-    // looking for.
     if (advertisedDevice.haveServiceUUID() &&
         advertisedDevice.getServiceUUID().equals(serviceUUID)) {
-      //
-      Serial.print("Found our device!  address: ");
+      Serial.print(" - Found the RaspberryPi!");
       advertisedDevice.getScan()->stop();
 
       pServerAddress = new BLEAddress(advertisedDevice.getAddress());
       doConnect = true;
-
-    }  // Found our server
-  }    // onResult
-};     // MyAdvertisedDeviceCallbacks
-
+    }
+  }
+};
 
 typedef std::map<std::string, int> cardsSpending;
 
@@ -65,13 +60,9 @@ class BluetoothManager {
   int getRefreshRate();
   int getGoal();
   int getDaysLeft();
-  // String getCycleStartDate();
-  // String getCycleEndDate();
-  // int getDaysInCycle();
   DynamicJsonDocument getGraphData();
-  // blm.getGraphDataPoints());
   bool connectToServer(BLEAddress pAddress);
 };
 
-void waitForAuth(); 
+void waitForAuth();
 #endif  // DISPLAY_SRC_BLUETOOTHMANAGER_H_

@@ -23,12 +23,8 @@ void PageManager::printPageMenu(int pageNum, int totalPages) {
   short y = 9;
   for (int i = 0; i < totalPages; ++i) {
     if (pageNum == i) {
-      // display.drawBitmap(fullCircle, x, y, circleSize, circleSize,
-      // GxEPD_BLACK, 0);
       display.fillCircle(x, y, 8, GxEPD_BLACK);
     } else {
-      // display.drawBitmap(emptyCircle, x, y, circleSize, circleSize,
-      // GxEPD_BLACK, 0);
       display.drawCircle(x, y, 8, GxEPD_BLACK);
     }
     x += 21;
@@ -143,20 +139,18 @@ void resetDisplay(GxDEPG0213BN &display) {
 }
 
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
-  Serial.println("Starting printing first page");
+  Serial.println("Printing Total Sum page");
   resetDisplay(display);
   printPageMenu(0, 3);
   printDaysLeft(daysLeft);
   printTotalSum(totalSum);
   printProgressAndGoal(totalSum, monthlyGoal);
-  //   printProgressBar(totalSum, monthlyGoal);
-  //   printMonthlyGoal(monthlyGoal);
   display.update();
 }
 
 void PageManager::showCardSpendingPage(
     const std::map<std::string, int> &cardMap) {
-  Serial.println("Starting printing spending page");
+  Serial.println("Printing Card Spending page");
   resetDisplay(display);
   printPageMenu(1, 3);
   printCardSpending(cardMap);
@@ -185,6 +179,7 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
 #define MAX_DATA_POINTS 31
 void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,
                                 int daysInCycle, JsonArray dataPoints) {
+  Serial.println("Printing Monthly Spending Graph page");
   resetDisplay(display);
   printPageMenu(2, 3);
   float dataPointsArr[MAX_DATA_POINTS];

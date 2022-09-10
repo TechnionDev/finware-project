@@ -194,8 +194,6 @@ void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
   drawString(x_pos + gwidth, y_pos + gheight + 4, x_end_title, RIGHT);
 
   for (int i = 0; i < 3; i++) {
-    // drawString(20 + x_pos + gwidth / 3 * i, y_pos + gheight + 10,
-    //  String(i) + "d", LEFT);
     if (i < 2)
       drawFastVLine(x_pos + gwidth / 3 * i + gwidth / 3, y_pos, gheight,
                     LightGrey);

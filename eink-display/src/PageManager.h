@@ -44,7 +44,6 @@ class PageManager {
   void showGraphPage(String cycleStartDate, String cycleEndDate,
                      int daysInCycle, JsonArray dataPoints);
   void showTitle(String title, String subtitle, int delayAfter=0);
-  // void showGraphPage();
 };
 
 #endif  // DISPLAY_SRC_PAGEMANAGER_H_

@@ -12,19 +12,19 @@ class MySecurity : public BLESecurityCallbacks {
  public:
   MySecurity(PageManager pageManager) : pageManager(pageManager) {}
 
-  uint32_t onPassKeyRequest() { return 123456; }
+  uint32_t onPassKeyRequest() { return 0; }
+
   void onPassKeyNotify(uint32_t pass_key) {
     Serial.printf("onPassKeyNotify \n");
     pageManager.showPassKey(pass_key);
   }
-  bool onConfirmPIN(uint32_t pass_key) {
-    return false;
-  }
+  bool onConfirmPIN(uint32_t pass_key) { return false; }
+
   bool onSecurityRequest() {
     Serial.printf("onSecurityRequest \n");
-    ESP_LOGI(LOG_TAG, "Security Request");
-    return true;
+    return false;
   }
+
   void onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl) {
     if (auth_cmpl.success) {
       authed = true;
@@ -40,12 +40,7 @@ class MySecurity : public BLESecurityCallbacks {
 };
 
 static void notifyCallback(BLERemoteCharacteristic *pBLERemoteCharacteristic,
-                           uint8_t *pData, size_t length, bool isNotify) {
-  Serial.print("Notify callback for characteristic ");
-  Serial.print(pBLERemoteCharacteristic->getUUID().toString().c_str());
-  Serial.print(" of data length ");
-  Serial.println(length);
-}
+                           uint8_t *pData, size_t length, bool isNotify) {}
 
 bool BluetoothManager::connectToServer(BLEAddress pAddress) {
   Serial.print("Forming a connection to ");
@@ -55,16 +50,13 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
   BLEDevice::setSecurityCallbacks(new MySecurity(pageManager));
 
   BLESecurity *pSecurity = new BLESecurity();
-  // TODO::SWITCH TO BOND
   pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
-  // pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM);
 
   pSecurity->setCapability(ESP_IO_CAP_OUT);
   pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
   BLEClient *pClient = BLEDevice::createClient();
   Serial.println(" - Created client");
 
-  // Connect to the remove(remote?) BLE Server.
   pClient->connect(pAddress, BLE_ADDR_TYPE_PUBLIC);
   Serial.println(" - Connected to server");
 
@@ -75,12 +67,10 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
     Serial.println(serviceUUID.toString().c_str());
     return false;
   }
-  Serial.println(" - Found our service");
 
-  // Obtain a reference to the characteristic in the service of the remote BLE
-  // server.
-  return true;  // TODO: i dont think finding all the characteristics is
-                // important, think about this more
+  // TODO: i dont think finding all the characteristics is important, think
+  // about this more
+  /*
   for (const auto &it : this->ServiceName2ServiceUuid) {
     BLERemoteCharacteristic *pRemoteCharacteristic =
         this->pRemoteService->getCharacteristic(BLEUUID(it.second));
@@ -92,13 +82,14 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
     Serial.println((" - Found this characteristic: " + it.first).c_str());
   }
   Serial.println("Found all characteristics!");
+  */
   return true;
 }
+
 /**
  * Scan for BLE servers and find the first one that advertises the service we
  * are looking for.
  */
-
 BluetoothManager::BluetoothManager(PageManager &pageManager)
     : pageManager(pageManager) {}
 
@@ -111,16 +102,13 @@ cardsSpending BluetoothManager::getBankInfo() {
     Serial.println(error.c_str());
     return {};
   }
+
   cardsSpending bankInfo;
   JsonObject root = doc.as<JsonObject>();
   for (JsonPair kv : root) {
     bankInfo[kv.key().c_str()] = -kv.value().as<int>();
   }
 
-  // for (const auto &it : bankInfo) {
-  //   Serial.println(it.first.c_str());
-  //   Serial.println(it.second);
-  // }
   return bankInfo;
 }
 

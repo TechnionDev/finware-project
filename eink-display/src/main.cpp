@@ -32,11 +32,7 @@ void setup() {
   Serial.println("Setup done");
 }
 
-// This is the Arduino main loop function.
 void loop() {
-  // If the flag "doConnect" is true then we have scanned for and found the
-  // desired BLE Server with which we wish to connect.  Now we connect to it.
-  // Once we are connected we set the connected flag to be true.
   if (doConnect) {
     if (blm.connectToServer(*pServerAddress)) {
       Serial.println("We are now connected to the BLE Server.");
@@ -49,18 +45,17 @@ void loop() {
     doConnect = false;
   }
   waitForAuth();
-  // If we are connected to a peer BLE Server, update the characteristic each
-  // time we are reached with the current time since boot.
   if (connected) {
-    int totalSum = 0;
-    for (const auto& it : blm.getBankInfo()) {
-      totalSum += it.second;
-    }
-
+    auto bankInfo = blm.getBankInfo();
     DynamicJsonDocument doc = blm.getGraphData();
     int daysLeft = blm.getDaysLeft();
     int goal = blm.getGoal();
-    auto bankInfo = blm.getBankInfo();
+
+    int totalSum = 0;
+    for (const auto& it : bankInfo) {
+      totalSum += it.second;
+    }
+
     while (true) {
       pageManager.showSumPage(totalSum, daysLeft, goal);
       blockUntilPress();
@@ -71,9 +66,6 @@ void loop() {
       blockUntilPress();
     }
 
-    delay(blm.getRefreshRate() * 1000);  // Delay a second between loops.
+    delay(blm.getRefreshRate() * 1000);
   }
-  if (!connected) {
-    delay(100000);
-  }
-}  // End of loop
+}
