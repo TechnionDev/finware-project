@@ -91,7 +91,7 @@ class FinanceAccountsController {
                 for (let account of fbe.scrape_result.accounts) {
                     for (let txn of account.txns) {
                         const txnCycleIndex = getDateIndexInCycle(cycleStartDate, new Date(txn.date));
-                        graphData.data[txnCycleIndex] += txn.chargedAmount;
+                        graphData.data[txnCycleIndex] += -txn.chargedAmount;
                     }
                 }
             }
