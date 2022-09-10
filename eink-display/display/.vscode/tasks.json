@@ -1,7 +1,7 @@
 {
     "label": "Upload to",
     "type": "shell",
-    "command": "./upload-and-monitor.bat",
+    "command": "./saar-uam.bat",
     "presentation": {
         "echo": true,
         "reveal": "always",
