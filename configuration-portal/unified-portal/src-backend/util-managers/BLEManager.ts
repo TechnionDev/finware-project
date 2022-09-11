@@ -70,7 +70,7 @@ export default class BLEManager {
         // Without this event handler the I/O capabilities will be no input, no output
         conn.smp.on('pairingRequest', (req, callback) => {
             console.log("Pairing request");
-            callback({ ioCap: IOCapabilities.KEYBOARD_ONLY, bondingFlags: 1, mitm: true });
+            callback({ ioCap: IOCapabilities.KEYBOARD_ONLY, bondingFlags: 1, mitm: true, sc: true});
         });
 
         conn.smp.on('passkeyExchange', (associationModel, passkey, callback) => {

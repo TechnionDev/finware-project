@@ -1,6 +1,6 @@
 import BLEManager from "../util-managers/BLEManager";
 import NodeBleHost from "ble-host";
-import { getCycleStartDate, getCycleEndDate, getCycleDayCount } from "./utils"
+import { getCycleStartDate, getCycleEndDate, getCycleDayCount, datediff } from "./utils"
 const AttErrors = NodeBleHost.AttErrors;
 
 enum UUIDS {
@@ -17,7 +17,7 @@ class GATTInformation {
     public refreshRate: number;
     public goal: number;
     public cycleStartDay: number;
-    public graphData: object;
+    public graphData: any;
 
     constructor({ refreshRate, goal, cycleStartDay }) {
         this.refreshRate = refreshRate;
@@ -37,7 +37,7 @@ class GATTInformation {
                     "properties": ["read"],
                     "readPerm": "encrypted-mitm-sc",
                     onRead: (_, callback) => {
-                        callback(AttErrors.SUCCESS, JSON.stringify({ value: this.cycleStartDay }));// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: datediff(new Date(), getCycleEndDate(this.cycleStartDay)) }));// todo this is super wrong... fix to correctly diff the next cycle with current date
                     }
                 },
                 {
@@ -48,6 +48,7 @@ class GATTInformation {
                         this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
                         this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
                         this.graphData["daysInCycle"] = getCycleDayCount(this.cycleStartDay);
+                        this.graphData.data = this.graphData?.data.map(x => Math.round(x));
                         callback(AttErrors.SUCCESS, JSON.stringify(this.graphData));
                     }
                 }

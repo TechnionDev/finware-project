@@ -15,7 +15,7 @@ export const getCycleEndDate = (cycleStartDay: number): Date => {
     return cycleEndDate;
 }
 
-function datediff(dateStart, dateEnd) {
+export const datediff = (dateStart, dateEnd) => {
     let loop = new Date(dateStart);
     let count = 0;
     while (loop < dateEnd) {

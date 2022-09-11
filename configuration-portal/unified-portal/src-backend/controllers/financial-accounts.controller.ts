@@ -82,7 +82,7 @@ class FinanceAccountsController {
                 if (fbe.scrape_result.success == false) {
                     continue;
                 }
-                bankInfo[fbe.company] = fbe.scrape_result.accounts.reduce((companySum, account) => {
+                bankInfo[fbe.name] = fbe.scrape_result.accounts.reduce((companySum, account) => {
                     return companySum + account.txns.reduce((accountSum, txn) => {
                         return accountSum + txn.originalAmount;
                     }, 0);
@@ -95,7 +95,7 @@ class FinanceAccountsController {
                     }
                 }
             }
-            graphData.data = graphData.data.map((sum => value => sum += value)(0));
+            // graphData.data = graphData.data.map((sum => value => sum += value)(0));
             graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
             console.log("Settings bank info to: ", bankInfo)
             console.log("Settings graphData to: ", graphData);
