@@ -2,6 +2,12 @@ import { Schema, model } from 'mongoose';
 import SettingsModel from './Settings';
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
 
+export enum ValidationStatus {
+    VALIDATED = "VALIDATED",
+    FAILED = "FAILED",
+    INPROGRESS = "INPROGRESS"
+}
+
 
 interface IFinancialBackend {
     name: string;
@@ -14,6 +20,7 @@ interface IFinancialBackend {
     card6Digits?: string;
     last_scrape: Date;
     scrape_result: ScaperScrapingResult;
+    validation_status?: String;
 }
 
 const financialBackendSchema = new Schema<IFinancialBackend>({
@@ -59,6 +66,11 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
         default: { success: true, accounts: [] },
         required: true
     },
+    validation_status: {
+        type: String,
+        default: ValidationStatus.INPROGRESS,
+        required: false
+    }
 
 }, { timestamps: true });
 

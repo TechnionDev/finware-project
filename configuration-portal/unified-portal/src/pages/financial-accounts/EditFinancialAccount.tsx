@@ -15,7 +15,7 @@ function InputElem({ credName }) {
         <div className="mb-1 block">
             <Label htmlFor={credName} value={capitalize(credName)} />
         </div>
-        <TextInput name={credName} id={credName} placeholder="" required={true} type={credName === "password" ? "password": "text"} />
+        <TextInput name={credName} id={credName} placeholder="" required={true} type={credName === "password" ? "password" : "text"} />
     </div>
     // switch (loginField) {
     //     case ""
@@ -56,20 +56,21 @@ function EditFinancialAccount() {
     console.log(company && SCRAPERS[company].loginFields.map(compName => <option value={compName}>{ }</option>));
 
     return (
-        <div>
+        <div className="max-w-[80%]">
             <form id="new-card-form"
                 onSubmit={async (ev) => {
                     await handleSubmit(id, ev);
                     navigate("../");
                 }}>
                 <div className="text-2xl mb-4"> Add a new credit card account: </div>
-                <div>Note that it can take up to an hour for the information to update</div>
                 <div id="comp-select">
                     <Select name="company" {...bind}>
                         <option value="">
                             -
                         </option>
-                        {Object.keys(SCRAPERS).map(compName => <option key={compName} value={compName}>{capitalize(compName)}</option>)}
+                        {Object.keys(SCRAPERS).map((compName): any => {
+                            return <option key={compName} value={compName}>{capitalize(compName)}</option>
+                        })}
                     </Select>
                 </div>
                 {company ? <>
