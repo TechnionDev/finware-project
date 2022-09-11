@@ -50,6 +50,11 @@ function FinancialAccountsList() {
                     </Link>
                 </Button>
             </div>
+            <div className="flex justify-center mb-1">
+                <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
+                    Scrape Financial Accounts
+                </Button>
+            </div>
         </div >
     );
 }

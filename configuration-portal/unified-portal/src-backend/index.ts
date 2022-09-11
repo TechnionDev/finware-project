@@ -18,11 +18,11 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
 
 
-    const bluetoothController = new BluetoothController({ refreshRate: settings.display_refresh_frequency_minutes, goal: settings.expense_budget, cycleStartDate: settings.month_cycle_start_day }); // TODO: populate with actual data
+    const bluetoothController = new BluetoothController({ refreshRate: settings.display_refresh_frequency_minutes, goal: settings.expense_budget, cycleStartDay: settings.month_cycle_start_day }); // TODO: populate with actual data
     const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
     new CronJob(
-        '0 */15 * * *',
+        '0 */5 * * * *',
         financeAccountsController.updateFinancialData.bind(financeAccountsController),
         null,
         true, /* start */

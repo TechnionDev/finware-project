@@ -44,12 +44,14 @@ export default class BLEManager {
 
         this.btConnection = conn;
         conn.on('disconnect', (errorCode) => {
-            console.log("Bluetooth was disconnected ")
+            console.log("Bluetooth was disconnected");
             this.btConnection = null;
-            this.startAdvertising()
+            this.startAdvertising();
         }); // restart advertising after disconnect
 
         console.log('Connection established!');
+        console.log(conn);
+        console.log(conn.smp);
 
         this.connectionStatus = Connection.PAIRING;
         conn.smp.sendSecurityRequest(/*bond*/ true, /*mitm*/ true, /*sc*/ true, /*keypress*/ false);
@@ -68,7 +70,7 @@ export default class BLEManager {
         // Without this event handler the I/O capabilities will be no input, no output
         conn.smp.on('pairingRequest', (req, callback) => {
             console.log("Pairing request");
-            callback({ ioCap: IOCapabilities.KEYBOARD_ONLY, bondingFlags: 1, mitm: true });
+            callback({ ioCap: IOCapabilities.KEYBOARD_ONLY, bondingFlags: 1, mitm: true, sc: true});
         });
 
         conn.smp.on('passkeyExchange', (associationModel, passkey, callback) => {

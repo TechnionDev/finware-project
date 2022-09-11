@@ -1,5 +1,6 @@
 import { Schema, model, ObjectId } from 'mongoose';
 
+
 interface ISettings {
     display_refresh_frequency_minutes: number;
     scrape_frequency_hours: number;
