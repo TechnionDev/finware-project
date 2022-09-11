@@ -23,11 +23,11 @@ void PageManager::printPageMenu(int pageNum, int totalPages) {
   short y = 9;
   for (int i = 0; i < totalPages; ++i) {
     if (pageNum == i) {
-      display.fillCircle(x, y, 8, GxEPD_BLACK);
+      display.fillCircle(x, y, 6, GxEPD_BLACK);
     } else {
-      display.drawCircle(x, y, 8, GxEPD_BLACK);
+      display.drawCircle(x, y, 6, GxEPD_BLACK);
     }
-    x += 21;
+    x += 18;
   }
   this->currentCourser = x;
 }
