@@ -15,7 +15,7 @@ function useSettings() {
             .then((response) => { return response.json(); })
             .then((data) => { setSettings(data); });
     }, []);
-    return [settings, setSettings];
+    return settings;
 }
 
 async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
@@ -45,7 +45,7 @@ async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
 }
 
 function ConfigPage() {
-    const [settings, setSettings] = useSettings();
+    const settings = useSettings();
     const navigate = useNavigate();
 
     return (

@@ -36,6 +36,7 @@
     "mystart": "node ./backend-build/index.js",
     "car": "react-scripts --max_old_space_size=512 build && npx tsc && node ./backend-build/index.js",
     "cbar": "npx tsc && node ./backend-build/index.js",
+    "devw": "concurrently --kill-others \"react-scripts start\" \"SET NODE_ENV=\"development\" && ts-node-dev ./src-backend/index.ts\"",
     "dev": "concurrently --kill-others \"react-scripts start\" \"NODE_ENV=development ts-node-dev ./src-backend/index.ts\""
   },
   "eslintConfig": {

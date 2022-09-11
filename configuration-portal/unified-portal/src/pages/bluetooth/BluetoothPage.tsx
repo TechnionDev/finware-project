@@ -45,7 +45,7 @@ function useBtState(setLoading) {
     updateBtState();
     const int = setInterval(updateBtState, POLLING_INTERVAL);
     return () => clearInterval(int);
-  }, []);
+  }, [setLoading]);
 
   return btState;
 }

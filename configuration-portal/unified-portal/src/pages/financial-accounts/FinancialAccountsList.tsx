@@ -1,22 +1,95 @@
 import React from 'react';
 import "./FinancialAccountsList.css";
-import { Button } from 'flowbite-react';
+import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { XCircleIcon } from "@heroicons/react/24/solid";
+import { XCircleIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 
 const CREDIT_STATE_ENDPOINT = "/api/financial-account";
 const FA_DELETE_TEMPLATE = "/api/financial-account/{id}/delete";
+const FE_LOGOS_ENDPOINTS = "/fe-logos";
+
+const POLLING_INTERVAL = 1000;
+
+const ValidationStatus = {
+    VALIDATED: "VALIDATED",
+    FAILED: "FAILED",
+    INPROGRESS: "INPROGRESS"
+}
 
 function useFinancialAccountsState() {
     const [FAState, setFAState]: [any[], any] = useState([]);
     useEffect(() => {
-        fetch(CREDIT_STATE_ENDPOINT)
-            .then((response) => { return response.json(); })
-            .then((data) => { setFAState(data); });
+        function updateFAState() {
+            fetch(CREDIT_STATE_ENDPOINT)
+                .then((response) => { return response.json(); })
+                .then((data) => { setFAState(data); });
+        }
+        updateFAState();
+        const int = setInterval(updateFAState, POLLING_INTERVAL);
+        return () => clearInterval(int);
+
     }, []);
     return [FAState, setFAState];
+}
+
+function FinancialAccount({ _id, name, company, last_scrape, validation_status, onDelete }) {
+    console.log(last_scrape);
+    let compLogoSrc = FE_LOGOS_ENDPOINTS + `/${company?.toLowerCase()}.png`;
+
+    let status;
+    switch (validation_status) {
+        case ValidationStatus.INPROGRESS:
+            status = <><Spinner color="info" /> <div className="ml-2 text-blue-800">Validating</div></>
+            break;
+        case ValidationStatus.VALIDATED:
+            status = <>
+                <CheckIcon className="text-green-700 h-7 w-6" />
+                <div className="ml-1 text-green-600">Validated</div>
+            </>
+            break;
+        case ValidationStatus.FAILED:
+            status = <>
+                <XMarkIcon className="text-rose-600 h-6 w-6" />
+                <div className="ml-1 text-rose-700">Failed</div>
+            </>
+            break;
+        default:
+            break;
+    }
+
+    return (<div className="overflow-hidden bg-white shadow rounded-lg relative text-gray-900">
+        <XCircleIcon onClick={() => onDelete(_id)} className="absolute top-1 right-1 h-8 w-8 text-red-600 cursor-pointer" />
+        <div className="px-4 py-5 sm:px-6">
+            <h3 className="text-xl font-bold leading-6 text-gray-900">{name}</h3>
+        </div>
+        <div className="border-t border-gray-200">
+            <dl>
+                <div className="bg-gray-50 px-4 py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-base font-medium text-gray-500">Company</dt>
+                    <div className="col-span-2">
+                        <div className="flex items-center">
+                            <img className=" mr-1 w-[18px]" src={compLogoSrc} alt={`${company} logo`} />
+                            <dd className="text-base text-gray-900 mt-0 capitalize">{company}</dd>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white px-4 py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-base font-medium text-gray-500">Last Checked</dt>
+                    <div className="col-span-2 flex items-center">
+                        <dd className="text-base text-gray-900 mt-0 capitalize">{new Date(last_scrape).getTime() !== new Date(0).getTime() ? new Date(last_scrape).toLocaleString() : "N/A"}</dd>
+                    </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-base font-medium text-gray-500">Validation</dt>
+                    <div className="col-span-2 flex items-center">
+                        {status}
+                    </div>
+                </div>
+            </dl>
+        </div>
+    </div>);
 }
 
 
@@ -24,35 +97,38 @@ function FinancialAccountsList() {
     const [FAState, setFAState] = useFinancialAccountsState();
 
     function deleteFA(FAId) {
-        setFAState(FAState.filter(fa => fa._id != FAId));
+        // setFAState(FAState.filter(fa => fa._id !== FAId));
         fetch(FA_DELETE_TEMPLATE.replace("{id}", FAId), {
             method: "POST"
         });
     }
 
     return (
-        <div>
-            {
-                FAState.map((financialAccount: any) => {
-                    return (
-                        <div key={financialAccount._id} className="relative p-3 min-w-[200px] mb-3 credit-card-container">
-                            <XCircleIcon onClick={() => deleteFA(financialAccount._id)} className="absolute top-1 right-2 h-8 w-8 text-red-700" />
-                            <div className="font-bold text-center text-2xl"> {financialAccount.name} </div>
-                            <div className="text-center capitalize text-md text-gray-500 dark:text-gray-700"> {financialAccount.company} </div>
-                        </div>
-                    )
-                })
-            }
-            <div className="flex justify-center mb-1">
-                <Button color="success">
-                    <Link to="create">
-                        Add Account
-                    </Link>
+        <div className="w-[100%]">
+            <div className="mx-auto w-[80%] max-w-[600px] mb-3 grid gap-y-6">
+                {
+                    FAState.map((financialAccount: any) => {
+                        /* return (
+                            <div key={financialAccount._id} className="relative py-3 px-12 min-w-[200px] mb-3 credit-card-container">
+                                <XCircleIcon onClick={() => deleteFA(financialAccount._id)} className="absolute top-1 right-1 h-7 w-7 text-red-700" />
+                                <div className="font-bold text-center text-2xl"> {financialAccount.name} </div>
+                                <div className="text-center capitalize text-md text-gray-500 dark:text-gray-700"> {financialAccount.company} </div>
+                            </div>
+                        ) */
+                        return <FinancialAccount {...financialAccount} onDelete={deleteFA} />
+                    })
+                }
+            </div>
+            <div className="flex justify-center mb-5">
+                <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
+                    Force Update All
                 </Button>
             </div>
             <div className="flex justify-center mb-1">
-                <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
-                    Scrape Financial Accounts
+                <Button color="info">
+                    <Link to="create">
+                        Add Account
+                    </Link>
                 </Button>
             </div>
         </div >

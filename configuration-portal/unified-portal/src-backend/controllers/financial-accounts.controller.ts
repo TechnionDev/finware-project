@@ -1,5 +1,5 @@
 import scrapeFinancialBE from "../util-managers/FinanceAccountsManager";
-import FinancialBE from "../models/FinancialBE";
+import FinancialBE, {ValidationStatus} from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 import Settings from "../models/Settings";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
@@ -14,7 +14,7 @@ class FinanceAccountsController {
 
     async fetchCreditCards(_req, res) {
         try {
-            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1 });
+            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1, "last_scrape": 1, "validation_status": 1});
             res.json(all);
         } catch (err) {
             console.log('Error while fetching credit cards: ', err);
@@ -25,6 +25,7 @@ class FinanceAccountsController {
     async createFinancialAccount(req, res) {
         FinancialBE.create({
             ...req.body,
+            validation_status: ValidationStatus.INPROGRESS
         }).then((_result) => {
             this.updateFinancialData();
             res.json({ status: "SUCCESS" });
@@ -55,7 +56,7 @@ class FinanceAccountsController {
             for (let fbe of fbes) {
                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
-                if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours && fbe.scrape_result.success) {
+                if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
                     console.log('Account ', fbe.name, ' was recently updated. Skipping.');
                     continue;
                 }
@@ -65,17 +66,20 @@ class FinanceAccountsController {
                         console.log('Scraping done for', fbe.name);
                         // Update account
                         if (scrapeResult.success) {
-                            fbe.last_scrape = now;
                             fbe.scrape_result = scrapeResult;
-                            fbe.save();
+                            fbe.validation_status = ValidationStatus.VALIDATED;
                             console.log('results: ', scrapeResult);
                         } else {
+                            fbe.validation_status = ValidationStatus.FAILED;
                             console.log('failed with: ', scrapeResult);
                         }
+                        fbe.last_scrape = now;
+                        fbe.save();
                     })
                 );
             }
             await Promise.all(scrapeJobs);
+
             let bankInfo = {};
             let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
             for (const fbe of fbes) {
@@ -95,7 +99,6 @@ class FinanceAccountsController {
                     }
                 }
             }
-            // graphData.data = graphData.data.map((sum => value => sum += value)(0));
             graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
             console.log("Settings bank info to: ", bankInfo)
             console.log("Settings graphData to: ", graphData);
