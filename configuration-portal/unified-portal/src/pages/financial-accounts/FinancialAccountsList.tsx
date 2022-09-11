@@ -67,7 +67,7 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
         <div className="border-t border-gray-200">
             <dl>
                 <div className="bg-gray-50 px-4 py-3 grid grid-cols-3 gap-4">
-                    <dt className="text-base font-medium text-gray-500">Company</dt>
+                    <dt className="flex items-center text-base font-medium text-gray-500">Company</dt>
                     <div className="col-span-2">
                         <div className="flex items-center">
                             <img className=" mr-1 w-[18px]" src={compLogoSrc} alt={`${company} logo`} />
@@ -76,13 +76,13 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
                     </div>
                 </div>
                 <div className="bg-white px-4 py-3 grid grid-cols-3 gap-4">
-                    <dt className="text-base font-medium text-gray-500">Last Checked</dt>
+                    <dt className="flex items-center text-base font-medium text-gray-500">Last Checked</dt>
                     <div className="col-span-2 flex items-center">
                         <dd className="text-base text-gray-900 mt-0 capitalize">{new Date(last_scrape).getTime() !== new Date(0).getTime() ? new Date(last_scrape).toLocaleString() : "N/A"}</dd>
                     </div>
                 </div>
                 <div className="bg-gray-50 px-4 py-3 grid grid-cols-3 gap-4">
-                    <dt className="text-base font-medium text-gray-500">Validation</dt>
+                    <dt className="flex items-center text-base font-medium text-gray-500">Validation</dt>
                     <div className="col-span-2 flex items-center">
                         {status}
                     </div>
