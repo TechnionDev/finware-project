@@ -42,11 +42,11 @@ void reverseheb(char* string) {
 
 void blockUntilPress() {
   int last = 1;
-  int now = digitalRead(GPIO_NUM_39);
+  int now = digitalRead(GPIO_NUM_2);
   while (now == 1) {
     last = now;
     delay(1);
-    now = digitalRead(GPIO_NUM_39);
+    now = digitalRead(GPIO_NUM_2);
   }
 }
 

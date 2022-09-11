@@ -17,19 +17,70 @@ static GraphBuilder gb(display, u8g2);
 static PageManager pageManager(u8g2, display, gb);
 static BluetoothManager blm(pageManager);
 
+RTC_DATA_ATTR int bootCount = 0;
+RTC_DATA_ATTR bool show = true;
+
+RTC_DATA_ATTR cardsSpending bankInfo;
+RTC_DATA_ATTR DynamicJsonDocument doc;
+RTC_DATA_ATTR int daysLeft = 0;
+RTC_DATA_ATTR int goal = 0;
+RTC_DATA_ATTR int refrashRate = 0;
+
+#define BUTTON_PIN_BITMASK 0x8004
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  60        /* Time ESP32 will go to sleep (in seconds) */
+
+#define HIDE_SHOW_BUTTON GPIO_NUM_15
+#define NEXT_BUTTON GPIO_NUM_2
+
+esp_sleep_wakeup_cause_t print_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
+    default : 
+      Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason);
+      wakeup_reason = ESP_SLEEP_WAKEUP_UNDEFINED;
+      break;
+  }
+  return wakeup_reason;
+}
+
+int getGPIOPIN(){
+  uint64_t GPIO_reason = esp_sleep_get_ext1_wakeup_status();
+  Serial.print("GPIO that triggered the wake up: GPIO ");
+  int pgioPin = (log(GPIO_reason))/log(2);
+  Serial.println(pgioPin, 0);
+  return pgioPin;
+}
+
 void setup() {
   Serial.begin(115200);
-  pinMode(GPIO_NUM_39, INPUT);
+  pinMode(GPIO_NUM_2, INPUT);
   Serial.println("Starting Finware application");
+   ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+  esp_sleep_wakeup_cause_t wakeup_reason = print_wakeup_reason();
+  getGPIOPIN();
 
-  Serial.println("Scanning Bluetooth for the raspberryPi");
-  pageManager.showTitle("Scanning...", "", 1000);
-  BLEDevice::init("");
-  BLEScan* pBLEScan = BLEDevice::getScan();
-  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-  pBLEScan->setActiveScan(true);
-  pBLEScan->start(30);
-  Serial.println("Setup done");
+  
+  esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
+  
+  // ESP_SLEEP_WAKEUP_UNDEFINED is for reset button
+  if (wakeup_reason == ESP_SLEEP_WAKEUP_UNDEFINED ){
+    Serial.println("Scanning Bluetooth for the raspberryPi");
+    pageManager.showTitle("Scanning...", "", 1000);
+    BLEDevice::init("");
+    BLEScan* pBLEScan = BLEDevice::getScan();
+    pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+    pBLEScan->setActiveScan(true);
+    pBLEScan->start(30);
+    Serial.println("Setup done");
+  }
 }
 
 void loop() {
@@ -46,26 +97,39 @@ void loop() {
   }
   waitForAuth();
   if (connected) {
-    auto bankInfo = blm.getBankInfo();
-    DynamicJsonDocument doc = blm.getGraphData();
-    int daysLeft = blm.getDaysLeft();
-    int goal = blm.getGoal();
-
     int totalSum = 0;
-    for (const auto& it : bankInfo) {
-      totalSum += it.second;
-    }
-
-    while (true) {
+    if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_EXT1){
+      //the cause of the weakup was refresh or restart, therefor need to fetch the date from the BLE
+      bankInfo = blm.getBankInfo();
+      doc = blm.getGraphData();
+      daysLeft = blm.getDaysLeft();
+      goal = blm.getGoal();
+      refrashRate = blm.getRefreshRate();
+      esp_sleep_enable_timer_wakeup(refrashRate * uS_TO_S_FACTOR);
+      for (const auto& it : bankInfo) {
+        totalSum += it.second;
+      }
       pageManager.showSumPage(totalSum, daysLeft, goal);
-      blockUntilPress();
-      pageManager.showCardSpendingPage(bankInfo);
-      blockUntilPress();
-      pageManager.showGraphPage(doc["cycleStartDate"], doc["cycleEndDate"],
-                                doc["daysInCycle"], doc["data"]);
-      blockUntilPress();
+    }else{
+      if (getGPIOPIN()==HIDE_SHOW_BUTTON){
+        show =! show; 
+        show? pageManager.showSumPage(totalSum, daysLeft, goal): display.eraseDisplay();
+      }
+      else{
+        while (true) {
+          //TODO:: need to finish this while loop
+          pageManager.showSumPage(totalSum, daysLeft, goal);
+          blockUntilPress();
+          pageManager.showCardSpendingPage(bankInfo);
+          blockUntilPress();
+          pageManager.showGraphPage(doc["cycleStartDate"], doc["cycleEndDate"],
+                                    doc["daysInCycle"], doc["data"]);
+          blockUntilPress();
+        }
+      }
     }
-
-    delay(blm.getRefreshRate() * 1000);
+    Serial.println("Going to sleep now");
+    delay(1000);
+    esp_deep_sleep_start();
   }
 }

@@ -4,7 +4,8 @@
 
 #include "BluetoothManager.h"
 
-static boolean authed = false;
+//authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
+RTC_DATA_ATTR static boolean authed = false;
 class MySecurity : public BLESecurityCallbacks {
  private:
   PageManager pageManager;
