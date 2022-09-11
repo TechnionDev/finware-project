@@ -119,11 +119,13 @@ function FinancialAccountsList() {
                     })
                 }
             </div>
-            <div className="flex justify-center mb-5">
-                <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
-                    Force Update All
-                </Button>
-            </div>
+            {FAState && FAState.length ?
+                <div className="flex justify-center mb-5">
+                    <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
+                        Force Update All
+                    </Button>
+                </div> : <></>
+            }
             <div className="flex justify-center mb-1">
                 <Button color="info">
                     <Link to="create">
