@@ -71,7 +71,6 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
         default: ValidationStatus.INPROGRESS,
         required: false
     }
-
 }, { timestamps: true });
 
 // Before returning result, add 'outdated' field

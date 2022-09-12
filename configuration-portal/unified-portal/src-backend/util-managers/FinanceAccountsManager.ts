@@ -1,26 +1,21 @@
 import { CompanyTypes, createScraper, ScraperOptions } from 'israeli-bank-scrapers';
 import { ScaperScrapingResult } from 'israeli-bank-scrapers/lib/scrapers/base-scraper';
 
-export default async function scrapeFinancialBE(account, company: String, startDate: Date): Promise<ScaperScrapingResult> {
+const FAILURE_SCREENSHOT_DIR = "./build/static/media";
+
+export default async function scrapeFinancialBE(account, company: String, startDate: Date, failureScreenshotPath=null): Promise<ScaperScrapingResult> {
     let options: ScraperOptions;
     options = {
-        'companyId': company as CompanyTypes,
-        'verbose': true,
-        'startDate': startDate,
-        'combineInstallments': false,
-        'showBrowser': process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase().indexOf('dev') != -1
+        companyId: company as CompanyTypes,
+        verbose: true,
+        startDate: startDate,
+        combineInstallments: false,
+        storeFailureScreenShotPath: failureScreenshotPath && FAILURE_SCREENSHOT_DIR + `/${failureScreenshotPath}.jpg`,
+        showBrowser: process.env.NODE_ENV?.toLowerCase().includes('dev'),
     };
 
-    if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase().indexOf('dev') != -1) {
-        console.log('environment is dev, showing browser and saving screenshot');
-        options.showBrowser = true;
-        options.storeFailureScreenShotPath = './failureScreenshot.png';
-    }
-
     // Scrape is existing results are outdated
-    let scrapeResult: ScaperScrapingResult;
-    const scraper = createScraper(options);
-    scrapeResult = await scraper.scrape(account);
+    const scrapeResult = await createScraper(options).scrape(account);
     var totalAmount = 0;
     if (scrapeResult.success) {
         console.log(scrapeResult.accounts);

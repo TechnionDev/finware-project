@@ -1,5 +1,7 @@
+import slugify from "slugify";
+
 import scrapeFinancialBE from "../util-managers/FinanceAccountsManager";
-import FinancialBE, {ValidationStatus} from "../models/FinancialBE";
+import FinancialBE, { ValidationStatus } from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 import Settings from "../models/Settings";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
@@ -14,7 +16,7 @@ class FinanceAccountsController {
 
     async fetchCreditCards(_req, res) {
         try {
-            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1, "last_scrape": 1, "validation_status": 1});
+            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1, "last_scrape": 1, "validation_status": 1, "scrape_result": 1});
             res.json(all);
         } catch (err) {
             console.log('Error while fetching credit cards: ', err);
@@ -57,23 +59,26 @@ class FinanceAccountsController {
                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
                 if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
-                    console.log('Account ', fbe.name, ' was recently updated. Skipping.');
+                    console.log('Account', fbe.name, `was updated ${hours_since_last_scrape} (<${settings.scrape_frequency_hours}) hours ago. Skipping.`);
                     continue;
                 }
-                console.log("Scraping for account: ", fbe.name, "from start date: ", cycleStartDate);
+
+                console.log("Scraping account:", fbe.name, ". Starting from:", cycleStartDate);
+                fbe.last_scrape = now;
+                await fbe.save();
+
                 scrapeJobs.push(
-                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate).then((scrapeResult: ScaperScrapingResult) => {
+                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then((scrapeResult: ScaperScrapingResult) => {
                         console.log('Scraping done for', fbe.name);
                         // Update account
                         if (scrapeResult.success) {
-                            fbe.scrape_result = scrapeResult;
                             fbe.validation_status = ValidationStatus.VALIDATED;
                             console.log('results: ', scrapeResult);
                         } else {
                             fbe.validation_status = ValidationStatus.FAILED;
                             console.log('failed with: ', scrapeResult);
                         }
-                        fbe.last_scrape = now;
+                        fbe.scrape_result = scrapeResult;
                         fbe.save();
                     })
                 );

@@ -4,6 +4,7 @@ import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { XCircleIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { ErrorScreenshotModal } from './ErrorScreenshotModal';
 
 
 const CREDIT_STATE_ENDPOINT = "/api/financial-account";
@@ -31,12 +32,22 @@ function useFinancialAccountsState() {
         return () => clearInterval(int);
 
     }, []);
-    return [FAState, setFAState];
+    return FAState;
 }
 
-function FinancialAccount({ _id, name, company, last_scrape, validation_status, onDelete }) {
-    console.log(last_scrape);
-    let compLogoSrc = FE_LOGOS_ENDPOINTS + `/${company?.toLowerCase()}.png`;
+function FinancialAccount({ _id, name, company, last_scrape, validation_status, scrape_result, onDelete }) {
+    const [isOpen, setOpen] = useState(false);
+
+    useEffect(() => {
+        function setClosed() {
+            setOpen(false);
+        }
+        document.body.addEventListener('click', setClosed);
+
+        return function cleanup() {
+            document.body.removeEventListener('click', setClosed);
+        }
+    }, []);
 
     let status;
     switch (validation_status) {
@@ -51,14 +62,21 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
             break;
         case ValidationStatus.FAILED:
             status = <>
-                <XMarkIcon className="text-rose-600 h-6 w-6" />
-                <div className="ml-1 text-rose-700">Failed</div>
+                <div>
+                    <div className="flex flex-row mb-1">
+                        <XMarkIcon className="text-rose-600 h-6 w-6" />
+                        <div className="ml-1 text-rose-700">Failed</div>
+                    </div>
+                    <ErrorScreenshotModal errorMessage={scrape_result?.errorMessage} errorType={scrape_result?.errorType}
+                        name={name} show={isOpen} onClose={setOpen.bind(null, false)} onOpen={setOpen.bind(null, true)} />
+                </div>
             </>
             break;
         default:
             break;
     }
 
+    let compLogoSrc = FE_LOGOS_ENDPOINTS + `/${company?.toLowerCase()}.png`;
     return (<div className="overflow-hidden bg-white shadow rounded-lg relative text-gray-900">
         <XCircleIcon onClick={() => onDelete(_id)} className="absolute top-1 right-1 h-8 w-8 text-red-600 cursor-pointer" />
         <div className="px-4 py-5 sm:px-6">
@@ -94,7 +112,7 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
 
 
 function FinancialAccountsList() {
-    const [FAState, setFAState] = useFinancialAccountsState();
+    const FAState = useFinancialAccountsState();
 
     function deleteFA(FAId) {
         // setFAState(FAState.filter(fa => fa._id !== FAId));
@@ -115,7 +133,7 @@ function FinancialAccountsList() {
                                 <div className="text-center capitalize text-md text-gray-500 dark:text-gray-700"> {financialAccount.company} </div>
                             </div>
                         ) */
-                        return <FinancialAccount {...financialAccount} onDelete={deleteFA} />
+                        return <FinancialAccount key={financialAccount._id} {...financialAccount} onDelete={deleteFA} />
                     })
                 }
             </div>
