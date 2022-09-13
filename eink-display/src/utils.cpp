@@ -40,13 +40,14 @@ void reverseheb(char* string) {
   free(temp);
 }
 
-void blockUntilPress() {
-  int last = 1;
-  int now = digitalRead(GPIO_NUM_39);
-  while (now == 1) {
-    last = now;
+void blockUntilPress(unsigned long startTime) {
+  int now = digitalRead(GPIO_NUM_2);
+  while (now == 0) {
+    if(millis() - startTime > NEXT_BUTTON_TIME_INTERVAL){
+      break;
+    }
     delay(1);
-    now = digitalRead(GPIO_NUM_39);
+    now = digitalRead(GPIO_NUM_2);
   }
 }
 

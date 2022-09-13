@@ -7,9 +7,10 @@
 #include <BLEUtils.h>
 #include <GxDEPG0213BN/GxDEPG0213BN.h>
 #include <U8g2_for_Adafruit_GFX.h>
+#define NEXT_BUTTON_TIME_INTERVAL 30000 /* wakeup Time in miliseconds between next button */
 
 void reverseheb(char* string);
-void blockUntilPress();
+void blockUntilPress(unsigned long startTime );
 
 enum alignment { LEFT, RIGHT, CENTER };
 #define Black GxEPD_BLACK

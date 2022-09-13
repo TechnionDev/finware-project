@@ -4,7 +4,8 @@
 
 #include "BluetoothManager.h"
 
-static boolean authed = false;
+//authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
+RTC_DATA_ATTR static boolean authed = false;
 class MySecurity : public BLESecurityCallbacks {
  private:
   PageManager pageManager;
@@ -93,22 +94,27 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 BluetoothManager::BluetoothManager(PageManager &pageManager)
     : pageManager(pageManager) {}
 
-cardsSpending BluetoothManager::getBankInfo() {
+
+void BluetoothManager::updateBankInfoBuffer(char BankInfoBuffer[]) {
+  strcpy(BankInfoBuffer,requestService("BankInfo").c_str());
+}
+
+cardsSpending BluetoothManager::getBankInfo(const char BankInfoBuffer[]) {
+  //deserializeJson will alter the char array that is given, thus we need to copy the BankInfoBuffer to a tmp buffer
+  // char tmp [1024];
+  // strcpy(tmp,BankInfoBuffer);
   DynamicJsonDocument doc(200);
-  auto output = requestService("BankInfo");
-  DeserializationError error = deserializeJson(doc, output);
+  DeserializationError error = deserializeJson(doc, BankInfoBuffer);
   if (error) {
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
     return {};
   }
-
   cardsSpending bankInfo;
   JsonObject root = doc.as<JsonObject>();
   for (JsonPair kv : root) {
     bankInfo[kv.key().c_str()] = -kv.value().as<int>();
   }
-
   return bankInfo;
 }
 
@@ -151,10 +157,16 @@ int BluetoothManager::getDaysLeft() {
   return DaysLeft;
 }
 
-DynamicJsonDocument BluetoothManager::getGraphData() {
+void BluetoothManager::updateJsonDocBuffer(char jsonDocBuffer[]) {
+  strcpy(jsonDocBuffer,requestService("GraphData").c_str());
+}
+
+DynamicJsonDocument BluetoothManager::getGraphData(const char jsonDocBuffer[]) {
+  //deserializeJson will alter the char array that is given, thus we need to copy the BankInfoBuffer to a tmp buffer
+  // char tmp [1024];
+  // strcpy(tmp,jsonDocBuffer);
   DynamicJsonDocument doc(1024);
-  auto output = requestService("GraphData");
-  DeserializationError error = deserializeJson(doc, output);
+  DeserializationError error = deserializeJson(doc, jsonDocBuffer);
   if (error) {
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
