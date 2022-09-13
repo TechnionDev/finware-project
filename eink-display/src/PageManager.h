@@ -22,6 +22,21 @@
 
 #include <map>
 
+
+typedef std::map<std::string, int> cardsSpending;
+
+// class financialData{
+//  public:
+//   std::map<std::string, int> bankInfo;
+//   DynamicJsonDocument doc;
+//   int daysLeft = 0;
+//   int goal = 0;
+//   int refrashRate = 0;
+//   int totalSum = 0;
+//   financialData():doc (1024) {};
+//   // financialData( financialData const&  data) = default;
+//   };
+
 class PageManager {
  private:
   GxEPD_Class& display;
@@ -32,18 +47,19 @@ class PageManager {
   void printDaysLeft(int daysLeft);
   void printTotalSum(int totalSum);
   void printProgressAndGoal(int totalSum, int monthlyGoal);
-  void printCardSpending(const std::map<std::string, int>& cardMap);
+  void printCardSpending(const cardsSpending& cardMap);
 
  public:
   explicit PageManager(U8G2_FOR_ADAFRUIT_GFX& u8g2, GxEPD_Class& display,
                        GraphBuilder& gb);
   void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
-  void showCardSpendingPage(const std::map<std::string, int>& cardMap);
+  void showCardSpendingPage(const cardsSpending& cardMap);
   void showTopFivePurchase();
   void showPassKey(uint32_t pass_key);
   void showGraphPage(String cycleStartDate, String cycleEndDate,
                      int daysInCycle, JsonArray dataPoints);
   void showTitle(String title, String subtitle, int delayAfter=0);
+  //void printNextPage(int pageNum, financialData data );
 };
 
 #endif  // DISPLAY_SRC_PAGEMANAGER_H_

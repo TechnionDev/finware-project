@@ -42,7 +42,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   }
 };
 
-typedef std::map<std::string, int> cardsSpending;
 
 class BluetoothManager {
   PageManager pageManager;
@@ -57,11 +56,13 @@ class BluetoothManager {
 
  public:
   BluetoothManager(PageManager &pageManager);
-  cardsSpending getBankInfo();
+  void updateBankInfoBuffer(char BankInfoBuffer[]);
+  cardsSpending getBankInfo(const char BankInfoBuffer[]);
   int getRefreshRate();
   int getGoal();
   int getDaysLeft();
-  DynamicJsonDocument getGraphData();
+  void updateJsonDocBuffer(char jsonDocBuffer[]);
+  DynamicJsonDocument getGraphData(const char jsonDocBuffer[]);
   bool connectToServer(BLEAddress pAddress);
 };
 

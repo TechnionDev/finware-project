@@ -19,17 +19,20 @@ static BluetoothManager blm(pageManager);
 
 RTC_DATA_ATTR int bootCount = 0;
 RTC_DATA_ATTR bool show = true;
+RTC_DATA_ATTR int currPage = 0;
 
-RTC_DATA_ATTR cardsSpending bankInfo;
-RTC_DATA_ATTR DynamicJsonDocument doc;
+
+RTC_DATA_ATTR char BankInfoBuffer[1024];
+RTC_DATA_ATTR char jsonDocBuffer[1024];
 RTC_DATA_ATTR int daysLeft = 0;
 RTC_DATA_ATTR int goal = 0;
 RTC_DATA_ATTR int refrashRate = 0;
+RTC_DATA_ATTR int totalSum = 0;
+
 
 #define BUTTON_PIN_BITMASK 0x8004
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  60        /* Time ESP32 will go to sleep (in seconds) */
-
 #define HIDE_SHOW_BUTTON GPIO_NUM_15
 #define NEXT_BUTTON GPIO_NUM_2
 
@@ -97,11 +100,12 @@ void loop() {
   }
   waitForAuth();
   if (connected) {
-    int totalSum = 0;
+    
     if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_EXT1){
       //the cause of the weakup was refresh or restart, therefor need to fetch the date from the BLE
-      bankInfo = blm.getBankInfo();
-      doc = blm.getGraphData();
+      blm.updateBankInfoBuffer(BankInfoBuffer);
+      auto bankInfo = blm.getBankInfo(BankInfoBuffer);
+      blm.updateJsonDocBuffer(jsonDocBuffer);
       daysLeft = blm.getDaysLeft();
       goal = blm.getGoal();
       refrashRate = blm.getRefreshRate();
@@ -116,16 +120,28 @@ void loop() {
         show? pageManager.showSumPage(totalSum, daysLeft, goal): display.eraseDisplay();
       }
       else{
-        while (true) {
+        auto startTime = millis();
+        while (millis() - startTime < NEXT_BUTTON_TIME_INTERVAL) {
           //TODO:: need to finish this while loop
-          pageManager.showSumPage(totalSum, daysLeft, goal);
-          blockUntilPress();
-          pageManager.showCardSpendingPage(bankInfo);
-          blockUntilPress();
-          pageManager.showGraphPage(doc["cycleStartDate"], doc["cycleEndDate"],
-                                    doc["daysInCycle"], doc["data"]);
-          blockUntilPress();
-        }
+          currPage ++;
+          cardsSpending bankInfo;
+          switch (currPage % 3)
+          {
+            case 0:
+              pageManager.showSumPage(totalSum, daysLeft, goal);
+              break;
+            case 1:
+              bankInfo = blm.getBankInfo(BankInfoBuffer);
+              pageManager.showCardSpendingPage(bankInfo);
+              break;
+            case 2:
+              auto doc = blm.getGraphData(jsonDocBuffer);
+              pageManager.showGraphPage(doc["cycleStartDate"], doc["cycleEndDate"],
+                                              doc["daysInCycle"], doc["data"]);
+              break;
+          }
+          blockUntilPress(startTime);
+          }
       }
     }
     Serial.println("Going to sleep now");
