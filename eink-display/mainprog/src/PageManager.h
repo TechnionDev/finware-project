@@ -14,6 +14,7 @@
 class PageManager {
  private:
   short currentCourser = 0;
+  void resetDisplay();
   void printPageMenu(int pageNum, int totalPages);
   void printDaysLeft(int daysLeft);
   void printTotalSum(int totalSum);

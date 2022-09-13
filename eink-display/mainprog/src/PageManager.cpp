@@ -3,7 +3,7 @@
 #include "esp_adc_cal.h"
 #include "roboto12.h"
 #include "roboto16.h"
-#include "roboto20.h"
+#include "roboto16B.h"
 #include "roboto26b.h"
 #include "roboto45b.h"
 
@@ -33,9 +33,9 @@ void PageManager::printPageMenu(int pageNum, int totalPages) {
       drawCircle(x, y, radius - 2, 0x66, framebuffer);
     }
     if (i != totalPages - 1) {
-      drawFastHLine(x + radius, y-1, CIRCLES_MARGIN, 0x22, framebuffer);
+      drawFastHLine(x + radius, y - 1, CIRCLES_MARGIN, 0x22, framebuffer);
       drawFastHLine(x + radius, y, CIRCLES_MARGIN, 0x22, framebuffer);
-      drawFastHLine(x + radius, y+1, CIRCLES_MARGIN, 0x22, framebuffer);
+      drawFastHLine(x + radius, y + 1, CIRCLES_MARGIN, 0x22, framebuffer);
     }
     x += 2 * radius + CIRCLES_MARGIN;
   }
@@ -86,7 +86,7 @@ void PageManager::DrawBattery(int x, int y) {
     drawRect(x + 25, y - 14, 40, 15, Black, framebuffer);
     fillRect(x + 65, y - 10, 4, 7, Black, framebuffer);
     fillRect(x + 27, y - 12, 36 * percentage / 100.0, 11, Black, framebuffer);
-    drawString(x + 78, y - 6, String(percentage) + "%", LEFT, &Roboto12,
+    drawString(x + 78, y - 7, String(percentage) + "%", LEFT, &Roboto12,
                framebuffer);
   }
 }
@@ -133,20 +133,20 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
     // &Roboto16,
     //            framebuffer);
   } else {
-    int warningY = barY - 8;
-    int warningHeight = 11 + barSize;
-    fillTriangle(progIndicatorX, warningY - 2, progIndicatorX - 10,
-                 warningY + warningHeight, progIndicatorX + 10,
+    int warningY = barY - 21;
+    int warningHeight = 32 + barSize;
+    fillTriangle(progIndicatorX, warningY - 7, progIndicatorX - 24,
+                 warningY + warningHeight, progIndicatorX + 24,
                  warningY + warningHeight, White, framebuffer);
-    fillTriangle(progIndicatorX, warningY, progIndicatorX - 8,
-                 warningY + warningHeight, progIndicatorX + 8,
-                 warningY + warningHeight, White, framebuffer);
-    /*     u8g2.setCursor(progIndicatorX - 3, warningY + warningHeight);
-        u8g2.setForegroundColor(GxEPD_WHITE);
-        u8g2.setBackgroundColor(GxEPD_BLACK);
-        u8g2.print("!");
-        u8g2.setForegroundColor(GxEPD_BLACK);
-        u8g2.setBackgroundColor(GxEPD_WHITE); */
+    fillTriangle(progIndicatorX, warningY, progIndicatorX - 20,
+                 warningY + warningHeight, progIndicatorX + 20,
+                 warningY + warningHeight, Black, framebuffer);
+
+    const FontProperties fp = {15, 0x00, 0, 0};
+    int exclX = progIndicatorX - 4;
+    int exclY = progIndicatorY + 12;
+    write_mode(&Roboto16B, "!", &exclX, &exclY, framebuffer, WHITE_ON_BLACK,
+               &fp);
   }
 
   /*   u8g2.setFont(u8g2_font_6x10_mr);
@@ -175,7 +175,12 @@ void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
   //   y += 25;
   // }
 }
-void resetDisplay() { epd_clear(); }
+void PageManager::resetDisplay() {
+  epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, Black, framebuffer);
+  epd_update(framebuffer);
+  epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, White, framebuffer);
+  epd_clear();
+}
 
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
   Serial.println("Printing Total Sum page");

@@ -53,7 +53,8 @@ void setup() {
 
 // drawString(100, 100 , "Test String", CENTER, framebuffer);
 // epd_update(framebuffer);
-  pageManager.showSumPage(1005, 10, 2000);
+  pageManager.showSumPage(3123, 10, 2800);
+    // epd_clear();
 /*    epd_clear();
   drawString(0, 0, "BOTTOM", LEFT, BOTTOM, &FiraSans, framebuffer);
   drawString(0,0, "CENTER", LEFT, CENTER, &FiraSans, framebuffer);
