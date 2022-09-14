@@ -19,8 +19,8 @@ static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 
 static BLEAddress *pServerAddress;
 // connected, doConnect and authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
-RTC_DATA_ATTR static boolean doConnect = false;
-RTC_DATA_ATTR static boolean connected = false;
+static boolean doConnect = false;
+static boolean connected = false;
 static char LOG_TAG[] = "INFO";
 
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
@@ -33,7 +33,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 
     if (advertisedDevice.haveServiceUUID() &&
         advertisedDevice.getServiceUUID().equals(serviceUUID)) {
-      Serial.print(" - Found the RaspberryPi!");
+      Serial.println(" - Found the RaspberryPi!");
       advertisedDevice.getScan()->stop();
 
       pServerAddress = new BLEAddress(advertisedDevice.getAddress());

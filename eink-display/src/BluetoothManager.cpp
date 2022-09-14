@@ -4,8 +4,9 @@
 
 #include "BluetoothManager.h"
 
-//authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
-RTC_DATA_ATTR static boolean authed = false;
+// authed should be consistent between deepSleeps, therefor need to be saved in
+// RTC memory
+static boolean authed = false;
 class MySecurity : public BLESecurityCallbacks {
  private:
   PageManager pageManager;
@@ -32,7 +33,7 @@ class MySecurity : public BLESecurityCallbacks {
       Serial.println("Bluetooth pairing finished successfully!");
     } else {
       Serial.printf("Bluetooth pairing encountered an error: %d\n",
-                    auth_cmpl.fail_reason);
+                    auth_cmpl.fail_reason); // I think 102 is connection was closed by slave
       pageManager.showTitle(
           "Pairing Error",
           String("Error Code: " + String(auth_cmpl.fail_reason)));
@@ -94,15 +95,15 @@ bool BluetoothManager::connectToServer(BLEAddress pAddress) {
 BluetoothManager::BluetoothManager(PageManager &pageManager)
     : pageManager(pageManager) {}
 
-
 void BluetoothManager::updateBankInfoBuffer(char BankInfoBuffer[]) {
-  strcpy(BankInfoBuffer,requestService("BankInfo").c_str());
+  strcpy(BankInfoBuffer, requestService("BankInfo").c_str());
 }
 
 cardsSpending BluetoothManager::getBankInfo(const char BankInfoBuffer[]) {
-  //deserializeJson will alter the char array that is given, thus we need to copy the BankInfoBuffer to a tmp buffer
-  // char tmp [1024];
-  // strcpy(tmp,BankInfoBuffer);
+  // deserializeJson will alter the char array that is given, thus we need to
+  // copy the BankInfoBuffer to a tmp buffer
+  //  char tmp [1024];
+  //  strcpy(tmp,BankInfoBuffer);
   DynamicJsonDocument doc(200);
   DeserializationError error = deserializeJson(doc, BankInfoBuffer);
   if (error) {
@@ -158,13 +159,14 @@ int BluetoothManager::getDaysLeft() {
 }
 
 void BluetoothManager::updateJsonDocBuffer(char jsonDocBuffer[]) {
-  strcpy(jsonDocBuffer,requestService("GraphData").c_str());
+  strcpy(jsonDocBuffer, requestService("GraphData").c_str());
 }
 
 DynamicJsonDocument BluetoothManager::getGraphData(const char jsonDocBuffer[]) {
-  //deserializeJson will alter the char array that is given, thus we need to copy the BankInfoBuffer to a tmp buffer
-  // char tmp [1024];
-  // strcpy(tmp,jsonDocBuffer);
+  // deserializeJson will alter the char array that is given, thus we need to
+  // copy the BankInfoBuffer to a tmp buffer
+  //  char tmp [1024];
+  //  strcpy(tmp,jsonDocBuffer);
   DynamicJsonDocument doc(1024);
   DeserializationError error = deserializeJson(doc, jsonDocBuffer);
   if (error) {

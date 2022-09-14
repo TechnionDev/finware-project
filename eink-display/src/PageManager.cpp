@@ -59,6 +59,10 @@ void PageManager::printTotalSum(int totalSum) {
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
+  if(monthlyGoal == 0) {
+    monthlyGoal = 1;
+  }
+
   int barWidth = 0.8 * display.width();
   int barX = (display.width() - barWidth) / 2;
   int barY = display.height() - 23;
@@ -117,7 +121,7 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
   u8g2.print(monthlyGoalStr.c_str());
 }
 
-void PageManager::printCardSpending(const cardsSpending& cardMap) {
+void PageManager::printCardSpending(const cardsSpending &cardMap) {
   u8g2.setFont(u8g2_font_9x15_tr);
   u8g2.setCursor(HCENTER(display.width(), String("Credit Cards")), 15);
   u8g2.print("Credit Cards");
@@ -147,7 +151,7 @@ void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
   display.update();
 }
 
-void PageManager::showCardSpendingPage(const cardsSpending& cardMap) {
+void PageManager::showCardSpendingPage(const cardsSpending &cardMap) {
   resetDisplay(display);
   printPageMenu(1, 3);
   printCardSpending(cardMap);
@@ -173,24 +177,25 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
   delay(delayAfter);
 }
 
-// void PageManager::printNextPage(int pageNum, financialData data){
-//   switch (pageNum % 3)
-//   {
-//   case 0:
-//     this->showSumPage(data.totalSum, data.daysLeft, data.goal);
-//     break;
-//   case 1:
-//     this->showCardSpendingPage(data.bankInfo);
-//     break;
-//   case 2:
-//     this->showGraphPage(data.doc["cycleStartDate"], data.doc["cycleEndDate"],
-//                                     data.doc["daysInCycle"], data.doc["data"]);
-//     break;
-//   default:
-//     Serial.println("worng page number");
-//     break;
-//   }
-// }
+/* void PageManager::printNextPage(int pageNum, financialData data){
+  switch (pageNum % 3)
+  {
+  case 0:
+    this->showSumPage(data.totalSum, data.daysLeft, data.goal);
+    break;
+  case 1:
+    this->showCardSpendingPage(data.bankInfo);
+    break;
+  case 2:
+    this->showGraphPage(data.doc["cycleStartDate"], data.doc["cycleEndDate"],
+                                    data.doc["daysInCycle"],
+                                    data.doc["data"]);
+    break;
+  default:
+    Serial.println("worng page number");
+    break;
+  }
+} */
 
 #define MAX_DATA_POINTS 31
 void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,

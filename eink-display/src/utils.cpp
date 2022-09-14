@@ -40,15 +40,37 @@ void reverseheb(char* string) {
   free(temp);
 }
 
-void blockUntilPress(unsigned long startTime) {
-  int now = digitalRead(GPIO_NUM_2);
-  while (now == 0) {
-    if(millis() - startTime > NEXT_BUTTON_TIME_INTERVAL){
-      break;
+boolean blockUntilPress(unsigned long startTime) {
+  int next_button = digitalRead(NEXT_BUTTON);
+  int hide_button = digitalRead(HIDE_SHOW_BUTTON);
+  while (hide_button == 0 && next_button == 0) {
+    if (millis() - startTime > LISTEN_FOR_CLICKS_TIMEOUT) {
+      return false;
     }
     delay(1);
-    now = digitalRead(GPIO_NUM_2);
+    next_button = digitalRead(NEXT_BUTTON);
+    hide_button = digitalRead(HIDE_SHOW_BUTTON);
   }
+  return true;
+}
+
+int listenForButtonClick(int timeout) {
+  int next_button = digitalRead(NEXT_BUTTON);
+  int hide_button = digitalRead(HIDE_SHOW_BUTTON);
+  int startTime = millis();
+  while (millis() - startTime < timeout) {
+    delay(1);
+    next_button = digitalRead(NEXT_BUTTON);
+    hide_button = digitalRead(HIDE_SHOW_BUTTON);
+
+    if (next_button) {
+      return NEXT_BUTTON;
+    } else if (hide_button) {
+      return HIDE_SHOW_BUTTON;
+    }
+  }
+
+  return BUTTON_CLICK_TIMEOUT;
 }
 
 GraphBuilder::GraphBuilder(GxEPD_Class& display_, U8G2_FOR_ADAFRUIT_GFX& u8g2_)

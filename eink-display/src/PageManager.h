@@ -22,7 +22,6 @@
 
 #include <map>
 
-
 typedef std::map<std::string, int> cardsSpending;
 
 // class financialData{
@@ -58,8 +57,8 @@ class PageManager {
   void showPassKey(uint32_t pass_key);
   void showGraphPage(String cycleStartDate, String cycleEndDate,
                      int daysInCycle, JsonArray dataPoints);
-  void showTitle(String title, String subtitle, int delayAfter=0);
-  //void printNextPage(int pageNum, financialData data );
+  void showTitle(String title, String subtitle, int delayAfter = 0);
+  // void printNextPage(int pageNum, financialData data );
 };
 
 #endif  // DISPLAY_SRC_PAGEMANAGER_H_
