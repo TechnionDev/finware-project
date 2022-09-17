@@ -44,7 +44,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 
 
 class BluetoothManager {
-  PageManager pageManager;
+  PageManager& pageManager;
   BLERemoteService *pRemoteService{};
   std::string requestService(const std::string &serviceName);
   std::map<std::string, std::string> ServiceName2ServiceUuid{

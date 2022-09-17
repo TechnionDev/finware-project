@@ -18,16 +18,21 @@ PageManager::PageManager(U8G2_FOR_ADAFRUIT_GFX &u8g2_, GxDEPG0213BN &display_,
   u8g2.setBackgroundColor(GxEPD_WHITE);  // apply Adafruit GFX color
 }
 
+#define CIRCLES_MARGIN 6
+#define CIRCLES_RADIUS 6
 void PageManager::printPageMenu(int pageNum, int totalPages) {
   short x = 9;
   short y = 9;
   for (int i = 0; i < totalPages; ++i) {
     if (pageNum == i) {
-      display.fillCircle(x, y, 6, GxEPD_BLACK);
+      display.fillCircle(x, y, CIRCLES_RADIUS, GxEPD_BLACK);
     } else {
-      display.drawCircle(x, y, 6, GxEPD_BLACK);
+      display.drawCircle(x, y, CIRCLES_RADIUS, GxEPD_BLACK);
     }
-    x += 18;
+    if (i != totalPages - 1) {
+      display.drawFastHLine(x + CIRCLES_RADIUS, y, CIRCLES_MARGIN, GxEPD_BLACK);
+    }
+    x += 2 * CIRCLES_RADIUS + CIRCLES_MARGIN;
   }
   this->currentCourser = x;
 }
@@ -59,7 +64,7 @@ void PageManager::printTotalSum(int totalSum) {
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
-  if(monthlyGoal == 0) {
+  if (monthlyGoal == 0) {
     monthlyGoal = 1;
   }
 

@@ -165,8 +165,8 @@ void GraphBuilder::DrawGraph(int x_pos, int y_pos, int gwidth, int gheight,
     }
     Y1Min = round(minYscale);
   }
-  Y1Min = Y1Min - ((int)Y1Min % 200);
-  Y1Max = Y1Max + (200 - ((int)Y1Max % 200));
+  Y1Min = barchart_mode ? 0 : Y1Min - ((int)Y1Min % 200);
+  Y1Max = Y1Max + (100 - ((int)Y1Max % 100)) + 100;
 
   // Draw the graph
   last_x = x_pos + 1;

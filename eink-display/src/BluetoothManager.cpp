@@ -23,7 +23,7 @@ class MySecurity : public BLESecurityCallbacks {
 
   bool onSecurityRequest() {
     Serial.printf("onSecurityRequest \n");
-    return false;
+    return true;
   }
 
   void onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl) {
