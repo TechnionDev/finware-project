@@ -87,44 +87,11 @@ void setup() {
     pBLEScan->start(SCAN_TIMEOUT_SEC);  // Scan forever
     if (!doConnect) {
       Serial.println("RPi was not found, going back to sleep");
-      pageManager.showTitle("RPi Wasn't Found", "Will retry in 30 min");
+      pageManager.showTitle("RPi Wasn't Found", "Will retry later");
       esp_deep_sleep(refreshRate * uS_TO_M_FACTOR);
     }
     Serial.println("RPi was found, Setup done");
   }
-}
-
-void refreshDataAndDisplay() {
-  if (!connected) {
-    Serial.println(
-        "Attempted to refresh display data when there is no bluetooth "
-        "connection, ignoring");
-    return;
-  }
-  blm.updateBankInfoBuffer(BankInfoBuffer);
-  auto bankInfo = blm.getBankInfo(BankInfoBuffer);
-  blm.updateJsonDocBuffer(jsonDocBuffer);
-  daysLeft = blm.getDaysLeft();
-  goal = blm.getGoal();
-  refreshRate = blm.getRefreshRate();
-  totalSum = 0;
-  for (const auto& it : bankInfo) {
-    totalSum += it.second;
-  }
-  pageManager.showSumPage(totalSum, daysLeft, goal);
-}
-
-void connectBT() {
-  if (blm.connectToServer(*pServerAddress)) {
-    Serial.println("We are now connected to the BLE Server.");
-    connected = true;
-  } else {
-    Serial.println(
-        "We have failed to connect to the server; there is nothin more we "
-        "will do.");
-  }
-  doConnect = false;
-  waitForAuth();
 }
 
 void showPage(int page) {
@@ -144,6 +111,42 @@ void showPage(int page) {
                                     doc["daysInCycle"], doc["data"]);
       break;
   }
+}
+
+
+void refreshDataAndDisplay() {
+  if (!connected) {
+    Serial.println(
+        "Attempted to refresh display data when there is no bluetooth "
+        "connection, ignoring");
+    return;
+  }
+  blm.updateBankInfoBuffer(BankInfoBuffer);
+  auto bankInfo = blm.getBankInfo(BankInfoBuffer);
+  blm.updateJsonDocBuffer(jsonDocBuffer);
+  daysLeft = blm.getDaysLeft();
+  goal = blm.getGoal();
+  refreshRate = blm.getRefreshRate();
+  totalSum = 0;
+  for (const auto& it : bankInfo) {
+    totalSum += it.second;
+  }
+  showPage(currPage);
+}
+
+boolean connectBT() {
+  doConnect = false;
+  if (blm.connectToServer(*pServerAddress)) {
+    Serial.println("We are now connected to the BLE Server.");
+    connected = waitForAuth();
+    return connected;
+  }
+
+  Serial.println(
+      "We have failed to connect to the server; there is nothin more we "
+      "will do.");
+
+  return false;
 }
 
 void handleNextButtonClick() {
@@ -174,7 +177,18 @@ void loop() {
   Serial.printf("Running loop. doConnect: %s | connected: %s\n",
                 doConnect ? "true" : "false", connected ? "true" : "false");
   if (doConnect) {
-    connectBT();
+    boolean success = connectBT();
+    if (!success) {
+      Serial.println("Could not connect to RaspberryPi, going to sleep");
+
+      if (!isAuthedFailed()) { 
+        //  We have not asynchronisely shown error title to screen
+        pageManager.showTitle("Pairing Error", "Will retry later");
+      }
+      esp_deep_sleep(refreshRate * uS_TO_M_FACTOR);
+
+      return;
+    }
   }
 
   esp_sleep_wakeup_cause_t wakeup_cause = esp_sleep_get_wakeup_cause();
@@ -196,6 +210,5 @@ void loop() {
   }
 
   Serial.println("Finished loop, going to sleep");
-  delay(1000);
   esp_deep_sleep(refreshRate * uS_TO_M_FACTOR);
 }

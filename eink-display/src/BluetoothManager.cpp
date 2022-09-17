@@ -4,9 +4,8 @@
 
 #include "BluetoothManager.h"
 
-// authed should be consistent between deepSleeps, therefor need to be saved in
-// RTC memory
 static boolean authed = false;
+static boolean authedFailed = false;
 class MySecurity : public BLESecurityCallbacks {
  private:
   PageManager pageManager;
@@ -32,11 +31,12 @@ class MySecurity : public BLESecurityCallbacks {
       authed = true;
       Serial.println("Bluetooth pairing finished successfully!");
     } else {
-      Serial.printf("Bluetooth pairing encountered an error: %d\n",
-                    auth_cmpl.fail_reason); // I think 102 is connection was closed by slave
-      pageManager.showTitle(
-          "Pairing Error",
-          String("Error Code: " + String(auth_cmpl.fail_reason)));
+      authedFailed = true;
+      Serial.printf(
+          "Bluetooth pairing encountered an error: %d\n",
+          auth_cmpl
+              .fail_reason);  // I think 102 is connection was closed by slave
+      pageManager.showTitle( "Pairing Error", String("Error: " + String(auth_cmpl.fail_reason)) + ". Retry later");
     }
   }
 };
@@ -189,8 +189,17 @@ std::string BluetoothManager::requestService(const std::string &serviceName) {
   return res;
 }
 
-void waitForAuth() {
-  while (!authed) {
-    delay(2000);
+boolean waitForAuth() {
+  while (!authed && !authedFailed) {
+    delay(500);
   }
+
+  if (authedFailed) {
+    return false;
+  }
+  return true;
+}
+
+boolean isAuthedFailed() {
+  return authedFailed;
 }

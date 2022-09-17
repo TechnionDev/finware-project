@@ -66,5 +66,6 @@ class BluetoothManager {
   bool connectToServer(BLEAddress pAddress);
 };
 
-void waitForAuth();
+boolean waitForAuth();
+boolean isAuthedFailed();
 #endif  // DISPLAY_SRC_BLUETOOTHMANAGER_H_
