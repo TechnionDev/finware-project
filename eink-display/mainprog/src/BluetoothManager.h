@@ -11,16 +11,17 @@
 #include <BLEScan.h>
 #include <BLEUtils.h>
 
-#include "pageManager.h"
+#include "PageManager.h"
 // The remote service we wish to connect to.
 
 static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 // The characteristic of the remote service we are interested in.
 
 static BLEAddress *pServerAddress;
+// connected, doConnect and authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
 static boolean doConnect = false;
 static boolean connected = false;
-static char LOG_TAG[] = "INFO";
+
 
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   /**
@@ -32,19 +33,17 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 
     if (advertisedDevice.haveServiceUUID() &&
         advertisedDevice.getServiceUUID().equals(serviceUUID)) {
-      Serial.print(" - Found the RaspberryPi!");
+      Serial.println(" - Found the RaspberryPi!");
       advertisedDevice.getScan()->stop();
-
       pServerAddress = new BLEAddress(advertisedDevice.getAddress());
       doConnect = true;
     }
   }
 };
 
-typedef std::map<std::string, int> cardsSpending;
 
 class BluetoothManager {
-  PageManager pageManager;
+  PageManager& pageManager;
   BLERemoteService *pRemoteService{};
   std::string requestService(const std::string &serviceName);
   std::map<std::string, std::string> ServiceName2ServiceUuid{
@@ -56,13 +55,16 @@ class BluetoothManager {
 
  public:
   BluetoothManager(PageManager &pageManager);
-  cardsSpending getBankInfo();
+  void updateBankInfoBuffer(char BankInfoBuffer[]);
+  cardsSpending getBankInfo(const char BankInfoBuffer[]);
   int getRefreshRate();
   int getGoal();
   int getDaysLeft();
-  DynamicJsonDocument getGraphData();
+  void updateJsonDocBuffer(char jsonDocBuffer[]);
+  DynamicJsonDocument getGraphData(const char jsonDocBuffer[]);
   bool connectToServer(BLEAddress pAddress);
 };
 
-void waitForAuth();
+boolean waitForAuth();
+boolean isAuthedFailed();
 #endif  // DISPLAY_SRC_BLUETOOTHMANAGER_H_

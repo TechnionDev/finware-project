@@ -8,8 +8,9 @@
 #include <map>
 
 #include "epd_driver.h"
-#include "firesans.h"
 #include "utils.h"
+
+typedef std::map<std::string, int> cardsSpending;
 
 class PageManager {
  private:
@@ -28,7 +29,7 @@ class PageManager {
   void showCardSpendingPage(const std::map<std::string, int>& cardMap);
   void showTopFivePurchase();
   void showPassKey(uint32_t pass_key);
-  void showGraphPage(String cycleStartDate, String cycleEndDate,
+  void showGraphPage(String cycleStartDate, String cycleEndDate, int daysLeft,
                      int daysInCycle, JsonArray dataPoints);
   void showTitle(String title, String subtitle, int delayAfter = 0);
   void DrawBattery(int x, int y);

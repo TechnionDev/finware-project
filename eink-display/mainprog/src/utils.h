@@ -7,18 +7,22 @@
 #include <BLEScan.h>
 #include <BLEUtils.h>
 #include <epd_driver.h>
-// #include <GxDEPG0213BN/GxDEPG0213BN.h>
-// #include <U8g2_for_Adafruit_GFX.h>
 
-void reverseheb(char *string);
-void blockUntilPress();
+#define LISTEN_FOR_CLICKS_TIMEOUT 15000
+#define HIDE_SHOW_BUTTON GPIO_NUM_34
+#define NEXT_BUTTON GPIO_NUM_39
+#define BUTTON_CLICK_TIMEOUT -1
 
-enum alignment { LEFT, RIGHT, CENTER, TOP, BOTTOM };
 #define White 0xFF
 #define LightGrey 0xBB
 #define Grey 0x88
 #define DarkGrey 0x44
 #define Black 0x00
+
+enum alignment { LEFT, RIGHT, CENTER, TOP, BOTTOM };
+void reverseheb(char* string);
+boolean blockUntilPress(unsigned long startTime);
+int listenForButtonClick(int timeout);
 
 /* (C) D L BIRD
     This function will draw a graph on a ePaper/TFT/LCD display using data

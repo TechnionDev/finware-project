@@ -4,6 +4,7 @@
 #include "roboto12.h"
 #include "roboto16.h"
 #include "roboto16B.h"
+#include "roboto24.h"
 #include "roboto26b.h"
 #include "roboto45b.h"
 
@@ -162,8 +163,15 @@ void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
   /*   u8g2.setFont(u8g2_font_9x15_tr);
     u8g2.setCursor(HCENTER(EPD_WIDTH, String("Credit Cards")), 15);
     u8g2.print("Credit Cards"); */
-  drawString(EPD_WIDTH / 2, 15, String("Credit Cards"), CENTER, &FiraSans,
+  drawString(EPD_WIDTH / 2, 15, "Credit Cards", CENTER, BOTTOM, &Roboto24,
              framebuffer);
+
+  int i = 0;
+  for (auto const &it : cardMap) {
+    drawString(20, 115 + i*90, String(it.first.c_str()) + ": ", LEFT, BOTTOM, &Roboto24, framebuffer);
+    drawString(EPD_WIDTH - 270, 115 + i*100, String(it.second), LEFT, BOTTOM, &Roboto26B, framebuffer);
+    i++;
+  }
 
   // u8g2.setFont(u8g2_font_10x20_tr);
   // int y = 42;
@@ -176,8 +184,8 @@ void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
   // }
 }
 void PageManager::resetDisplay() {
-  epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, Black, framebuffer);
-  epd_update(framebuffer);
+  // epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, Black, framebuffer);
+  // epd_update(framebuffer);
   epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, White, framebuffer);
   epd_clear();
 }
@@ -198,6 +206,7 @@ void PageManager::showCardSpendingPage(
   Serial.println("Printing Card Spending page");
   resetDisplay();
   printPageMenu(1, 3);
+  DrawBattery(EPD_WIDTH - 150, 42);
   printCardSpending(cardMap);
   epd_update(framebuffer);
 }
@@ -207,6 +216,8 @@ void PageManager::showPassKey(uint32_t pass_key) {
 }
 
 void PageManager::showTitle(String title, String subtitle, int delayAfter) {
+  Serial.printf("Showing title: %s | subtitle: %s\n", title.c_str(),
+                subtitle.c_str());
   resetDisplay();
   /*   u8g2.setFont(u8g2_font_9x15_tr);
     u8g2.setCursor(HCENTER(EPD_WIDTH, subtitle), 20);
@@ -225,14 +236,15 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
 
 #define MAX_DATA_POINTS 31
 void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,
-                                int daysInCycle, JsonArray dataPoints) {
+                                int daysLeft, int daysInCycle,
+                                JsonArray dataPoints) {
   Serial.println("Printing Monthly Spending Graph page");
   resetDisplay();
   printPageMenu(2, 3);
   float dataPointsArr[MAX_DATA_POINTS];
   copyArray(dataPoints, dataPointsArr);
-
-  DrawGraph(30, 24, 215, 80, -1, -1, "Monthly Spending", dataPointsArr,
+  DrawBattery(EPD_WIDTH - 150, 42);
+  DrawGraph(110, 83, 815, 395, -1, -1, "Monthly Spending", dataPointsArr,
             dataPoints.size(), daysInCycle, cycleStartDate, cycleEndDate, true,
             true, framebuffer);
   epd_update(framebuffer);

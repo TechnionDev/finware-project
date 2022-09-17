@@ -2,6 +2,7 @@
 #error "Please enable PSRAM !!!"
 #endif
 
+#include "Arduino.h"
 #include "epd_driver.h"
 
 void setup()

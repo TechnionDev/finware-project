@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "firesans.h"
+#include "roboto16.h"
+#include "roboto24.h"
 
 void reverseheb(char *string) {
   int i, j;
@@ -42,17 +43,40 @@ void reverseheb(char *string) {
   free(temp);
 }
 
-void blockUntilPress() {
-  int last = 1;
-  int now = digitalRead(GPIO_NUM_39);
-  while (now == 1) {
-    last = now;
+boolean blockUntilPress(unsigned long startTime) {
+  int next_button = digitalRead(NEXT_BUTTON);
+  int hide_button = digitalRead(HIDE_SHOW_BUTTON);
+  while (hide_button == 0 && next_button == 0) {
+    if (millis() - startTime > LISTEN_FOR_CLICKS_TIMEOUT) {
+      return false;
+    }
     delay(1);
-    now = digitalRead(GPIO_NUM_39);
+    next_button = digitalRead(NEXT_BUTTON);
+    hide_button = digitalRead(HIDE_SHOW_BUTTON);
   }
+  return true;
 }
 
-const GFXfont *currentFont = &FiraSans;
+int listenForButtonClick(int timeout) {
+  int next_button = digitalRead(NEXT_BUTTON);
+  int hide_button = digitalRead(HIDE_SHOW_BUTTON);
+  int startTime = millis();
+  while (millis() - startTime < timeout) {
+    delay(1);
+    next_button = digitalRead(NEXT_BUTTON);
+    hide_button = digitalRead(HIDE_SHOW_BUTTON);
+
+    if (!next_button) {
+      return NEXT_BUTTON;
+    } else if (!hide_button) {
+      return HIDE_SHOW_BUTTON;
+    }
+  }
+
+  return BUTTON_CLICK_TIMEOUT;
+}
+
+const GFXfont *currentFont = &Roboto16;
 
 void initEpd(uint8_t *framebuffer) {
   delay(1500);
@@ -189,21 +213,18 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
     }
     Y1Min = round(minYscale);
   }
-  Y1Min = Y1Min - ((int)Y1Min % 200);
-  Y1Max = Y1Max + (200 - ((int)Y1Max % 200));
+  Y1Min = barchart_mode ? 0 : Y1Min - ((int)Y1Min % 200);
+  Y1Max = Y1Max + (100 - ((int)Y1Max % 100)) + 100;
 
   // Draw the graph
   last_x = x_pos + 1;
   last_y = y_pos + (Y1Max - constrain(DataArray[0], Y1Min, Y1Max)) /
                        (Y1Max - Y1Min) * gheight;
   drawRect(x_pos, y_pos, gwidth + 3, gheight + 2, Grey, framebuffer);
-  drawString(x_pos - 20 + gwidth / 2, y_pos - 18, title, CENTER, &FiraSans,
+  drawString(x_pos - 20 + gwidth / 2, 8, title, CENTER, BOTTOM, &Roboto24,
              framebuffer);
   for (int gx = 0; gx < readings; gx++) {
-    // x2 = x_pos + gx * gwidth / (readings - 1) -
-    x2 = x_pos + gx * gwidth / (max_data_points - 1) -
-         1;  // max_readings is the global variable that sets the maximum data
-             // that can be plotted
+    x2 = x_pos + gx * gwidth / (max_data_points - 1) - 1;
     y2 = y_pos +
          (Y1Max - constrain(DataArray[gx], Y1Min, Y1Max)) / (Y1Max - Y1Min) *
              gheight +
@@ -232,13 +253,13 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
     }
 
     drawString(
-        x_pos - 3, y_pos + ((gheight * spacing) / y_minor_axis) - 3,
+        x_pos - 15, y_pos + ((gheight * spacing) / y_minor_axis) + 3,
         String((int)(Y1Max - (Y1Max - Y1Min) / y_minor_axis * spacing + 0.01)),
         RIGHT, framebuffer);
   }
 
-  drawString(x_pos, y_pos + gheight + 4, x_start_title, LEFT, framebuffer);
-  drawString(x_pos + gwidth, y_pos + gheight + 4, x_end_title, RIGHT,
+  drawString(x_pos, y_pos + gheight + 22, x_start_title, LEFT, framebuffer);
+  drawString(x_pos + gwidth, y_pos + gheight + 22, x_end_title, RIGHT,
              framebuffer);
 
   for (int i = 0; i < 3; i++) {
