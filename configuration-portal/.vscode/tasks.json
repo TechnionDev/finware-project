@@ -1,7 +1,7 @@
 {
     "label": "Build and Upload",
     "type": "shell",
-    "command": "./send_and_run_w.sh",
+    "command": "./scripts/send_and_run_w.sh",
     "presentation": {
         "echo": true,
         "reveal": "always",
