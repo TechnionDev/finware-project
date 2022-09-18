@@ -38,7 +38,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     app.use(express.static(path.resolve(__dirname, "../build")));
     app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
 
-    if (process.env.NODE_ENV.includes("development")) {
+    if (process.env.NODE_ENV?.includes("development")) {
         app.listen(PORT, () => {
             console.log(`Server listening on ${PORT}`);
         });
