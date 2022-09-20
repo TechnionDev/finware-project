@@ -19,13 +19,13 @@ PageManager pageManager;
 static BluetoothManager blm(pageManager);
 
 RTC_DATA_ATTR bool show = true;
-RTC_DATA_ATTR int currPage = 1;
+RTC_DATA_ATTR int currPage = 0;
 
 RTC_DATA_ATTR char BankInfoBuffer[1024];
 RTC_DATA_ATTR char jsonDocBuffer[1024];
 RTC_DATA_ATTR int daysLeft = 0;
 RTC_DATA_ATTR int goal = 0;
-RTC_DATA_ATTR int refreshRate = DEFAULT_REFRESH_RATE_MIN;
+RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
@@ -67,18 +67,23 @@ int getGPIOPIN() {
     return -1;
   }
 }
+void initDisplay(){
+  framebuffer =
+      (uint8_t*)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
+  if (!framebuffer) Serial.println("Memory alloc failed!");
+  memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
+  pageManager.framebuffer = framebuffer;
+  epd_init();
+  epd_poweron();
+
+}
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting Finware application");
   pinMode(NEXT_BUTTON, INPUT);
   pinMode(HIDE_SHOW_BUTTON, INPUT);
-
-  framebuffer =
-      (uint8_t*)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
-  if (!framebuffer) Serial.println("Memory alloc failed!");
-  memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
-  pageManager.framebuffer = framebuffer;
+  initDisplay();
 
   esp_sleep_wakeup_cause_t wakeup_reason = print_wakeup_reason();
   esp_sleep_enable_ext0_wakeup(HIDE_SHOW_BUTTON, ESP_EXT1_WAKEUP_ALL_LOW);
@@ -97,7 +102,6 @@ void setup() {
     pBLEScan->setActiveScan(true);
     pBLEScan->start(SCAN_TIMEOUT_SEC);
     delay(1000);
-    Serial.println("After delay");
     if (!doConnect) {
       Serial.println("RPi was not found, going back to sleep");
       pageManager.showTitle("RPi Wasn't Found", "Will retry later");
@@ -190,7 +194,6 @@ void loop() {
   int next_button = digitalRead(NEXT_BUTTON);
   int hide_button = digitalRead(HIDE_SHOW_BUTTON);
   int startTime = millis();
-  Serial.printf("next: %d, hide: %d\n", next_button, hide_button);
 
   delay(1000);
 

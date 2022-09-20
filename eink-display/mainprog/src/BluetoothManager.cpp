@@ -39,7 +39,7 @@ class MySecurity : public BLESecurityCallbacks {
               .fail_reason);  // I think 102 is connection was closed by slave
       pageManager.showTitle(
           "Pairing Error",
-          String("Error: " + String(auth_cmpl.fail_reason)) + ". Retry later");
+          String("Error: " + String(auth_cmpl.fail_reason)) + ". Retry later", 2500);
     }
   }
 };

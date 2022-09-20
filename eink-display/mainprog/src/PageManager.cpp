@@ -15,8 +15,7 @@ PageManager::PageManager() {
   // memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
   // framebuffer = (uint8_t*)malloc(EPD_WIDTH * EPD_HEIGHT / 2);
   Serial.println("Initializing display");
-  epd_init();
-  epd_poweron();
+
 }
 
 #define CIRCLES_MARGIN 20
@@ -73,7 +72,6 @@ void PageManager::DrawBattery(int x, int y) {
   esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
       ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
   if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
-    Serial.printf("eFuse Vref:%u mV", adc_chars.vref);
     vref = adc_chars.vref;
   }
   float voltage = analogRead(36) / 4096.0 * 6.566 * (vref / 1000.0);
@@ -186,17 +184,25 @@ void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
 void PageManager::resetDisplay() {
   // epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, Black, framebuffer);
   // epd_update(framebuffer);
+  Serial.println("1");
   epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, White, framebuffer);
+  Serial.println("2");
   epd_clear();
+  Serial.println("3");
 }
 
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
   Serial.println("Printing Total Sum page");
   resetDisplay();
+  Serial.println("4");
   printPageMenu(0, 3);
+  Serial.println("5");
   printDaysLeft(daysLeft);
+  Serial.println("6");
   printTotalSum(totalSum);
+  Serial.println("7");
   printProgressAndGoal(totalSum, monthlyGoal);
+  Serial.println("8");
   DrawBattery(EPD_WIDTH - 150, 42);
   epd_update(framebuffer);
 }
