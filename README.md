@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 - [Installation](#installation)
   * [Setup Raspberry Pi](#setup-raspberry-pi)
     + [Step 1 - Installing our image on your microSD card (microSD must be `TODO` GB or more)](#step-1---installing-our-image-on-your-microsd-card--microsd-must-be--todo--gb-or-more-)
@@ -69,3 +70,10 @@ The next step will be to add the credentials of each credit card you want to mon
 
 
 <!-- ## E-Ink Display -->
+=======
+Welcome to the **Finware** project.\
+Please refer to the [Wiki](https://github.com/TechnionDev/finware-project/wiki) for setup and installation information
+
+
+Please note that this page and wiki are still under construction - thank you for your understanding!
+>>>>>>> caaa35bd85d8fad4ac892d617aaad72634982ea1
