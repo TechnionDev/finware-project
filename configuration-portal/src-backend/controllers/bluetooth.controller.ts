@@ -1,6 +1,8 @@
 import BLEManager from "../util-managers/BLEManager";
 import NodeBleHost from "ble-host";
 import { getCycleStartDate, getCycleEndDate, getCycleDayCount, datediff } from "./utils"
+import Settings from "../models/Settings";
+
 const AttErrors = NodeBleHost.AttErrors;
 
 enum UUIDS {
@@ -30,8 +32,16 @@ class GATTInformation {
             "uuid": UUIDS.SERVICE_MAIN,
             "characteristics": [
                 this.computeCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
-                this.computeCharacteristic(UUIDS.CHAR_REFRESH_RATE, "refreshRate", "number"),
                 this.computeCharacteristic(UUIDS.CHAR_GOAL, "goal", "number"),
+                {
+                    "uuid": UUIDS.CHAR_REFRESH_RATE,
+                    "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
+                    onRead: async (_, callback) => {
+                        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+                        callback(AttErrors.SUCCESS, settings.display_refresh_frequency_minutes);// todo this is super wrong... fix to correctly diff the next cycle with current date
+                    }
+                },
                 {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
