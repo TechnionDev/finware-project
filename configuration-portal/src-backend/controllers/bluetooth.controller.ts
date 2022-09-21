@@ -39,7 +39,7 @@ class GATTInformation {
                     "readPerm": "encrypted-mitm-sc",
                     onRead: async (_, callback) => {
                         let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
-                        callback(AttErrors.SUCCESS, settings.display_refresh_frequency_minutes);// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.display_refresh_frequency_minutes }));// todo this is super wrong... fix to correctly diff the next cycle with current date
                     }
                 },
                 {
