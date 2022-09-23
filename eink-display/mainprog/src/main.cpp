@@ -104,7 +104,7 @@ void setup() {
     delay(1000);
     if (!doConnect) {
       Serial.println("RPi was not found, going back to sleep");
-      pageManager.showTitle("RPi Wasn't Found", "Will retry later");
+      pageManager.showTitle("RPi Wasn't Found", "Will retry later", 2500);
       esp_deep_sleep(refreshRate * uS_TO_M_FACTOR);
     }
     Serial.println("RPi was successfully found, Setup done");
