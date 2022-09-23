@@ -69,5 +69,6 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
         res.json({ error: err.stack });
     });
 }).catch(err => {
-    console.log('Failed to connect to MongoDB:\n', err);
+    console.log("Failed to start up the server, error:", err);
+    process.exit(1);
 });

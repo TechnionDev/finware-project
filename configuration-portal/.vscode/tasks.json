@@ -1,7 +1,7 @@
 {
     "label": "Build and Upload",
     "type": "shell",
-    "command": "./scripts/send_and_run_w.sh",
+    "command": "./scripts/upload_to_rpi_w.sh",
     "presentation": {
         "echo": true,
         "reveal": "always",
