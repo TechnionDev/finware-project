@@ -8,7 +8,7 @@ export default function apiRouterFactory({ financeAccountsController, bluetoothC
     const apiRouter = express.Router();
     apiRouter.use("/financial-account", financialRouterFactory(financeAccountsController));
     apiRouter.use("/bluetooth", bluetoothRouterFactory(bluetoothController));
-    apiRouter.use("/settings", settingsRouterFactory());
+    apiRouter.use("/settings", settingsRouterFactory(financeAccountsController));
     // TODO: Make 404 page instead of always returning the main app page
 
     return apiRouter;

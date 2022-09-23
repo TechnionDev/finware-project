@@ -8,6 +8,7 @@ export default function financialRouterFactory(financialAccountsController: Fina
   financialAccountsRouter.post("/create", financialAccountsController.createFinancialAccount.bind(financialAccountsController))
   financialAccountsRouter.post("/:id/delete", financialAccountsController.removeFinancialAccount.bind(financialAccountsController));
   financialAccountsRouter.post("/scrape", financialAccountsController.updateFinancialData.bind(financialAccountsController, true));
+  financialAccountsRouter.post("/:id/scrape", financialAccountsController.scrapeFinancialAccount.bind(financialAccountsController));
 
 
   return financialAccountsRouter;

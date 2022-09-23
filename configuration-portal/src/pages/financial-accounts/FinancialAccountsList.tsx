@@ -9,6 +9,7 @@ import { ErrorScreenshotModal } from './ErrorScreenshotModal';
 
 const CREDIT_STATE_ENDPOINT = "/api/financial-account";
 const FA_DELETE_TEMPLATE = "/api/financial-account/{id}/delete";
+const FA_SCRAPE_TEMPLATE = "/api/financial-account/{id}/scrape";
 const FE_LOGOS_ENDPOINTS = "/fe-logos";
 
 const POLLING_INTERVAL = 1000;
@@ -105,6 +106,14 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
                         {status}
                     </div>
                 </div>
+                <div className="bg-white px-4 py-2 flex justify-center text-gray-500">
+                    <Button color="success" onClick={() => {
+                        fetch(FA_SCRAPE_TEMPLATE.replace("{id}", _id), {
+                            method: "POST"
+                        });
+                    }
+                    }><span className="">Force Update</span></Button>
+                </div>
             </dl>
         </div>
     </div>);
@@ -137,14 +146,14 @@ function FinancialAccountsList() {
                     })
                 }
             </div>
-            {FAState && FAState.length ?
+            {/* {FAState && FAState.length ?
                 <div className="flex justify-center mb-5">
                     <Button color="gray" onClick={() => fetch("/api/financial-account/scrape", { method: "POST" })}>
                         Force Update All
                     </Button>
                 </div> : <></>
-            }
-            <div className="flex justify-center mb-1">
+            } */}
+            <div className="flex justify-center mb-1 mt-5">
                 <Button color="info">
                     <Link to="create">
                         Add Account

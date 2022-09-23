@@ -16,7 +16,7 @@ class FinanceAccountsController {
 
     async fetchCreditCards(_req, res) {
         try {
-            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1, "last_scrape": 1, "validation_status": 1, "scrape_result": 1});
+            const all = await FinancialBE.find({}).select({ "name": 1, "company": 1, "last_scrape": 1, "validation_status": 1, "scrape_result": 1 });
             res.json(all);
         } catch (err) {
             console.log('Error while fetching credit cards: ', err);
@@ -47,7 +47,13 @@ class FinanceAccountsController {
         });
     }
 
-    async updateFinancialData(forceUpdate = false) {
+    async scrapeFinancialAccount(req, res) {
+        console.log(`Force scraping financial account: ${req.params.id}`)
+        this.updateFinancialData(true, req.params.id);
+        res.json({ status: "SUCCESS" });
+    }
+
+    async updateFinancialData(forceUpdate = false, target_fbe_id = null) {
         try {
             let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
@@ -56,6 +62,10 @@ class FinanceAccountsController {
 
             let scrapeJobs = [];
             for (let fbe of fbes) {
+                if (target_fbe_id && target_fbe_id != fbe._id) {
+                    console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`)
+                    continue;
+                }
                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
                 if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
@@ -65,6 +75,7 @@ class FinanceAccountsController {
 
                 console.log("Scraping account:", fbe.name, ". Starting from:", cycleStartDate);
                 fbe.last_scrape = now;
+                fbe.validation_status = ValidationStatus.INPROGRESS;
                 await fbe.save();
 
                 scrapeJobs.push(
@@ -93,7 +104,7 @@ class FinanceAccountsController {
                 }
                 bankInfo[fbe.name] = fbe.scrape_result.accounts.reduce((companySum, account) => {
                     return companySum + account.txns.reduce((accountSum, txn) => {
-                        return accountSum + txn.originalAmount;
+                        return accountSum + txn.chargedAmount;
                     }, 0);
                 }, 0);
 

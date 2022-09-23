@@ -32,14 +32,22 @@ class GATTInformation {
             "uuid": UUIDS.SERVICE_MAIN,
             "characteristics": [
                 this.computeCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
-                this.computeCharacteristic(UUIDS.CHAR_GOAL, "goal", "number"),
+                {
+                    "uuid": UUIDS.CHAR_GOAL,
+                    "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
+                    onRead: async (_, callback) => {
+                        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.expense_budget }));
+                    }
+                },
                 {
                     "uuid": UUIDS.CHAR_REFRESH_RATE,
                     "properties": ["read"],
                     "readPerm": "encrypted-mitm-sc",
                     onRead: async (_, callback) => {
                         let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
-                        callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.display_refresh_frequency_minutes }));// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.display_refresh_frequency_minutes }));
                     }
                 },
                 {
@@ -47,7 +55,7 @@ class GATTInformation {
                     "properties": ["read"],
                     "readPerm": "encrypted-mitm-sc",
                     onRead: (_, callback) => {
-                        callback(AttErrors.SUCCESS, JSON.stringify({ value: datediff(new Date(), getCycleEndDate(this.cycleStartDay)) }));// todo this is super wrong... fix to correctly diff the next cycle with current date
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: datediff(new Date(), getCycleEndDate(this.cycleStartDay)) }));
                     }
                 },
                 {
