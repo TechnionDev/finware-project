@@ -33,7 +33,7 @@ RTC_DATA_ATTR char BankInfoBuffer[1024];
 RTC_DATA_ATTR char jsonDocBuffer[1024];
 RTC_DATA_ATTR int daysLeft = 0;
 RTC_DATA_ATTR int goal = 0;
-RTC_DATA_ATTR int refreshRate = DEFAULT_REFRESH_RATE_MIN;
+RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
