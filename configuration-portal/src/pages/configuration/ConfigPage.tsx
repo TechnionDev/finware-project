@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const SETTINGS_READ_URL = "/api/settings/get";
 const SETTINGS_UPDATE_URL = "/api/settings/update";
 
-const IGNORE_FIELDS = ["createdAt", "updatedAt", "_id", "__v"];
+const IGNORE_FIELDS = ["createdAt", "updatedAt", "dictionary", "_id", "__v"];
 
 
 function useSettings() {
@@ -59,9 +59,9 @@ function ConfigPage() {
                     return IGNORE_FIELDS.includes(key) ? <></> : <div>
                         <div className="mt-3">
                             <div className="mb-1 block">
-                                <Label htmlFor={key} value={key} />
+                                <Label htmlFor={key} value={settings['dictionary'][key]} />
                             </div>
-                            <TextInput name={key} id={key} placeholder="" required={true} type={key === "password" ? "password" : "text"} defaultValue={value} />
+                            <TextInput name={key} id={key} placeholder="" required={key !== "password_hash"} type={key === "password_hash" ? "password" : "text"} defaultValue={value} />
                         </div>
                     </div>
                 })}
