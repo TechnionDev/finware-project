@@ -9,6 +9,7 @@ import LandingPortal from './pages/landing-portal'
 import ConfigPage from './pages/configuration'
 import BluetoothPage from './pages/bluetooth'
 import WifiPage from './pages/wifi'
+import LoginPage from './pages/login'
 import {
   FinancialAccountsList,
   EditFinancialAccount
@@ -34,6 +35,7 @@ function App() {
           <Route path="config" element={<ConfigPage />} />
           <Route path="bluetooth" element={<BluetoothPage />} />
           <Route path="wifi" element={<WifiPage />} />
+          <Route path="login" element={<LoginPage />} />
         </Routes>
       </div>
     </div >

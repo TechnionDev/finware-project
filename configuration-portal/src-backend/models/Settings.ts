@@ -78,10 +78,13 @@ const settingsSchema = new Schema<ISettings>({
 
 // Pre save, check for updating the password field
 settingsSchema.pre('findOneAndUpdate', async function (next) {
-    if (this.getUpdate()['password_hash']) {
-        let salt = CryptoJS.lib.WordArray.random(128 / 8);
+    let password_hash = this.getUpdate()['password_hash'];
+    if (password_hash) {
+        let salt = CryptoJS.lib.WordArray.random(128 / 8).toString();
         this.set('password_salt', salt);
-        this.set('password_hash', sha256(this.getQuery().password_hash, salt));
+        console.log('Hashing password', password_hash);
+        console.log('with salt', salt);
+        this.set('password_hash', sha256(password_hash + salt).toString());
     }
     next();
 });
