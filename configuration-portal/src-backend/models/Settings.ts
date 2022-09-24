@@ -7,7 +7,6 @@ interface ISettings {
     scrape_frequency_hours: number;
     month_cycle_start_day: number;
     expense_budget: number;
-    currency_symbol: string;
     session_timeout_hours: number;
     password_hash: string;
     password_salt: string;
@@ -36,11 +35,6 @@ const settingsSchema = new Schema<ISettings>({
         type: Number,
         default: 2500,
         required: true,
-    },
-    currency_symbol: {
-        type: String,
-        default: '₪',
-        required: true
     },
     session_timeout_hours: {
         type: Number,
