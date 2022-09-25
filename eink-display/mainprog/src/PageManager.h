@@ -21,11 +21,13 @@ class PageManager {
   void printTotalSum(int totalSum);
   void printProgressAndGoal(int totalSum, int monthlyGoal);
   void printCardSpending(const std::map<std::string, int>& cardMap);
+  void printCardSpendingOpt2(const std::map<std::string, int>& cardMap);
 
  public:
   uint8_t* framebuffer;
   explicit PageManager();
-  void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
+  void showSumPage(int totalSum, int daysLeft, int monthlyGoal,
+                   const std::map<std::string, int>& cardMap);
   void showCardSpendingPage(const std::map<std::string, int>& cardMap);
   void showTopFivePurchase();
   void showPassKey(uint32_t pass_key);

@@ -115,13 +115,10 @@ void showPage(int page) {
   cardsSpending bankInfo;
   switch (page % 3) {
     case 0:
-      pageManager.showSumPage(totalSum, daysLeft, goal);
+      bankInfo = blm.getBankInfo(BankInfoBuffer);
+      pageManager.showSumPage(totalSum, daysLeft, goal, bankInfo);
       break;
     case 1:
-      bankInfo = blm.getBankInfo(BankInfoBuffer);
-      pageManager.showCardSpendingPage(bankInfo);
-      break;
-    case 2:
       auto doc = blm.getGraphData(jsonDocBuffer);
       doc["daysInCycle"],
           pageManager.showGraphPage(doc["cycleStartDate"], doc["cycleEndDate"],

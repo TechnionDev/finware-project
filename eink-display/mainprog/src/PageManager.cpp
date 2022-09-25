@@ -15,7 +15,6 @@ PageManager::PageManager() {
   // memset(framebuffer, 0xFF, EPD_WIDTH * EPD_HEIGHT / 2);
   // framebuffer = (uint8_t*)malloc(EPD_WIDTH * EPD_HEIGHT / 2);
   Serial.println("Initializing display");
-
 }
 
 #define CIRCLES_MARGIN 20
@@ -95,8 +94,8 @@ void PageManager::printTotalSum(int totalSum) {
     u8g2.setCursor(HCENTER(EPD_WIDTH, String(totalSum)),
                    VCENTER(EPD_HEIGHT, String(totalSum)) - 5);
     u8g2.print((std::to_string(totalSum)).c_str()); */
-  drawString(EPD_WIDTH / 2, EPD_HEIGHT / 2, "₪" + String(totalSum), CENTER,
-             CENTER, &Roboto45B, framebuffer);
+  drawString(80, EPD_HEIGHT / 2, "₪" + String(totalSum), LEFT, CENTER,
+             &Roboto45B, framebuffer);
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
@@ -158,51 +157,79 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
 }
 
 void PageManager::printCardSpending(const std::map<std::string, int> &cardMap) {
-  /*   u8g2.setFont(u8g2_font_9x15_tr);
-    u8g2.setCursor(HCENTER(EPD_WIDTH, String("Credit Cards")), 15);
-    u8g2.print("Credit Cards"); */
   drawString(EPD_WIDTH / 2, 15, "Credit Cards", CENTER, BOTTOM, &Roboto24,
              framebuffer);
 
   int i = 0;
   for (auto const &it : cardMap) {
-    drawString(20, 115 + i*90, String(it.first.c_str()) + ": ", LEFT, BOTTOM, &Roboto24, framebuffer);
-    drawString(EPD_WIDTH - 270, 115 + i*100, String(it.second), LEFT, BOTTOM, &Roboto26B, framebuffer);
+    drawString(20, 115 + i * 90, String(it.first.c_str()) + ": ", LEFT, BOTTOM,
+               &Roboto24, framebuffer);
+    drawString(EPD_WIDTH - 270, 115 + i * 100, String(it.second), LEFT, BOTTOM,
+               &Roboto26B, framebuffer);
     i++;
   }
-
-  // u8g2.setFont(u8g2_font_10x20_tr);
-  // int y = 42;
-  // for (const auto &it : cardMap) {
-  //   u8g2.setCursor(3, y);
-  //   u8g2.println((it.first + ":").c_str());
-  //   u8g2.setCursor(180, y);
-  //   u8g2.println(std::to_string(it.second).c_str());
-  //   y += 25;
-  // }
 }
+
+// Comparator function to sort pairs
+// according to second value
+bool cmp(std::pair<std::string, int> &a, std::pair<std::string, int> &b) {
+  return a.second > b.second;
+}
+
+void PageManager::printCardSpendingOpt2(
+    const std::map<std::string, int> &cardMap) {
+  // drawString(EPD_WIDTH / 2, 15, "Credit Cards", CENTER, BOTTOM, &Roboto24,
+  //            framebuffer);
+
+  int i = 0;
+  /*   String cardNames = "";
+    String cardSpentValues = "";
+
+    for (auto const &it : cardMap) {
+      cardNames += String(it.first.c_str()) + "\n\n";
+      cardSpentValues += String(it.second) + "\n\n";
+    }
+    drawString(EPD_WIDTH / 2 + 25, EPD_HEIGHT / 2, cardNames, LEFT, TOP,
+               &Roboto16, framebuffer); */
+  std::vector<std::pair<std::string, int>> temp;
+  for (auto const &it : cardMap) {
+    temp.push_back(it);
+  }
+  sort(temp.begin(), temp.end(), cmp);
+
+
+  for (auto const &it : temp) {
+    drawString(EPD_WIDTH / 2 + 44, 135 + i * 66,
+               String(it.first.c_str()) + ": ", LEFT, CENTER, &Roboto16,
+               framebuffer);
+    drawString(EPD_WIDTH - 42, 135 + i * 66, String(it.second), RIGHT, CENTER,
+               &Roboto16B, framebuffer);
+    // drawString(EPD_WIDTH - 270, 115 + i * 100, String(it.second), LEFT,
+    // BOTTOM,
+    //            &Roboto26B, framebuffer);
+    i++;
+  }
+}
+
 void PageManager::resetDisplay() {
   // epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, Black, framebuffer);
   // epd_update(framebuffer);
-  Serial.println("1");
   epd_fill_rect(0, 0, EPD_WIDTH, EPD_HEIGHT, White, framebuffer);
-  Serial.println("2");
   epd_clear();
-  Serial.println("3");
 }
 
-void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
+#define DIVIDER_LENGTH (EPD_HEIGHT / 2.3)
+void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal,
+                              const std::map<std::string, int> &cardMap) {
   Serial.println("Printing Total Sum page");
   resetDisplay();
-  Serial.println("4");
-  printPageMenu(0, 3);
-  Serial.println("5");
+  printPageMenu(0, 2);
   printDaysLeft(daysLeft);
-  Serial.println("6");
   printTotalSum(totalSum);
-  Serial.println("7");
+  printCardSpendingOpt2(cardMap);
+  drawFastVLine(EPD_WIDTH / 2, EPD_HEIGHT / 2 - DIVIDER_LENGTH / 2,
+                DIVIDER_LENGTH, DarkGrey, framebuffer);
   printProgressAndGoal(totalSum, monthlyGoal);
-  Serial.println("8");
   DrawBattery(EPD_WIDTH - 150, 42);
   epd_update(framebuffer);
 }
@@ -211,7 +238,7 @@ void PageManager::showCardSpendingPage(
     const std::map<std::string, int> &cardMap) {
   Serial.println("Printing Card Spending page");
   resetDisplay();
-  printPageMenu(1, 3);
+  printPageMenu(1, 2);
   DrawBattery(EPD_WIDTH - 150, 42);
   printCardSpending(cardMap);
   epd_update(framebuffer);
@@ -246,7 +273,7 @@ void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,
                                 JsonArray dataPoints) {
   Serial.println("Printing Monthly Spending Graph page");
   resetDisplay();
-  printPageMenu(2, 3);
+  printPageMenu(1, 2);
   float dataPointsArr[MAX_DATA_POINTS];
   copyArray(dataPoints, dataPointsArr);
   DrawBattery(EPD_WIDTH - 150, 42);
