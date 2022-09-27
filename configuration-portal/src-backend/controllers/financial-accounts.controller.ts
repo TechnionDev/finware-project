@@ -116,6 +116,7 @@ class FinanceAccountsController {
                 }
             }
             graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
+
             console.log("Settings bank info to: ", bankInfo)
             console.log("Settings graphData to: ", graphData);
             this.bluetoothController.gattInformation.bankInfo = bankInfo;
