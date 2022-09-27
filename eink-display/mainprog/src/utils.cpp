@@ -230,7 +230,7 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
              gheight +
          1;
     if (barchart_mode) {
-      fillRect(last_x + 2, y2, (gwidth / max_data_points) - 1,
+      fillRect(x2 + 2, y2, (gwidth / max_data_points) - 1,
                y_pos + gheight - y2 + 2, Black, framebuffer);
     } else {
       drawLine(last_x, last_y - 1, x2, y2 - 1, Black,
