@@ -10,6 +10,8 @@
 #include "epd_driver.h"
 #include "utils.h"
 
+#define NO_DIFF_YET 99999999
+
 typedef std::map<std::string, int> cardsSpending;
 
 class PageManager {
@@ -18,7 +20,7 @@ class PageManager {
   void resetDisplay();
   void printPageMenu(int pageNum, int totalPages);
   void printDaysLeft(int daysLeft);
-  void printTotalSum(int totalSum);
+  void printTotalSum(int totalSum, int sumDiff);
   void printProgressAndGoal(int totalSum, int monthlyGoal);
   void printCardSpending(const std::map<std::string, int>& cardMap);
   void printCardSpendingOpt2(const std::map<std::string, int>& cardMap);
@@ -26,7 +28,7 @@ class PageManager {
  public:
   uint8_t* framebuffer;
   explicit PageManager();
-  void showSumPage(int totalSum, int daysLeft, int monthlyGoal,
+  void showSumPage(int totalSum, int daysLeft, int monthlyGoal, int sumDiff,
                    const std::map<std::string, int>& cardMap);
   void showCardSpendingPage(const std::map<std::string, int>& cardMap);
   void showTopFivePurchase();

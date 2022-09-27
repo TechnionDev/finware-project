@@ -23,8 +23,9 @@ RTC_DATA_ATTR int currPage = 0;
 
 RTC_DATA_ATTR char BankInfoBuffer[1024];
 RTC_DATA_ATTR char jsonDocBuffer[1024];
-RTC_DATA_ATTR int daysLeft = 0;
+RTC_DATA_ATTR int daysLeft = -1;
 RTC_DATA_ATTR int goal = 0;
+RTC_DATA_ATTR int sumDiff = NO_DIFF_YET;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
 
@@ -67,7 +68,7 @@ int getGPIOPIN() {
     return -1;
   }
 }
-void initDisplay(){
+void initDisplay() {
   framebuffer =
       (uint8_t*)ps_calloc(sizeof(uint8_t), EPD_WIDTH * EPD_HEIGHT / 2);
   if (!framebuffer) Serial.println("Memory alloc failed!");
@@ -75,7 +76,6 @@ void initDisplay(){
   pageManager.framebuffer = framebuffer;
   epd_init();
   epd_poweron();
-
 }
 
 void setup() {
@@ -116,7 +116,7 @@ void showPage(int page) {
   switch (page % 3) {
     case 0:
       bankInfo = blm.getBankInfo(BankInfoBuffer);
-      pageManager.showSumPage(totalSum, daysLeft, goal, bankInfo);
+      pageManager.showSumPage(totalSum, daysLeft, goal, sumDiff, bankInfo);
       break;
     case 1:
       auto doc = blm.getGraphData(jsonDocBuffer);
@@ -138,13 +138,21 @@ void refreshDataAndDisplay() {
   blm.updateBankInfoBuffer(BankInfoBuffer);
   auto bankInfo = blm.getBankInfo(BankInfoBuffer);
   blm.updateJsonDocBuffer(jsonDocBuffer);
-  daysLeft = blm.getDaysLeft();
   goal = blm.getGoal();
   refreshRate = blm.getRefreshRate();
+
+  int tempSum = totalSum;
   totalSum = 0;
   for (const auto& it : bankInfo) {
     totalSum += it.second;
   }
+
+  int newDaysLeft = blm.getDaysLeft();
+  Serial.printf("daysLeft: %d, newDaysLeft: %d, totalSum: %d, tempSum: %d, sumDiff: %d\n", daysLeft, newDaysLeft, totalSum, tempSum, sumDiff);
+  if (daysLeft != -1 && newDaysLeft != daysLeft) {
+    sumDiff = totalSum - tempSum;
+  }
+  daysLeft = newDaysLeft;
   showPage(currPage);
 }
 

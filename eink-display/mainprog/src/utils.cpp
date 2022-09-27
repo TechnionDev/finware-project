@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "roboto13.h"
 #include "roboto16.h"
 #include "roboto24.h"
 
@@ -193,6 +194,7 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
 #define auto_scale_margin \
   0  // Sets the autoscale increment, so axis steps up fter a change of e.g. 3
 #define y_minor_axis 5  // 5 y-axis division markers
+#define date_tooltip_freq
   int maxYscale = -10000;
   int minYscale = 10000;
   int last_x, last_y;
@@ -215,7 +217,6 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
   }
   Y1Min = barchart_mode ? 0 : Y1Min - ((int)Y1Min % 200);
   Y1Max = Y1Max + (100 - ((int)Y1Max % 100)) + 100;
-
   // Draw the graph
   last_x = x_pos + 1;
   last_y = y_pos + (Y1Max - constrain(DataArray[0], Y1Min, Y1Max)) /
@@ -223,6 +224,7 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
   drawRect(x_pos, y_pos, gwidth + 3, gheight + 2, Grey, framebuffer);
   drawString(x_pos - 20 + gwidth / 2, 8, title, CENTER, BOTTOM, &Roboto24,
              framebuffer);
+  int startDate = std::atoi(x_start_title.c_str());
   for (int gx = 0; gx < readings; gx++) {
     x2 = x_pos + gx * gwidth / (max_data_points - 1) - 1;
     y2 = y_pos +
@@ -237,6 +239,12 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, int Y1Min,
                framebuffer);  // Two lines for hi-res display
       drawLine(last_x, last_y, x2, y2, Black, framebuffer);
     }
+    if (gx > 0 && gx % 5 == 0 && gx < readings && gx < max_data_points - 5) {
+      int currDate = (startDate + gx) % (max_data_points + 1);
+      drawString(x2 + ((gwidth / max_data_points) / 2), y_pos + gheight + 10,
+                 String(currDate), CENTER, BOTTOM, &Roboto13, framebuffer);
+    }
+
     last_x = x2;
     last_y = y2;
   }

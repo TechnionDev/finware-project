@@ -89,13 +89,15 @@ void PageManager::DrawBattery(int x, int y) {
   }
 }
 
-void PageManager::printTotalSum(int totalSum) {
-  /*   u8g2.setFont(u8g2_font_inr30_mr);
-    u8g2.setCursor(HCENTER(EPD_WIDTH, String(totalSum)),
-                   VCENTER(EPD_HEIGHT, String(totalSum)) - 5);
-    u8g2.print((std::to_string(totalSum)).c_str()); */
-  drawString(80, EPD_HEIGHT / 2, "₪" + String(totalSum), LEFT, CENTER,
-             &Roboto45B, framebuffer);
+void PageManager::printTotalSum(int totalSum, int sumDiff) {
+  int sumY = sumDiff == NO_DIFF_YET ? EPD_HEIGHT - 65 : EPD_HEIGHT / 2;
+  drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2,
+             "₪" + String(totalSum), CENTER, CENTER, &Roboto45B, framebuffer);
+  if (sumDiff != NO_DIFF_YET) {
+    drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
+               (sumDiff >= 0 ? "(+" : "(-") + String(sumDiff) + ")", CENTER,
+               BOTTOM, &Roboto16, framebuffer);
+  }
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
@@ -147,10 +149,6 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
                &fp);
   }
 
-  /*   u8g2.setFont(u8g2_font_6x10_mr);
-    u8g2.setCursor(goalX - (u8g2.getUTF8Width(monthlyGoalStr.c_str()) / 2) + 1,
-                   goalY + goalIndicatorHeight + barSize + FONT_EPD_HEIGHT);
-    u8g2.print(monthlyGoalStr.c_str()); */
   String monthlyGoalStr = "Budget: " + String(monthlyGoal);
   drawString(goalX, goalY + goalIndicatorHeight / 2 + 20, monthlyGoalStr,
              CENTER, BOTTOM, &Roboto16, framebuffer);
@@ -178,35 +176,18 @@ bool cmp(std::pair<std::string, int> &a, std::pair<std::string, int> &b) {
 
 void PageManager::printCardSpendingOpt2(
     const std::map<std::string, int> &cardMap) {
-  // drawString(EPD_WIDTH / 2, 15, "Credit Cards", CENTER, BOTTOM, &Roboto24,
-  //            framebuffer);
-
   int i = 0;
-  /*   String cardNames = "";
-    String cardSpentValues = "";
-
-    for (auto const &it : cardMap) {
-      cardNames += String(it.first.c_str()) + "\n\n";
-      cardSpentValues += String(it.second) + "\n\n";
-    }
-    drawString(EPD_WIDTH / 2 + 25, EPD_HEIGHT / 2, cardNames, LEFT, TOP,
-               &Roboto16, framebuffer); */
   std::vector<std::pair<std::string, int>> temp;
   for (auto const &it : cardMap) {
     temp.push_back(it);
   }
   sort(temp.begin(), temp.end(), cmp);
 
-
   for (auto const &it : temp) {
-    drawString(EPD_WIDTH / 2 + 44, 135 + i * 66,
-               String(it.first.c_str()) + ": ", LEFT, CENTER, &Roboto16,
-               framebuffer);
-    drawString(EPD_WIDTH - 42, 135 + i * 66, String(it.second), RIGHT, CENTER,
-               &Roboto16B, framebuffer);
-    // drawString(EPD_WIDTH - 270, 115 + i * 100, String(it.second), LEFT,
-    // BOTTOM,
-    //            &Roboto26B, framebuffer);
+    drawString(25, 155 + i * 66, String(it.first.c_str()) + ": ", LEFT, CENTER,
+               &Roboto16, framebuffer);
+    drawString((EPD_WIDTH / 2) - 30, 155 + i * 66, String(it.second), RIGHT,
+               CENTER, &Roboto16B, framebuffer);
     i++;
   }
 }
@@ -220,14 +201,15 @@ void PageManager::resetDisplay() {
 
 #define DIVIDER_LENGTH (EPD_HEIGHT / 2.3)
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal,
+                              int sumDiff,
                               const std::map<std::string, int> &cardMap) {
   Serial.println("Printing Total Sum page");
   resetDisplay();
   printPageMenu(0, 2);
   printDaysLeft(daysLeft);
-  printTotalSum(totalSum);
+  printTotalSum(totalSum, sumDiff);
   printCardSpendingOpt2(cardMap);
-  drawFastVLine(EPD_WIDTH / 2, EPD_HEIGHT / 2 - DIVIDER_LENGTH / 2,
+  drawFastVLine(EPD_WIDTH / 2 + 25, EPD_HEIGHT / 2 - DIVIDER_LENGTH / 2,
                 DIVIDER_LENGTH, DarkGrey, framebuffer);
   printProgressAndGoal(totalSum, monthlyGoal);
   DrawBattery(EPD_WIDTH - 150, 42);
@@ -252,14 +234,7 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
   Serial.printf("Showing title: %s | subtitle: %s\n", title.c_str(),
                 subtitle.c_str());
   resetDisplay();
-  /*   u8g2.setFont(u8g2_font_9x15_tr);
-    u8g2.setCursor(HCENTER(EPD_WIDTH, subtitle), 20);
-    u8g2.print(subtitle.c_str()); */
-  drawString(EPD_WIDTH / 2, 20, subtitle, CENTER, &Roboto26B, framebuffer);
-
-  /*   u8g2.setFont(u8g2_font_fub20_tr);
-    u8g2.setCursor(HCENTER(EPD_WIDTH, title), VCENTER(EPD_HEIGHT, title));
-    u8g2.print(title.c_str()); */
+  drawString(EPD_WIDTH / 2, 44, subtitle, CENTER, &Roboto26B, framebuffer);
   drawString(EPD_WIDTH / 2, EPD_HEIGHT / 2, title, CENTER, &Roboto26B,
              framebuffer);
   epd_update(framebuffer);
