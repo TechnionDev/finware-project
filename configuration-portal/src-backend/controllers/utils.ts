@@ -2,7 +2,7 @@ export const getCycleStartDate = (cycleStartDay: number): Date => {
     const now = new Date();
     const cycleStartDate = new Date(now.getFullYear(), now.getMonth(), cycleStartDay);
     if (now.getDate() < cycleStartDay) {
-        cycleStartDate.setUTCMonth(cycleStartDate.getUTCMonth() - 1);
+        cycleStartDate.setMonth(cycleStartDate.getMonth() - 1);
     }
     return cycleStartDate;
 }
@@ -10,8 +10,8 @@ export const getCycleStartDate = (cycleStartDay: number): Date => {
 export const getCycleEndDate = (cycleStartDay: number): Date => {
     const cycleStartDate = getCycleStartDate(cycleStartDay);
     const cycleEndDate = new Date(cycleStartDate);
-    cycleEndDate.setUTCMonth(cycleEndDate.getUTCMonth() + 1);
-    cycleEndDate.setUTCSeconds(cycleEndDate.getUTCSeconds() - 1);
+    cycleEndDate.setMonth(cycleEndDate.getMonth() + 1);
+    cycleEndDate.setSeconds(cycleEndDate.getSeconds() - 1);
     return cycleEndDate;
 }
 
