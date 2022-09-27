@@ -1,4 +1,8 @@
 import SettingsModel from '../models/Settings';
+import SessionModel from '../models/Session';
+import sha256 from 'crypto-js/sha256';
+import CryptoJS from 'crypto-js';
+import { StatusCodes } from 'http-status-codes';
 
 const HIDDEN_PASSWORD_VALUE = ''
 
@@ -27,7 +31,32 @@ async function getSettings(req, res) {
     res.json(settings);
 }
 
+async function doLogin(req, res) {
+    console.log('In doLogin');
+    let settings = await SettingsModel.findOneAndUpdate({}, {}, { upsert: true, new: true });
+    let hashed_attemped = sha256(req.body.password + settings.password_salt).toString();
+    console.log('hashed attempt is', hashed_attemped);
+    console.log('true hashed', settings.password_hash);
+    if (settings.password_hash == hashed_attemped) {
+        // Create a session
+        let sessionKey = CryptoJS.lib.WordArray.random(128 / 8).toString();
+        let session = new SessionModel({ 'key': sessionKey });
+        res.cookie('sessionKey', sessionKey);
+        res.status(StatusCodes.ACCEPTED).json({ success: true });
+        session.save();
+    } else {
+        res.status(StatusCodes.UNAUTHORIZED).json({ success: false });
+    }
+}
+
+async function checkSessionKey(key) {
+    let session = await SessionModel.findOne({ 'key': key });
+    return session != null;
+}
+
 export {
     updateSettings,
-    getSettings
+    getSettings,
+    doLogin,
+    checkSessionKey
 };

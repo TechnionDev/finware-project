@@ -1,10 +1,12 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import path from "path";
 import mongoose from "mongoose";
 import routerFactory from "./routes";
 // Import https and fs
 import https from "https";
 import fs from "fs";
+import logger from "morgan";
 
 import { FinancialAccountsController } from "./controllers"
 import { BluetoothController } from "./controllers"
@@ -42,7 +44,9 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     const HTTPS_PORT = process.env.HTTPS_PORT || 443;
 
     const app = express();
+    app.use(logger(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status - :response-time ms'));
     app.use(express.json());
+    app.use(cookieParser());
     app.use(requireHTTPS);
     app.use(express.static(path.resolve(__dirname, "../build")));
     app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
