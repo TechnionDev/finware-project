@@ -15,7 +15,7 @@ enum UUIDS {
 };
 
 class GATTInformation {
-    public bankInfo: object;
+    public bankInfo: object = {};
     public refreshRate: number;
     public goal: number;
     public cycleStartDay: number;

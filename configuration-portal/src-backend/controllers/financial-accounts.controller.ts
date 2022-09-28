@@ -99,6 +99,9 @@ class FinanceAccountsController {
             let bankInfo = {};
             let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
             for (const fbe of fbes) {
+                if (target_fbe_id && target_fbe_id != fbe._id) {
+                    continue;
+                }
                 if (fbe.scrape_result.success == false) {
                     continue;
                 }
@@ -117,9 +120,10 @@ class FinanceAccountsController {
             }
             graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
 
-            console.log("Settings bank info to: ", bankInfo)
+            let newBankInfo = {...this.bluetoothController.gattInformation.bankInfo, ...bankInfo};
+            console.log("Settings bank info to: ", newBankInfo);
             console.log("Settings graphData to: ", graphData);
-            this.bluetoothController.gattInformation.bankInfo = bankInfo;
+            this.bluetoothController.gattInformation.bankInfo = newBankInfo;
             this.bluetoothController.gattInformation.graphData = graphData;
         } catch (err) {
             console.log('There was an error while scraping: ', err);
