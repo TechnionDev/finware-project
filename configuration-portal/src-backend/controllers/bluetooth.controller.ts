@@ -21,10 +21,9 @@ class GATTInformation {
     public cycleStartDay: number;
     public graphData: any;
 
-    constructor({ refreshRate, goal, cycleStartDay }) {
+    constructor({ refreshRate, goal}) {
         this.refreshRate = refreshRate;
         this.goal = goal;
-        this.cycleStartDay = cycleStartDay;
     }
 
     private services = [
@@ -54,18 +53,20 @@ class GATTInformation {
                     "uuid": UUIDS.CHAR_DAYS_LEFT,
                     "properties": ["read"],
                     "readPerm": "encrypted-mitm-sc",
-                    onRead: (_, callback) => {
-                        callback(AttErrors.SUCCESS, JSON.stringify({ value: datediff(new Date(), getCycleEndDate(this.cycleStartDay)) }));
+                    onRead: async (_, callback) => {
+                        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: datediff(new Date(), getCycleEndDate(settings.month_cycle_start_day)) }));
                     }
                 },
                 {
                     "uuid": UUIDS.CHAR_GRAPH_DATA,
                     "properties": ["read"],
                     "readPerm": "encrypted-mitm-sc",
-                    onRead: (_, callback) => {
-                        this.graphData["cycleStartDate"] = getCycleStartDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
-                        this.graphData["cycleEndDate"] = getCycleEndDate(this.cycleStartDay).toLocaleString(undefined, { month: "short", day: "numeric" });
-                        this.graphData["daysInCycle"] = getCycleDayCount(this.cycleStartDay);
+                    onRead: async (_, callback) => {
+                        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+                        this.graphData["cycleStartDate"] = getCycleStartDate(settings.month_cycle_start_day).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["cycleEndDate"] = getCycleEndDate(settings.month_cycle_start_day).toLocaleString(undefined, { month: "short", day: "numeric" });
+                        this.graphData["daysInCycle"] = getCycleDayCount(settings.month_cycle_start_day);
                         this.graphData.data = this.graphData?.data.map(x => Math.round(x));
                         callback(AttErrors.SUCCESS, JSON.stringify(this.graphData));
                     }
@@ -115,8 +116,8 @@ class BluetoothController {
     public gattInformation: GATTInformation;
     public totalAmount: number = 0;
 
-    constructor({ refreshRate, goal, cycleStartDay }) {
-        this.gattInformation = new GATTInformation({ refreshRate, goal, cycleStartDay });
+    constructor({ refreshRate, goal }) {
+        this.gattInformation = new GATTInformation({ refreshRate, goal});
         const SERVICES = this.gattInformation.getServices();
         console.log(SERVICES);
 

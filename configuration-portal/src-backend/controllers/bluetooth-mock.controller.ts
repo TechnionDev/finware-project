@@ -5,13 +5,12 @@ class BluetoothController {
     private connection = "PAIRING";
 
     public totalAmount: number = 0;
-    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, cycleStartDay: 0, graphData: {}};
+    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, graphData: {}};
 
 
-    constructor({ refreshRate, goal, cycleStartDay }) {
+    constructor({ refreshRate, goal}) {
         this.gattInformation.refreshRate = refreshRate;
         this.gattInformation.goal = goal;
-        this.gattInformation.cycleStartDay = cycleStartDay;
         setTimeout(()=>console.log("Gatt information: ", this.gattInformation), 15000);
     }
 

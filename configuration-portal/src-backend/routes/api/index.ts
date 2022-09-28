@@ -6,7 +6,7 @@ import loginRouterFactory from "./login";
 
 export default function apiRouterFactory({ financeAccountsController, bluetoothController }) {
     const apiRouter = express.Router();
-    apiRouter.use(loginRouterFactory()); // Everything goes through authentication
+    // apiRouter.use(loginRouterFactory()); // Everything goes through authentication
     apiRouter.use("/financial-account", financialRouterFactory(financeAccountsController));
     apiRouter.use("/bluetooth", bluetoothRouterFactory(bluetoothController));
     apiRouter.use("/settings", settingsRouterFactory(financeAccountsController));
