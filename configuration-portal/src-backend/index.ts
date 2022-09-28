@@ -48,8 +48,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     app.use(express.json());
     app.use(cookieParser());
     app.use(requireHTTPS);
-    app.use(express.static(path.resolve(__dirname, "../build")));
     app.use("/", routerFactory({ financeAccountsController, bluetoothController }));
+    app.use(express.static(path.resolve(__dirname, "../build")));
 
     if (!process.env.NODE_ENV?.includes("development")) {
         const httpsOptions = {

@@ -76,7 +76,6 @@ function EditFinancialAccount() {
                 {company ? <>
                     <InputElem credName="name" />
                     {SCRAPERS[company].loginFields.map((credName) => {
-                        console.log("credname: ", credName);
                         return <InputElem credName={credName} />
                     })}
                     <div className="flex justify-center mt-6">
