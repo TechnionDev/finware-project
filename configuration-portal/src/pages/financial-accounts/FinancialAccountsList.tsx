@@ -2,9 +2,10 @@ import React from 'react';
 import "./FinancialAccountsList.css";
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import { XCircleIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { ErrorScreenshotModal } from './ErrorScreenshotModal';
+import RedirectFetch from '../../RedirectFetch';
 
 
 const CREDIT_STATE_ENDPOINT = "/api/financial-account";
@@ -20,12 +21,11 @@ const ValidationStatus = {
     INPROGRESS: "INPROGRESS"
 }
 
-function useFinancialAccountsState() {
+function useFinancialAccountsState(navigate: NavigateFunction) {
     const [FAState, setFAState]: [any[], any] = useState([]);
     useEffect(() => {
         function updateFAState() {
-            fetch(CREDIT_STATE_ENDPOINT)
-                .then((response) => { return response.json(); })
+            RedirectFetch(CREDIT_STATE_ENDPOINT, {}, navigate)
                 .then((data) => { setFAState(data); });
         }
         updateFAState();
@@ -38,7 +38,7 @@ function useFinancialAccountsState() {
 
 function FinancialAccount({ _id, name, company, last_scrape, validation_status, scrape_result, onDelete }) {
     const [isOpen, setOpen] = useState(false);
-
+    const navigate = useNavigate();
     useEffect(() => {
         function setClosed() {
             setOpen(false);
@@ -108,9 +108,9 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
                 </div>
                 <div className="bg-white px-4 py-2 flex justify-center text-gray-500">
                     <Button color="success" onClick={() => {
-                        fetch(FA_SCRAPE_TEMPLATE.replace("{id}", _id), {
+                        RedirectFetch(FA_SCRAPE_TEMPLATE.replace("{id}", _id), {
                             method: "POST"
-                        });
+                        }, navigate);
                     }
                     }><span className="">Force Update</span></Button>
                 </div>
@@ -121,13 +121,14 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
 
 
 function FinancialAccountsList() {
-    const FAState = useFinancialAccountsState();
+    const navigate = useNavigate();
+    const FAState = useFinancialAccountsState(navigate);
 
     function deleteFA(FAId) {
         // setFAState(FAState.filter(fa => fa._id !== FAId));
-        fetch(FA_DELETE_TEMPLATE.replace("{id}", FAId), {
+        RedirectFetch(FA_DELETE_TEMPLATE.replace("{id}", FAId), {
             method: "POST"
-        });
+        }, navigate);
     }
 
     return (

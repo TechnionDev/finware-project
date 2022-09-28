@@ -62,8 +62,8 @@ async function handleSubmit(ev: FormEvent<HTMLFormElement>, navigate: NavigateFu
 }
 
 function ConfigPage() {
-    const settings = useSettings();
     const navigate = useNavigate();
+    const settings = useSettings();
 
     return (
         <div className="min-w-[240px]">

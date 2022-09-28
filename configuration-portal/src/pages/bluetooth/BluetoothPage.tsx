@@ -7,6 +7,8 @@ import ResetModal from "./ResetModal";
 import PasskeyConfirmation from './PasskeyConfirmation';
 import { useInput } from "../../shared/hooks/useInput";
 import { Spinner } from 'flowbite-react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import RedirectFetch from '../../RedirectFetch';
 
 const BT_STATE_ENDOINT = "/api/bluetooth/current-state";
 const BT_RESET_ENDPOINT = "/api/bluetooth/reset";
@@ -26,13 +28,12 @@ interface BTState {
     passkey: string | null
 };
 
-function useBtState(setLoading) {
+function useBtState(setLoading, navigate: NavigateFunction) {
     const [btState, setBtState] = useState<BTState>();
 
     useEffect(() => {
         function updateBtState() {
-            fetch(BT_STATE_ENDOINT)
-                .then((response) => { return response.json(); })
+            RedirectFetch(BT_STATE_ENDOINT, {}, navigate)
                 .then((data: BTState) => {
                     setBtState((lastBTState: any) => {
                         if (data.connection !== lastBTState?.connection || lastBTState?.connection === Connection.ADVERTISING) {
@@ -50,32 +51,33 @@ function useBtState(setLoading) {
     return btState;
 }
 
-async function resetBTConnection() {
-    return fetch(BT_RESET_ENDPOINT, {
+async function resetBTConnection(navigate: NavigateFunction) {
+    return RedirectFetch(BT_RESET_ENDPOINT, {
         method: 'POST'
-    });
+    }, navigate);
 }
 
-async function acceptPairing(passkey) {
-    return fetch(BT_ACCEPT_PAIRING_ENDPOINT, {
+async function acceptPairing(passkey, navigate: NavigateFunction) {
+    return RedirectFetch(BT_ACCEPT_PAIRING_ENDPOINT, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ passkey: passkey })
-    });
+    }, navigate);
 }
 
-async function rejectPairing() {
-    return fetch(BT_REJECT_PAIRING_ENDPOINT, {
+async function rejectPairing(navigate: NavigateFunction) {
+    return RedirectFetch(BT_REJECT_PAIRING_ENDPOINT, {
         method: 'POST'
-    });
+    }, navigate);
 }
 
 function BluetoothPage() {
     const [loading, setLoading] = useState(false);
-    const btState = useBtState(setLoading);
+    const navigate = useNavigate();
+    const btState = useBtState(setLoading, navigate);
     const [isOpen, setOpen] = useState(false);
     const { value: passkey, setValue: setPasskey, bind: passkeyBind } = useInput();
 
@@ -116,7 +118,7 @@ function BluetoothPage() {
                     <div className="mt-2">
                         <ResetModal show={isOpen}
                             onOpen={() => { setOpen(true) }}
-                            onAccept={async () => { setOpen(false); setLoading(true); await resetBTConnection(); }}
+                            onAccept={async () => { setOpen(false); setLoading(true); await resetBTConnection(navigate); }}
                             onClose={() => { setOpen(false) }} />
                     </div>
                 </div>
@@ -124,8 +126,8 @@ function BluetoothPage() {
             <PasskeyConfirmation
                 btConnection={btState?.connection}
                 passkeyBind={passkeyBind}
-                onAccept={async () => { setLoading(true); acceptPairing(passkey); setPasskey(""); }}
-                onDecline={async () => { setLoading(true); rejectPairing(); }}
+                onAccept={async () => { setLoading(true); acceptPairing(passkey, navigate); setPasskey(""); }}
+                onDecline={async () => { setLoading(true); rejectPairing(navigate); }}
                 loading={loading} />
 
             {loading &&

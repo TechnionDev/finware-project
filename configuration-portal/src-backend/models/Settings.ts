@@ -43,8 +43,7 @@ const settingsSchema = new Schema<ISettings>({
     },
     password_hash: {
         type: String,
-        default: '7b54f535f932ff864ae211fead423268dd16a7d9bbaa0bbc56670da0'
-            + 'dc50d2904edaf9eccbda4981ce510d3cf67a32ac99645985161f43c7242c9c893192f3d4', // Default password is Password,
+        default: 'f9d21446893eda115d76e2b664f8ca3b6cb270b087de5700ac30e17186a22222', // Default password is Password,
         required: true
     },
     password_salt: {
@@ -76,8 +75,7 @@ settingsSchema.pre('findOneAndUpdate', async function (next) {
     if (password_hash) {
         let salt = CryptoJS.lib.WordArray.random(128 / 8).toString();
         this.set('password_salt', salt);
-        console.log('Hashing password', password_hash);
-        console.log('with salt', salt);
+        console.log(`Hashing password "${password_hash}"\nwith salt "${salt}"`);
         this.set('password_hash', sha256(password_hash + salt).toString());
     }
     next();
