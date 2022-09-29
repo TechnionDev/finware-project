@@ -11,19 +11,17 @@ enum UUIDS {
     CHAR_REFRESH_RATE = "49dc2b22-2dc4-4a66-afee-d7782b9b81cd",
     CHAR_GOAL = "8f71bd04-89f7-4290-b90f-ac1265f5f127",
     CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09",
-    CHAR_GRAPH_DATA = "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"
+    CHAR_GRAPH_DATA = "b8ed4639-8e38-4d0f-9ad6-5e46544f171a",
+    CHAR_SUM_DIFF = "3aefd736-2fbb-40f3-b970-54815a4c1038"
 };
 
 class GATTInformation {
     public bankInfo: object = {};
-    public refreshRate: number;
-    public goal: number;
-    public cycleStartDay: number;
     public graphData: any;
+    public sumDiff: number = 0;
 
-    constructor({ refreshRate, goal}) {
-        this.refreshRate = refreshRate;
-        this.goal = goal;
+    constructor() {
+
     }
 
     private services = [
@@ -31,6 +29,7 @@ class GATTInformation {
             "uuid": UUIDS.SERVICE_MAIN,
             "characteristics": [
                 this.computeCharacteristic(UUIDS.CHAR_BANK_INFO, "bankInfo", "object"),
+                this.computeCharacteristic(UUIDS.CHAR_SUM_DIFF, "sumDiff", "number"),
                 {
                     "uuid": UUIDS.CHAR_GOAL,
                     "properties": ["read"],
@@ -116,8 +115,8 @@ class BluetoothController {
     public gattInformation: GATTInformation;
     public totalAmount: number = 0;
 
-    constructor({ refreshRate, goal }) {
-        this.gattInformation = new GATTInformation({ refreshRate, goal});
+    constructor() {
+        this.gattInformation = new GATTInformation();
         const SERVICES = this.gattInformation.getServices();
         console.log(SERVICES);
 

@@ -79,7 +79,7 @@ class FinanceAccountsController {
                 await fbe.save();
 
                 scrapeJobs.push(
-                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then((scrapeResult: ScaperScrapingResult) => {
+                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then(async (scrapeResult: ScaperScrapingResult) => {
                         console.log('Scraping done for', fbe.name);
                         // Update account
                         if (scrapeResult.success) {
@@ -90,18 +90,16 @@ class FinanceAccountsController {
                             console.log('failed with: ', scrapeResult);
                         }
                         fbe.scrape_result = scrapeResult;
-                        fbe.save();
+                        await fbe.save();
                     })
                 );
             }
             await Promise.all(scrapeJobs);
 
+            fbes = await FinancialBE.find({});
             let bankInfo = {};
             let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
             for (const fbe of fbes) {
-                if (target_fbe_id && target_fbe_id != fbe._id) {
-                    continue;
-                }
                 if (fbe.scrape_result.success == false) {
                     continue;
                 }
@@ -120,11 +118,13 @@ class FinanceAccountsController {
             }
             graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
 
-            let newBankInfo = {...this.bluetoothController.gattInformation.bankInfo, ...bankInfo};
+            let newBankInfo = bankInfo;
             console.log("Settings bank info to: ", newBankInfo);
             console.log("Settings graphData to: ", graphData);
             this.bluetoothController.gattInformation.bankInfo = newBankInfo;
             this.bluetoothController.gattInformation.graphData = graphData;
+            this.bluetoothController.gattInformation.sumDiff = Math.round(graphData.data.at(-2));
+
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };

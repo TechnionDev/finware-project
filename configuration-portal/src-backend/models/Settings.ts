@@ -43,7 +43,7 @@ const settingsSchema = new Schema<ISettings>({
     },
     password_hash: {
         type: String,
-        default: 'f9d21446893eda115d76e2b664f8ca3b6cb270b087de5700ac30e17186a22222', // Default password is Password,
+        default: 'f9d21446893eda115d76e2b664f8ca3b6cb270b087de5700ac30e17186a22222', // Default password is password,
         required: true
     },
     password_salt: {
