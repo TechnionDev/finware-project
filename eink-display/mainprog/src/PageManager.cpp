@@ -90,14 +90,11 @@ void PageManager::DrawBattery(int x, int y) {
 }
 
 void PageManager::printTotalSum(int totalSum, int sumDiff) {
-  int sumY = sumDiff == NO_DIFF_YET ? EPD_HEIGHT - 65 : EPD_HEIGHT / 2;
   drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2,
              "₪" + String(totalSum), CENTER, CENTER, &Roboto45B, framebuffer);
-  if (sumDiff != NO_DIFF_YET) {
-    drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
-               (sumDiff >= 0 ? "(+" : "(-") + String(sumDiff) + ")", CENTER,
-               BOTTOM, &Roboto16, framebuffer);
-  }
+  drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
+             (sumDiff >= 0 ? "(+" : "(") + String(sumDiff) + ")", CENTER,
+             BOTTOM, &Roboto16, framebuffer);
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {

@@ -18,10 +18,10 @@ static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 // The characteristic of the remote service we are interested in.
 
 static BLEAddress *pServerAddress;
-// connected, doConnect and authed should be consistent between deepSleeps, therefor need to be saved in RTC memory
+// connected, doConnect and authed should be consistent between deepSleeps,
+// therefor need to be saved in RTC memory
 static boolean doConnect = false;
 static boolean connected = false;
-
 
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   /**
@@ -41,9 +41,8 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   }
 };
 
-
 class BluetoothManager {
-  PageManager& pageManager;
+  PageManager &pageManager;
   BLERemoteService *pRemoteService{};
   std::string requestService(const std::string &serviceName);
   std::map<std::string, std::string> ServiceName2ServiceUuid{
@@ -51,7 +50,9 @@ class BluetoothManager {
       {"RefreshRate", "49dc2b22-2dc4-4a66-afee-d7782b9b81cd"},
       {"Goal", "8f71bd04-89f7-4290-b90f-ac1265f5f127"},
       {"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"},
-      {"GraphData", "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"}};
+      {"GraphData", "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"},
+      {"SumDiff", "3aefd736-2fbb-40f3-b970-54815a4c1038"},
+  };
 
  public:
   BluetoothManager(PageManager &pageManager);
@@ -60,6 +61,7 @@ class BluetoothManager {
   int getRefreshRate();
   int getGoal();
   int getDaysLeft();
+  int getSumDiff();
   void updateJsonDocBuffer(char jsonDocBuffer[]);
   DynamicJsonDocument getGraphData(const char jsonDocBuffer[]);
   bool connectToServer(BLEAddress pAddress);

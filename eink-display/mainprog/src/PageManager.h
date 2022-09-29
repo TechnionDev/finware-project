@@ -10,8 +10,6 @@
 #include "epd_driver.h"
 #include "utils.h"
 
-#define NO_DIFF_YET 99999999
-
 typedef std::map<std::string, int> cardsSpending;
 
 class PageManager {

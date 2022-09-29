@@ -23,11 +23,11 @@ RTC_DATA_ATTR int currPage = 0;
 
 RTC_DATA_ATTR char BankInfoBuffer[1024];
 RTC_DATA_ATTR char jsonDocBuffer[1024];
-RTC_DATA_ATTR int daysLeft = -1;
+RTC_DATA_ATTR int daysLeft = 0;
 RTC_DATA_ATTR int goal = 0;
-RTC_DATA_ATTR int sumDiff = NO_DIFF_YET;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
+RTC_DATA_ATTR int sumDiff = 0;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -140,19 +140,14 @@ void refreshDataAndDisplay() {
   blm.updateJsonDocBuffer(jsonDocBuffer);
   goal = blm.getGoal();
   refreshRate = blm.getRefreshRate();
+  daysLeft = blm.getDaysLeft();
+  sumDiff = blm.getSumDiff();
 
-  int tempSum = totalSum;
   totalSum = 0;
   for (const auto& it : bankInfo) {
     totalSum += it.second;
   }
 
-  int newDaysLeft = blm.getDaysLeft();
-  Serial.printf("daysLeft: %d, newDaysLeft: %d, totalSum: %d, tempSum: %d, sumDiff: %d\n", daysLeft, newDaysLeft, totalSum, tempSum, sumDiff);
-  if (daysLeft != -1 && newDaysLeft != daysLeft) {
-    sumDiff = totalSum - tempSum;
-  }
-  daysLeft = newDaysLeft;
   showPage(currPage);
 }
 

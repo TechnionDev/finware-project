@@ -162,6 +162,19 @@ int BluetoothManager::getDaysLeft() {
   return DaysLeft;
 }
 
+int BluetoothManager::getSumDiff() {
+  DynamicJsonDocument doc(200);
+  auto output = requestService("SumDiff");
+  DeserializationError error = deserializeJson(doc, output);
+  if (error) {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+    return {};
+  }
+  int SumDiff = doc["value"];
+  return SumDiff;
+}
+
 void BluetoothManager::updateJsonDocBuffer(char jsonDocBuffer[]) {
   strcpy(jsonDocBuffer, requestService("GraphData").c_str());
 }
