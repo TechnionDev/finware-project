@@ -66,12 +66,12 @@ class FinanceAccountsController {
                     console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`)
                     continue;
                 }
-                // Check the difference in time (rounded up)
+/*                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
                 if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
                     console.log('Account', fbe.name, `was updated ${hours_since_last_scrape} (<${settings.scrape_frequency_hours}) hours ago. Skipping.`);
                     continue;
-                }
+                } */
 
                 console.log("Scraping account:", fbe.name, ". Starting from:", cycleStartDate);
                 fbe.last_scrape = now;

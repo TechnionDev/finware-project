@@ -4,7 +4,7 @@ import CryptoJS from 'crypto-js';
 
 interface ISettings {
     display_refresh_frequency_minutes: number;
-    scrape_frequency_hours: number;
+    scrape_hour: number;
     month_cycle_start_day: number;
     expense_budget: number;
     session_timeout_hours: number;
@@ -19,11 +19,11 @@ const settingsSchema = new Schema<ISettings>({
         default: 120,
         required: true
     },
-    scrape_frequency_hours: {
+/*     scrape_hour: {
         type: Number,
-        default: 24,
+        default: 4, // Default is at 04:00:00 (AM)
         required: true
-    },
+    }, */
     month_cycle_start_day: {
         type: Number,
         max: 28, // To be compatible with February too
@@ -43,7 +43,7 @@ const settingsSchema = new Schema<ISettings>({
     },
     password_hash: {
         type: String,
-        default: 'f9d21446893eda115d76e2b664f8ca3b6cb270b087de5700ac30e17186a22222', // Default password is password,
+        default: 'f9d21446893eda115d76e2b664f8ca3b6cb270b087de5700ac30e17186a22222', // Default password is Password,
         required: true
     },
     password_salt: {
@@ -55,7 +55,7 @@ const settingsSchema = new Schema<ISettings>({
         type: Object,
         default: {
             display_refresh_frequency_minutes: "Frequency of E-Ink display updates (e.g. 480)",
-            scrape_frequency_hours: "Update frequency of financial information (e.g. 24)",
+            // scrape_hour: "Hour to update the credit cards information (1 to 24 including) ",
             month_cycle_start_day: "Start day of the month (1 to 28 including)",
             expense_budget: "Budget (e.g. 5000)",
             currency_symbol: "Currency symbol (e.g. ₪)",
