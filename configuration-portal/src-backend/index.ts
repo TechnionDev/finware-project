@@ -37,8 +37,9 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
         true, /* start */
         null,
         null,
-        true /* runOnInit */
+        false /* runOnInit */
     );
+    financeAccountsController.updateBluetoothFromDB();
 
     const PORT = process.env.PORT || 80;
     const HTTPS_PORT = process.env.HTTPS_PORT || 443;

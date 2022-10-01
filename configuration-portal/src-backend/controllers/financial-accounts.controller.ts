@@ -7,6 +7,9 @@ import Settings from "../models/Settings";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
 import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle } from "./utils";
 
+
+const SCRAPING_FREQUENCY_MAXIMUM = 22;
+
 class FinanceAccountsController {
     private bluetoothController: BluetoothController;
 
@@ -53,6 +56,40 @@ class FinanceAccountsController {
         res.json({ status: "SUCCESS" });
     }
 
+    async updateBluetoothFromDB() {
+        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+        const cycleStartDate = getCycleStartDate(settings.month_cycle_start_day);
+        const now = new Date();
+        let fbes = await FinancialBE.find({});
+        let bankInfo = {};
+        let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
+        for (const fbe of fbes) {
+            if (fbe.scrape_result.success == false) {
+                continue;
+            }
+            bankInfo[fbe.name] = fbe.scrape_result.accounts.reduce((companySum, account) => {
+                return companySum + account.txns.reduce((accountSum, txn) => {
+                    return accountSum + txn.chargedAmount;
+                }, 0);
+            }, 0);
+
+            for (let account of fbe.scrape_result.accounts) {
+                for (let txn of account.txns) {
+                    const txnCycleIndex = getDateIndexInCycle(cycleStartDate, new Date(txn.date));
+                    graphData.data[txnCycleIndex] += -txn.chargedAmount;
+                }
+            }
+        }
+        graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
+
+        let newBankInfo = bankInfo;
+        console.log("Settings bank info to: ", newBankInfo);
+        console.log("Settings graphData to: ", graphData);
+        this.bluetoothController.gattInformation.bankInfo = newBankInfo;
+        this.bluetoothController.gattInformation.graphData = graphData;
+        this.bluetoothController.gattInformation.sumDiff = Math.round(graphData.data.at(-2));
+    }
+
     async updateFinancialData(forceUpdate = false, target_fbe_id = null) {
         try {
             let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
@@ -66,12 +103,12 @@ class FinanceAccountsController {
                     console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`)
                     continue;
                 }
-/*                 // Check the difference in time (rounded up)
+                // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
-                if (!forceUpdate && hours_since_last_scrape < settings.scrape_frequency_hours) {
-                    console.log('Account', fbe.name, `was updated ${hours_since_last_scrape} (<${settings.scrape_frequency_hours}) hours ago. Skipping.`);
+                if (!forceUpdate && hours_since_last_scrape < SCRAPING_FREQUENCY_MAXIMUM) {
+                    console.log('Account', fbe.name, `was updated ${Math.round(hours_since_last_scrape)} (<${SCRAPING_FREQUENCY_MAXIMUM}) hours ago. Skipping.`);
                     continue;
-                } */
+                }
 
                 console.log("Scraping account:", fbe.name, ". Starting from:", cycleStartDate);
                 fbe.last_scrape = now;
@@ -96,38 +133,10 @@ class FinanceAccountsController {
             }
             await Promise.all(scrapeJobs);
 
-            fbes = await FinancialBE.find({});
-            let bankInfo = {};
-            let graphData = { data: new Array(getCycleDayCount(settings.month_cycle_start_day)).fill(0) };
-            for (const fbe of fbes) {
-                if (fbe.scrape_result.success == false) {
-                    continue;
-                }
-                bankInfo[fbe.name] = fbe.scrape_result.accounts.reduce((companySum, account) => {
-                    return companySum + account.txns.reduce((accountSum, txn) => {
-                        return accountSum + txn.chargedAmount;
-                    }, 0);
-                }, 0);
-
-                for (let account of fbe.scrape_result.accounts) {
-                    for (let txn of account.txns) {
-                        const txnCycleIndex = getDateIndexInCycle(cycleStartDate, new Date(txn.date));
-                        graphData.data[txnCycleIndex] += -txn.chargedAmount;
-                    }
-                }
-            }
-            graphData.data.splice(getDateIndexInCycle(cycleStartDate, now) + 1);
-
-            let newBankInfo = bankInfo;
-            console.log("Settings bank info to: ", newBankInfo);
-            console.log("Settings graphData to: ", graphData);
-            this.bluetoothController.gattInformation.bankInfo = newBankInfo;
-            this.bluetoothController.gattInformation.graphData = graphData;
-            this.bluetoothController.gattInformation.sumDiff = Math.round(graphData.data.at(-2));
-
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };
+        await this.updateBluetoothFromDB();
     }
 }
 
