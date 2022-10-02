@@ -32,7 +32,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
 
     new CronJob(
         `0 0 4 * * *`, // Once every 24 hours at 04:00:00
-        financeAccountsController.updateFinancialData.bind(financeAccountsController),
+        financeAccountsController.updateFinancialData.bind(financeAccountsController, true),
         null,
         true, /* start */
         null,

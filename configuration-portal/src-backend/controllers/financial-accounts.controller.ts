@@ -8,7 +8,7 @@ import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-sc
 import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle } from "./utils";
 
 
-const SCRAPING_FREQUENCY_MAXIMUM = 22;
+const SCRAPING_FREQUENCY_MAXIMUM = 24;
 
 class FinanceAccountsController {
     private bluetoothController: BluetoothController;
