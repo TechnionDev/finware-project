@@ -73,6 +73,7 @@ const settingsSchema = new Schema<ISettings>({
 settingsSchema.pre('findOneAndUpdate', async function (next) {
     let password_hash = this.getUpdate()['password_hash'];
     if (password_hash) {
+        console.log("Detected password change")
         let salt = CryptoJS.lib.WordArray.random(128 / 8).toString();
         this.set('password_salt', salt);
         console.log(`Hashing password "${password_hash}"\nwith salt "${salt}"`);

@@ -55,8 +55,8 @@ boolean blockUntilPress(unsigned long startTime) {
 }
 
 int listenForButtonClick(int timeout) {
-  int next_button = digitalRead(NEXT_BUTTON);
-  int hide_button = digitalRead(HIDE_SHOW_BUTTON);
+  int next_button = 0;
+  int hide_button = 0;
   int startTime = millis();
   while (millis() - startTime < timeout) {
     delay(1);
