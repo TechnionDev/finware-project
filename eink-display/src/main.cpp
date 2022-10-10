@@ -41,8 +41,8 @@ RTC_DATA_ATTR int baseSpending = 0;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
 // doConnect should be consistent between deepSleeps, therefor need to be saved in RTC memory
-static RTC_DATA_ATTR boolean doConnect = false;
-static RTC_DATA_ATTR char bleServerAddrStr[18] = {0};
+static boolean doConnect = false;
+static char bleServerAddrStr[18] = {0};  // TODO: Maybe make this RTC and skip the scanning when waking up from deep sleep
 static boolean pairedAndConnected = false;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
