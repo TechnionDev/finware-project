@@ -17,8 +17,8 @@
 #define HIDE_SHOW_BUTTON GPIO_NUM_15
 #define NEXT_BUTTON GPIO_NUM_2
 #define BAT_TEST GPIO_NUM_35
-#define SCAN_TIMEOUT_SEC 60           // The timeout for finding a BLE server with matching characteristics
-#define DEFAULT_REFRESH_RATE_MIN 480  // Default: 8 hours = 480 minutes (3 times / day)
+#define SCAN_TIMEOUT_SEC 60          // The timeout for finding a BLE server with matching characteristics
+#define DEFAULT_REFRESH_RATE_MIN 30  // Default: 30 minutes until we get a proper refresh from the RPi (we use this refresh as a retry for connecting to RPi)
 
 static GxIO_Class io(SPI, EPD_CS, EPD_DC, EPD_RSET);
 static GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
@@ -40,6 +40,10 @@ RTC_DATA_ATTR int goal = 0;
 RTC_DATA_ATTR int baseSpending = 0;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
+// doConnect should be consistent between deepSleeps, therefor need to be saved in RTC memory
+static RTC_DATA_ATTR boolean doConnect = false;
+static RTC_DATA_ATTR char bleServerAddrStr[18] = {0};
+static boolean pairedAndConnected = false;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
     esp_sleep_wakeup_cause_t wakeup_reason;
@@ -73,9 +77,8 @@ void setup() {
     pinMode(NEXT_BUTTON, INPUT);
     pinMode(HIDE_SHOW_BUTTON, INPUT);
     pinMode(BAT_TEST, INPUT);
-    // Set verbosity to INFO
     ++bootCount;
-    logf("Starting Finware application (boot :%d)", String(bootCount));
+    logf("Starting Finware application (boot :%d)", bootCount);
     esp_sleep_wakeup_cause_t wakeup_reason = print_wakeup_reason();
     esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
 
@@ -84,19 +87,22 @@ void setup() {
     // ESP_SLEEP_WAKEUP_UNDEFINED is for reset button
     if (wakeup_reason == ESP_SLEEP_WAKEUP_UNDEFINED ||
         wakeup_reason == ESP_SLEEP_WAKEUP_TIMER) {
-        Serial.println("Scanning bluetooth to find the RaspberryPi");
+        doConnect = false;
+        logm("Scanning bluetooth to find the RaspberryPi");
         pageManager.showTitle("Scanning...", "Searching for RaspberryPi", 1000);
         BLEDevice::init("");
         BLEScan* pBLEScan = BLEDevice::getScan();
-        pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+        pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks(&doConnect, bleServerAddrStr));
         pBLEScan->setActiveScan(true);
         pBLEScan->start(SCAN_TIMEOUT_SEC);  // Scan forever
+        logm("Scan done");
+        sleep(1);  // The `start` returns before we finish the callback
         if (!doConnect) {
-            Serial.println("RPi was not found, going back to sleep");
+            logf("RPi was not found, going back to sleep. doConnect: %d", doConnect);
             pageManager.showTitle("RPi Wasn't Found", "Will retry later");
             deep_sleep();
         }
-        Serial.println("RPi was found, Setup done");
+        logm("RPi was found, Setup done");
     }
 }
 
@@ -105,7 +111,7 @@ void showPage(int page) {
     cardsSpending bankInfo;
     switch (page % 3) {
         case 0:
-            pageManager.showSumPage(totalSum, daysLeft, goal);
+            pageManager.showSumPage(totalSum + baseSpending, daysLeft, goal);
             break;
         case 1:
             bankInfo = blm.getBankInfo(BankInfoBuffer);
@@ -121,10 +127,8 @@ void showPage(int page) {
 }
 
 void refreshDataAndDisplay() {
-    if (!connected) {
-        logm(
-            "Attempted to refresh display data when there is no bluetooth "
-            "connection, ignoring");
+    if (!pairedAndConnected) {
+        logm("Attempted to refresh display data when there is no bluetooth connection, ignoring");
         return;
     }
     blm.updateBankInfoBuffer(BankInfoBuffer);
@@ -134,7 +138,7 @@ void refreshDataAndDisplay() {
     goal = blm.getGoal();
     refreshRate = blm.getRefreshRate();
     baseSpending = blm.getBaseSpending();
-    totalSum = baseSpending;
+    totalSum = 0;
     for (const auto& it : bankInfo) {
         totalSum += it.second;
     }
@@ -143,15 +147,15 @@ void refreshDataAndDisplay() {
 
 boolean connectBT() {
     doConnect = false;
-    if (blm.connectToServer(*pServerAddress)) {
+    BLEAddress address = BLEAddress(bleServerAddrStr);
+    if (blm.connectToServer(address)) {
         logm("We are now connected to the BLE Server.");
-        connected = waitForAuth();
-        return connected;
+        pairedAndConnected = waitForAuth();
+        return pairedAndConnected;
     }
 
-    logm(
-        "We have failed to connect to the server; there is nothin more we "
-        "will do.");
+    logm("We have failed to connect to the server; there is nothin more we will do.");
+    refreshRate = DEFAULT_REFRESH_RATE_MIN;  // We want to try again in a short while, not in the normal infrequent refresh of the display
 
     return false;
 }
@@ -181,8 +185,8 @@ void handleClick(int gpiopin) {
 void handleWakeupClick() { handleClick(getGPIOPIN()); }
 
 void loop() {
-    logf("Running loop. doConnect: %s | connected: %s",
-         doConnect ? "true" : "false", connected ? "true" : "false");
+    logf("Running loop. doConnect: %s | pairedAndConnected: %s",
+         doConnect ? "true" : "false", pairedAndConnected ? "true" : "false");
     if (doConnect) {
         boolean success = connectBT();
         if (!success) {
@@ -192,8 +196,7 @@ void loop() {
                 pageManager.showTitle("Pairing Error", "Will retry later");
             }
             deep_sleep();
-
-            return;
+            return;  // Will never reach this because deep_sleep is like a restart
         }
     }
 
@@ -220,12 +223,7 @@ void loop() {
 }
 
 void deep_sleep() {
-    auto secondsSinceBoot = esp_timer_get_time() / 1000000;
-    logf("%d: Finished loop, going to sleep in 1 seconds", secondsSinceBoot);
+    logf("Finished loop, going to sleep for %d minutes", refreshRate);
     esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK, ESP_EXT1_WAKEUP_ANY_HIGH);
-
-    delay(1000);
-    secondsSinceBoot = esp_timer_get_time() / 1000000;
-    logf("%d: Going to sleep now", secondsSinceBoot);
     esp_deep_sleep(refreshRate * uS_TO_M_FACTOR);
 }

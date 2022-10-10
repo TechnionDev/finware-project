@@ -4,6 +4,8 @@
 
 #include "BluetoothManager.h"
 
+// The characteristic of the remote service we are interested in.
+static BLEUUID serviceUUID("2c82b713-f76a-4696-98eb-d92f9f233f40");
 static boolean authed = false;
 static boolean authedFailed = false;
 class MySecurity : public BLESecurityCallbacks {
@@ -13,13 +15,19 @@ class MySecurity : public BLESecurityCallbacks {
    public:
     MySecurity(PageManager pageManager) : pageManager(pageManager) {}
 
-    uint32_t onPassKeyRequest() { return 0; }
+    uint32_t onPassKeyRequest() {
+        logm("onPassKeyRequest (shouldn't reach here in the Finware project)");
+        return 0;
+    }
 
     void onPassKeyNotify(uint32_t pass_key) {
         logm("onPassKeyNotify");
         pageManager.showPassKey(pass_key);
     }
-    bool onConfirmPIN(uint32_t pass_key) { return false; }
+    bool onConfirmPIN(uint32_t pass_key) {
+        logm("onConfirmPIN (shouldn't reach here in the Finware project)");
+        return false;
+    }
 
     bool onSecurityRequest() {
         logm("onSecurityRequest");
@@ -29,9 +37,11 @@ class MySecurity : public BLESecurityCallbacks {
     void onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl) {
         if (auth_cmpl.success) {
             authed = true;
+            authedFailed = false;
             logm("Bluetooth pairing finished successfully!");
         } else {
             authedFailed = true;
+            authed = false;
             logf("Bluetooth pairing encountered an error: %d\n", auth_cmpl.fail_reason);  // I think 102 is connection was closed by slave
             pageManager.showTitle("Pairing Error", String("Error: " + String(auth_cmpl.fail_reason)) + ". Retry later");
         }
@@ -41,7 +51,7 @@ class MySecurity : public BLESecurityCallbacks {
 static void notifyCallback(BLERemoteCharacteristic *pBLERemoteCharacteristic,
                            uint8_t *pData, size_t length, bool isNotify) {}
 
-bool BluetoothManager::connectToServer(BLEAddress pAddress) {
+bool BluetoothManager::connectToServer(BLEAddress &pAddress) {
     logf("Forming a connection to %s", pAddress.toString().c_str());
 
     BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT_MITM);
@@ -187,21 +197,30 @@ std::string BluetoothManager::requestService(const std::string &serviceName) {
         this->pRemoteService->getCharacteristic(BLEUUID(serviceUuid));
     auto res = pRemoteCharacteristic->readValue();
 
-    logf(" - Got characteristic value %s: %s", serviceName, res.c_str());
+    logf(" - Got characteristic value %s: %s", serviceName.c_str(), res.c_str());
     return res;
 }
 
 boolean waitForAuth() {
     while (!authed && !authedFailed) {
-        delay(500);
+        delay(100);
     }
 
-    if (authedFailed) {
-        return false;
-    }
-    return true;
+    return authed;
 }
 
 boolean isAuthedFailed() {
     return authedFailed;
+}
+void MyAdvertisedDeviceCallbacks::onResult(BLEAdvertisedDevice advertisedDevice) {
+    if (advertisedDevice.haveServiceUUID() &&
+        advertisedDevice.getServiceUUID().equals(serviceUUID)) {
+        logf("- Found RPi: %s", advertisedDevice.toString().c_str());
+        advertisedDevice.getScan()->stop();
+        strncpy(this->bleServerAddrStr, advertisedDevice.getAddress().toString().c_str(), 18);
+        *(this->doConnectPtr) = true;
+    }
+}
+
+MyAdvertisedDeviceCallbacks::MyAdvertisedDeviceCallbacks(boolean *doConnectPtr, char *bleServerAddrStr) : doConnectPtr(doConnectPtr), bleServerAddrStr(bleServerAddrStr) {
 }

@@ -74,7 +74,7 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
             </>
             break;
         case ValidationStatus.QUEUED:
-            status = <><Spinner color="info" /> <div className="ml-2 text-yellow-800">Queued</div></>;
+            status = <><Spinner color="gray" /> <div className="ml-2 text-yellow-800">Queued</div></>;
                 break;
         case ValidationStatus.FAILED:
             status = <>

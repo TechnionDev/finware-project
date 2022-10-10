@@ -91,7 +91,6 @@ class FinanceAccountsController {
     }
 
     async updateFinancialData(forceUpdate = false, target_fbe_id = null) {
-        let settings = {};
         try {
             let [settings, financialBackends] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
@@ -143,6 +142,7 @@ class FinanceAccountsController {
             await this.updateBluetoothFromDB();
             // Send email notification if needed
             let spendingSum = /*  positive */ -Object.values(this.bluetoothController.gattInformation.bankInfo).reduce((sum, val) => { return sum + val; });
+            spendingSum += settings.base_spent;
             if (spendingSum > settings.expense_budget) {
                 await emailOverBudgetNotification(settings, spendingSum);
             }

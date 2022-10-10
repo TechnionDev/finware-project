@@ -74,3 +74,9 @@ a {
 .user-link:active {
   text-decoration: underline;
 }
+
+@media (min-width: 768px) {
+  .md\:h-auto {
+    max-height: -webkit-fill-available;
+  }
+}
