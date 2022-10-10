@@ -54,7 +54,7 @@ function ConfigPage() {
         return <></>;
     }
     return (
-        <div className="min-w-[240px]">
+        <div className="min-w-[240px]" style={{ "margin": "5px" }}>
             <div className="text-2xl mb-4">Edit Settings</div>
             <form id="settings-form" onSubmit={async (ev) => {
                 await handleSubmit(ev, navigate);
@@ -64,7 +64,11 @@ function ConfigPage() {
                     return [key, IGNORE_FIELDS.includes(key) ? <></> : <div>
                         <div className="mt-3">
                             <div className="mb-1 block">
-                                <Label htmlFor={key} value={settings['dictionary'][key]} />
+                                <Label htmlFor={key}>
+                                    {settings['dictionary'][key]}<br />
+                                    {settings['dictionary'][key + "_EXT"] ? <div dangerouslySetInnerHTML={{ __html: settings['dictionary'][key + "_EXT"] }} /> : <></>}
+                                </Label>
+
                             </div>
                             <TextInput name={key} id={key} placeholder="" required={key !== "password_hash"} type={key === "password_hash" ? "password" : "text"} defaultValue={value} />
                         </div>

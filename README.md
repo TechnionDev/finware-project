@@ -45,12 +45,12 @@ Firstly we will setup the Raspberry Pi and the server with which the E-Ink displ
 
 
 ### Done!
-That's it, everything in the Raspberry Pi is configured. You can make sure it is up and running by navigating to https://raspberrypi.local/
+That's it, everything in the Raspberry Pi is configured. You can make sure it is up and running by navigating to https://finware.local/
 
 ## Setup Credit Cards & Configuration
 The next step will be to add the credentials of each credit card you want to monitor
 1. Connect to the same WiFi as the one you have configured for the Raspberry Pi
-2. Navigate to https://raspberrypi.local/ and select the "Credit Cards" menu item
+2. Navigate to https://finware.local/ and select the "Credit Cards" menu item
 <img src="https://user-images.githubusercontent.com/10295509/191369689-531e10db-7d55-4666-802d-ef80146c9f0d.png" width="200" />
 
 3. Press the `Add Account` button
@@ -59,7 +59,7 @@ The next step will be to add the credentials of each credit card you want to mon
 4. Pick your credit card company, enter the relevant credentials and press `Create`
 <img src="https://user-images.githubusercontent.com/10295509/191370071-1e91a66a-c002-41e5-b601-7d1e2ca7d6e2.png" width="200" />
 
-5. Navigate to https://raspberrypi.local/ and select the "General Config" menu item
+5. Navigate to https://finware.local/ and select the "General Config" menu item
 6. Change any setting you want to be different from the default
 
 ## Setup the E-Ink display

@@ -56,3 +56,21 @@ a {
 .font-quicksand {
   font-family: 'Quicksand', sans-serif;
 }
+
+.user-link:link {
+  text-decoration: none;
+  color: rgb(108, 108, 248);
+}
+
+.user-link:visited {
+  text-decoration: none;
+  color: rgb(136, 21, 136);
+}
+
+.user-link:hover {
+  text-decoration: underline;
+}
+
+.user-link:active {
+  text-decoration: underline;
+}

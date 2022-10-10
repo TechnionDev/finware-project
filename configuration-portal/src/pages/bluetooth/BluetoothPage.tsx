@@ -16,6 +16,8 @@ const BT_ACCEPT_PAIRING_ENDPOINT = "/api/bluetooth/accept";
 const BT_REJECT_PAIRING_ENDPOINT = "/api/bluetooth/reject";
 
 const POLLING_INTERVAL = 1000;
+let awaitingResponse = false;
+let lastRequest = new Date();
 
 export enum Connection {
     CONNECTED = "CONNECTED",
@@ -25,7 +27,7 @@ export enum Connection {
 
 interface BTState {
     connection: Connection | null,
-    passkey: string | null
+    passkey: string | null,
 };
 
 function useBtState(setLoading, navigate: NavigateFunction) {
@@ -33,8 +35,15 @@ function useBtState(setLoading, navigate: NavigateFunction) {
 
     useEffect(() => {
         function updateBtState() {
+            // Check we're not awaiting a response from the last 20 seconds
+            if (awaitingResponse && lastRequest > new Date(new Date().getTime() - 20000)) {
+                return;
+            }
+            awaitingResponse = true;
+            lastRequest = new Date();
             RedirectFetch(BT_STATE_ENDOINT, {}, navigate)
                 .then((data: BTState) => {
+                    awaitingResponse = false;
                     setBtState((lastBTState: any) => {
                         if (data.connection !== lastBTState?.connection || lastBTState?.connection === Connection.ADVERTISING) {
                             setLoading(false);

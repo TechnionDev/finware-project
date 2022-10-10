@@ -21,6 +21,7 @@
     "israeli-bank-scrapers": "^1.15.1",
     "mongoose": "^6.5.3",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.8.0",
     "npm": "^8.18.0",
     "postcss": "^8.4.16",
     "react": "^18.2.0",
