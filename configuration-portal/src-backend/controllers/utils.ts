@@ -42,7 +42,6 @@ export const emailOverBudgetNotification = async (settings, currentSpending: num
         console.log("Not sending over budget notification as the setting is disabled");
         return;
     }
-    console.log('Sending email notification');
 
     let mailOptions = {
         from: '"Finware Spending Police 🚔" <' + settings.smtp_account_email + '>',
@@ -54,23 +53,22 @@ export const emailOverBudgetNotification = async (settings, currentSpending: num
         You can go to <a href="https://finware.local/">Finware Settings</a> to get to the configuration portal.<br><br>
         Your budget is set to ${settings.expense_budget} and you spesnt ${currentSpending} this month.`
     };
-    console.log('Email options: ', mailOptions);
     let transporter = nodemailer.createTransport({
-        host: settings.smtp_account_server, // TODO: Replace with something real
-        port: 465,
-        secure: true, // true for 465, false for other ports
+        host: settings.smtp_account_server,
+        port: settings.smtp_account_server_port,
+        secure: true,
         auth: {
-            user: settings.smtp_account_email, // generated ethereal user
-            pass: settings.smtp_account_password, // generated ethereal password
+            user: settings.smtp_account_email,
+            pass: settings.smtp_account_password,
         },
     });
 
     // send mail with defined transport object
     transporter.sendMail(mailOptions).then((info) => {
         console.log("Message sent: %s", info.messageId);
-        // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        // If using a test Ethereal account
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
     }).catch((err) => {
-        console.error(err);
+        console.error('Failed to send email: ', err);
     });
 }
