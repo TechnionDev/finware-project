@@ -143,8 +143,9 @@ class FinanceAccountsController {
             await this.updateBluetoothFromDB();
             // Send email notification if needed
             let spendingSum = Object.values(this.bluetoothController.gattInformation.bankInfo).reduce((sum, val) => { return sum + val; });
-            //  TODO: Only send if needed (instead of always)
-            await emailOverBudgetNotification(settings, spendingSum);
+            if (spendingSum > settings.expense_budget) {
+                await emailOverBudgetNotification(settings, spendingSum);
+            }
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };
