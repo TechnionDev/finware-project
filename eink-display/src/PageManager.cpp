@@ -3,7 +3,7 @@
 PageManager::PageManager(U8G2_FOR_ADAFRUIT_GFX &u8g2_, GxDEPG0213BN &display_,
                          GraphBuilder &gb_)
     : u8g2(u8g2_), display(display_), gb(gb_) {
-    Serial.println("Initializing display");
+    logm("Initializing display");
     SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
     display.init();  // enable diagnostic output on Serial
     display.fillScreen(GxEPD_WHITE);
@@ -44,14 +44,14 @@ void PageManager::printPageMenu(int pageNum, int totalPages) {
 #define VCENTER(containerh, str) ((containerh + (FONT_HEIGHT())) / 2)
 
 int PageManager::getBatteryPercentage() {
-    Serial.println("Checking bat percentage");
+    logm("Checking bat percentage");
     uint32_t percentage = 100;
     const static int table[11] = {
         3000, 3650, 3700, 3740, 3760, 3795,
         3840, 3910, 3980, 4070, 4150};
     uint16_t v1 = analogRead(BAT_TEST);
     int voltage = ((float)analogRead(35) / 4200.0) * 7.05 * 1000;
-    
+
     for (int i = 0; i < 11; i++) {
         if (voltage < table[i]) {
             percentage = i * 10 - (10UL * (int)(table[i] - voltage)) /
@@ -60,13 +60,13 @@ int PageManager::getBatteryPercentage() {
         }
     }
     Serial.print("Battery percentage: ");
-    Serial.println(percentage);
+    logm(percentage);
 
     return percentage;
 }
 
 void PageManager::printDaysLeft(int daysLeftNum) {
-    u8g2.setFont(u8g2_font_9x15_mr);
+       u8g2.setFont(u8g2_font_9x15_mr);
     String daysLeft = 
         String(daysLeftNum) + (daysLeftNum == 1 ? " Day left" : " Days left");
 
@@ -171,7 +171,7 @@ void resetDisplay(GxDEPG0213BN &display) {
 }
 
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
-    Serial.println("Printing Total Sum page");
+    logm("Printing Total Sum page");
     resetDisplay(display);
     printPageMenu(0, 3);
     printDaysLeft(daysLeft);
@@ -221,7 +221,7 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
                                     data.doc["data"]);
     break;
   default:
-    Serial.println("worng page number");
+    logm("worng page number");
     break;
   }
 } */
@@ -229,7 +229,7 @@ void PageManager::showTitle(String title, String subtitle, int delayAfter) {
 #define MAX_DATA_POINTS 31
 void PageManager::showGraphPage(String cycleStartDate, String cycleEndDate,
                                 int daysInCycle, JsonArray dataPoints) {
-    Serial.println("Printing Monthly Spending Graph page");
+    logm("Printing Monthly Spending Graph page");
     resetDisplay(display);
     printPageMenu(2, 3);
     float dataPointsArr[MAX_DATA_POINTS];
