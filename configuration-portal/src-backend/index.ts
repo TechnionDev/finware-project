@@ -27,7 +27,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
 
 
-    const bluetoothController = new BluetoothController(); // TODO: populate with actual data
+    const bluetoothController = new BluetoothController();
     const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
     new CronJob(

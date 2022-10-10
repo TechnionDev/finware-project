@@ -5,7 +5,7 @@ import FinancialBE, { ValidationStatus } from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 import Settings from "../models/Settings";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
-import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle } from "./utils";
+import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle, emailOverBudgetNotification } from "./utils";
 
 
 const SCRAPING_FREQUENCY_MAXIMUM = 24;
@@ -91,52 +91,64 @@ class FinanceAccountsController {
     }
 
     async updateFinancialData(forceUpdate = false, target_fbe_id = null) {
+        let settings = {};
         try {
-            let [settings, fbes] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
+            let [settings, financialBackends] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
             const cycleStartDate = getCycleStartDate(settings.month_cycle_start_day);
             console.log(`Scraping started for financial backends. Scraping from date: ${cycleStartDate.toDateString()}`);
 
-            let scrapeJobs = [];
-            for (let fbe of fbes) {
-                if (target_fbe_id && target_fbe_id != fbe._id) {
-                    console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`)
+            let scrapeJobsQueue = [];
+            for (let financialBE of financialBackends) {
+                if (target_fbe_id && target_fbe_id != financialBE._id) {
+                    console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${financialBE._id}`)
                     continue;
                 }
                 // Check the difference in time (rounded up)
-                let hours_since_last_scrape = (now.getTime() - fbe.last_scrape.getTime()) / 1000 / 60 / 60;
+                let hours_since_last_scrape = (now.getTime() - financialBE.last_scrape.getTime()) / 1000 / 60 / 60;
                 if (!forceUpdate && hours_since_last_scrape < SCRAPING_FREQUENCY_MAXIMUM) {
-                    console.log('Account', fbe.name, `was updated ${Math.round(hours_since_last_scrape)} (<${SCRAPING_FREQUENCY_MAXIMUM}) hours ago. Skipping.`);
+                    console.log('Account', financialBE.name, `was updated ${Math.round(hours_since_last_scrape)} (<${SCRAPING_FREQUENCY_MAXIMUM}) hours ago. Skipping.`);
                     continue;
                 }
 
-                console.log("Scraping account:", fbe.name, ". Starting from:", cycleStartDate);
-                fbe.last_scrape = now;
-                fbe.validation_status = ValidationStatus.INPROGRESS;
-                await fbe.save();
+                console.log("Scraping account:", financialBE.name, ". Starting from:", cycleStartDate);
+                financialBE.last_scrape = now;
+                financialBE.validation_status = ValidationStatus.QUEUED;
+                await financialBE.save();
 
-                scrapeJobs.push(
-                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then(async (scrapeResult: ScaperScrapingResult) => {
-                        console.log('Scraping done for', fbe.name);
+                scrapeJobsQueue.push(() => {
+                    // Update validation_status to in progress (we don't need to wait for the success)
+                    FinancialBE.findOneAndUpdate({ _id: financialBE._id }, { validation_status: ValidationStatus.INPROGRESS }).catch((err) => {
+                        console.log('Error while updating financialBE validation_status: ', err);
+                    });
+                    return scrapeFinancialBE(financialBE, financialBE.company, cycleStartDate, slugify(financialBE.name)).then(async (scrapeResult: ScaperScrapingResult) => {
+                        console.log('Scraping done for', financialBE.name);
                         // Update account
                         if (scrapeResult.success) {
-                            fbe.validation_status = ValidationStatus.VALIDATED;
-                            console.log('results: ', scrapeResult);
+                            console.log('successfully scraped with results: ', scrapeResult);
+                            await FinancialBE.findOneAndUpdate({ _id: financialBE._id }, { validation_status: ValidationStatus.VALIDATED, scrape_result: scrapeResult });
                         } else {
-                            fbe.validation_status = ValidationStatus.FAILED;
                             console.log('failed with: ', scrapeResult);
+                            await FinancialBE.findOneAndUpdate({ _id: financialBE._id }, { validation_status: ValidationStatus.FAILED, scrape_result: scrapeResult });
                         }
-                        fbe.scrape_result = scrapeResult;
-                        await fbe.save();
                     })
-                );
+                });
             }
-            await Promise.all(scrapeJobs);
+            // Await scrape jobs in queue
+            for (let job of scrapeJobsQueue) {
+                await job();
+            }
+            // await Promise.all(scrapeJobsQueue); // Commented out due to serializing the scrape jobs (was too heavy on reasources on the poor RPi)
 
+            await this.updateBluetoothFromDB();
+            // Send email notification if needed
+            let spendingSum = Object.values(this.bluetoothController.gattInformation.bankInfo).reduce((sum, val) => { return sum + val; });
+            //  TODO: Only send if needed (instead of always)
+            await emailOverBudgetNotification(settings, spendingSum);
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };
-        await this.updateBluetoothFromDB();
+
     }
 }
 

@@ -3,8 +3,10 @@ import { ScaperScrapingResult } from 'israeli-bank-scrapers/lib/scrapers/base-sc
 
 const FAILURE_SCREENSHOT_DIR = "./build/static/media";
 
-export default async function scrapeFinancialBE(account, company: String, startDate: Date, failureScreenshotPath=null): Promise<ScaperScrapingResult> {
+export default async function scrapeFinancialBE(financialBE, company: String, startDate: Date, failureScreenshotPath=null): Promise<ScaperScrapingResult> {
     let options: ScraperOptions;
+    // Log failure screenshot path and location
+    console.log(`screenshot ${failureScreenshotPath} in ${FAILURE_SCREENSHOT_DIR}/${failureScreenshotPath}.jpg`);
     options = {
         companyId: company as CompanyTypes,
         verbose: true,
@@ -15,7 +17,7 @@ export default async function scrapeFinancialBE(account, company: String, startD
     };
 
     // Scrape is existing results are outdated
-    const scrapeResult = await createScraper(options).scrape(account);
+    const scrapeResult = await createScraper(options).scrape(financialBE);
     var totalAmount = 0;
     if (scrapeResult.success) {
         console.log(scrapeResult.accounts);
@@ -26,7 +28,7 @@ export default async function scrapeFinancialBE(account, company: String, startD
                 // console.log(`Transaction ${txn.description}, with amount: ${txn.chargedAmount} is ${txn.status}`);
             })
         });
-        console.log('Total for ', account.name, ' is ', totalAmount);
+        console.log('Total for ', financialBE.name, ' is ', totalAmount);
     }
 
     return scrapeResult;

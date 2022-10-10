@@ -5,7 +5,8 @@ import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-sc
 export enum ValidationStatus {
     VALIDATED = "VALIDATED",
     FAILED = "FAILED",
-    INPROGRESS = "INPROGRESS"
+    INPROGRESS = "INPROGRESS",
+    QUEUED = "QUEUED",
 }
 
 
@@ -75,7 +76,7 @@ const financialBackendSchema = new Schema<IFinancialBackend>({
 
 // Before returning result, add 'outdated' field
 financialBackendSchema.pre('save', function (next) {
-    // TODO: scrape in an async manner
+    // Figure out this todo TODO: scrape in an async manner
     // Get scrape frequency from settings
     if (!this.scrape_result) {
         this.scrape_result = { success: false, accounts: [] };

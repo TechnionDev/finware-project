@@ -5,10 +5,14 @@ import Settings from "../models/Settings";
 
 const AttErrors = NodeBleHost.AttErrors;
 
+type IBankInfo = { [key in string]: number };
+
+
 enum UUIDS {
     SERVICE_MAIN = "2c82b713-f76a-4696-98eb-d92f9f233f40",
     CHAR_BANK_INFO = "5b278f16-4460-47e1-919e-2d50d7d0a55d",
     CHAR_REFRESH_RATE = "49dc2b22-2dc4-4a66-afee-d7782b9b81cd",
+    CHAR_BASE_SPENDING = "f0e6f8b6-0c2d-4b2d-8a4f-1c4e4b4f4d0b",
     CHAR_GOAL = "8f71bd04-89f7-4290-b90f-ac1265f5f127",
     CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09",
     CHAR_GRAPH_DATA = "b8ed4639-8e38-4d0f-9ad6-5e46544f171a",
@@ -16,7 +20,7 @@ enum UUIDS {
 };
 
 class GATTInformation {
-    public bankInfo: object = {};
+    public bankInfo: IBankInfo = {};
     public graphData: any;
     public sumDiff: number = 0;
 
@@ -46,6 +50,15 @@ class GATTInformation {
                     onRead: async (_, callback) => {
                         let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
                         callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.display_refresh_frequency_minutes }));
+                    }
+                },
+                {
+                    "uuid": UUIDS.CHAR_BASE_SPENDING,
+                    "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
+                    onRead: async (_, callback) => {
+                        let settings = await Settings.findOneAndUpdate({}, {}, { upsert: true, new: true });
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: settings.base_spent }));
                     }
                 },
                 {
