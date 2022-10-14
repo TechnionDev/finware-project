@@ -50,6 +50,8 @@ class PageManager {
     void printProgressAndGoal(int totalSum, int monthlyGoal);
     void printCardSpending(const cardsSpending& cardMap);
     int getBatteryPercentage();
+    void drawBattery(int x, int y, double scale = 0.5);
+    void drawWarningTriangle(int x, int y);
 
    public:
     explicit PageManager(U8G2_FOR_ADAFRUIT_GFX& u8g2, GxEPD_Class& display,

@@ -43,7 +43,7 @@ RTC_DATA_ATTR int totalSum = 0;
 // doConnect should be consistent between deepSleeps, therefor need to be saved in RTC memory
 static boolean doConnect = false;
 static char bleServerAddrStr[18] = {0};  // TODO: Maybe make this RTC and skip the scanning when waking up from deep sleep
-static boolean pairedAndConnected = false;
+static RTC_DATA_ATTR boolean pairedAndConnected = false;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
     esp_sleep_wakeup_cause_t wakeup_reason;
@@ -211,7 +211,6 @@ void loop() {
             if (gpiopin == BUTTON_CLICK_TIMEOUT) {
                 break;
             }
-
             handleClick(gpiopin);
             lastPressTime = millis();
         }
