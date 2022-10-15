@@ -16,9 +16,10 @@
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
     boolean *doConnectPtr;
     char *bleServerAddrStr;
+    esp_ble_addr_type_t *bleServerAddrType;
 
    public:
-    MyAdvertisedDeviceCallbacks(boolean *doConnectPtr, char *bleServerAddrStr);
+    MyAdvertisedDeviceCallbacks(boolean *doConnectPtr, char *bleServerAddrStr, esp_ble_addr_type_t *bleServerAddrType);
     /**
      * Called for each advertising BLE server.
      */
@@ -35,7 +36,8 @@ class BluetoothManager {
         {"BaseSpending", "f0e6f8b6-0c2d-4b2d-8a4f-1c4e4b4f4d0b"},
         {"Goal", "8f71bd04-89f7-4290-b90f-ac1265f5f127"},
         {"DaysLeft", "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09"},
-        {"GraphData", "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"}};
+        {"GraphData", "b8ed4639-8e38-4d0f-9ad6-5e46544f171a"},
+        {"ShouldShowBEWarning", "a8e0e5f5-7b2e-4c9e-9a9a-2d2f2e2b2a29"}};
 
    public:
     BluetoothManager(PageManager &pageManager);
@@ -47,7 +49,8 @@ class BluetoothManager {
     int getDaysLeft();
     void updateJsonDocBuffer(char jsonDocBuffer[]);
     DynamicJsonDocument getGraphData(const char jsonDocBuffer[]);
-    bool connectToServer(BLEAddress &pAddress);
+    bool getShouldShowBEWarning();
+    bool connectToServer(BLEAddress &pAddress, esp_ble_addr_type_t addrType);
 };
 
 boolean waitForAuth();

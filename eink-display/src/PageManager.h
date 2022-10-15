@@ -51,12 +51,12 @@ class PageManager {
     void printCardSpending(const cardsSpending& cardMap);
     int getBatteryPercentage();
     void drawBattery(int x, int y, double scale = 0.5);
-    void drawWarningTriangle(int x, int y);
+    void drawWarningTriangle(int x, int y, const char sym[1]);
 
    public:
     explicit PageManager(U8G2_FOR_ADAFRUIT_GFX& u8g2, GxEPD_Class& display,
                          GraphBuilder& gb);
-    void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
+    void showSumPage(int totalSum, int daysLeft, int monthlyGoal, bool backendError = false);
     void showCardSpendingPage(const cardsSpending& cardMap);
     void showTopFivePurchase();
     void showPassKey(uint32_t pass_key);

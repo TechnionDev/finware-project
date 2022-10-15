@@ -28,7 +28,7 @@ export const ErrorScreenshotModal = ({ name, errorMessage, errorType, onOpen, on
                             }
                         </p>
 
-                        <img src={`${FAILURE_SCREENSHOT_ENDPOINT}/${slugify(name)}.jpg`} alt={"Failure screenshot"} />
+                        <img src={`${FAILURE_SCREENSHOT_ENDPOINT}/SCREENSHOT_LAST_ERROR_${slugify(name)}.jpg`} alt={"Failure screenshot"} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

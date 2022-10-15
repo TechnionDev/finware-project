@@ -51,7 +51,7 @@ class MySecurity : public BLESecurityCallbacks {
 static void notifyCallback(BLERemoteCharacteristic *pBLERemoteCharacteristic,
                            uint8_t *pData, size_t length, bool isNotify) {}
 
-bool BluetoothManager::connectToServer(BLEAddress &pAddress) {
+bool BluetoothManager::connectToServer(BLEAddress &pAddress, esp_ble_addr_type_t addrType) {
     logf("Forming a connection to %s", pAddress.toString().c_str());
 
     BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT_MITM);
@@ -65,7 +65,10 @@ bool BluetoothManager::connectToServer(BLEAddress &pAddress) {
     BLEClient *pClient = BLEDevice::createClient();
     logm(" - Created client");
 
-    pClient->connect(pAddress, BLE_ADDR_TYPE_PUBLIC);
+    if (pClient->connect(pAddress, addrType) == false) {
+        logm("Failed to connect to server");
+        return false;
+    }
     logm(" - Connected to server");
 
     // Obtain a reference to the service we are after in the remote BLE server.
@@ -75,9 +78,7 @@ bool BluetoothManager::connectToServer(BLEAddress &pAddress) {
         return false;
     }
 
-    // TODO: i dont think finding all the characteristics is important, think
-    // about this more
-    /*
+    // Make sure we can find all characteristics UUIDs
     for (const auto &it : this->ServiceName2ServiceUuid) {
       BLERemoteCharacteristic *pRemoteCharacteristic =
           this->pRemoteService->getCharacteristic(BLEUUID(it.second));
@@ -89,7 +90,6 @@ bool BluetoothManager::connectToServer(BLEAddress &pAddress) {
       logm((" - Found this characteristic: " + it.first).c_str());
     }
     logm("Found all characteristics!");
-    */
     return true;
 }
 
@@ -172,6 +172,17 @@ int BluetoothManager::getDaysLeft() {
     return DaysLeft;
 }
 
+bool BluetoothManager::getShouldShowBEWarning() {
+    DynamicJsonDocument doc(200);
+    auto output = requestService("ShouldShowBEWarning");
+    DeserializationError error = deserializeJson(doc, output);
+    if (error) {
+        logf("deserializeJson() failed: %s", error.c_str());
+        return {};
+    }
+    return doc["value"];
+}
+
 void BluetoothManager::updateJsonDocBuffer(char jsonDocBuffer[]) {
     strcpy(jsonDocBuffer, requestService("GraphData").c_str());
 }
@@ -191,14 +202,20 @@ DynamicJsonDocument BluetoothManager::getGraphData(const char jsonDocBuffer[]) {
 }
 
 std::string BluetoothManager::requestService(const std::string &serviceName) {
-    logm(("Requesting characteristic " + serviceName + "....").c_str());
+    try {
+    logf("Requesting characteristic '%s'....", serviceName.c_str());
     auto serviceUuid = ServiceName2ServiceUuid[serviceName];
-    BLERemoteCharacteristic *pRemoteCharacteristic =
-        this->pRemoteService->getCharacteristic(BLEUUID(serviceUuid));
+    // logf("Service UUID is '%s'", serviceUuid.c_str());
+    // logf("pRemoteService: %p", this->pRemoteService);
+    BLERemoteCharacteristic *pRemoteCharacteristic = this->pRemoteService->getCharacteristic(BLEUUID(serviceUuid));
     auto res = pRemoteCharacteristic->readValue();
 
     logf(" - Got characteristic value %s: %s", serviceName.c_str(), res.c_str());
     return res;
+    } catch (std::exception &e) {
+        logf("Error in requestService: %s", e.what());
+        return "Error";
+    }
 }
 
 boolean waitForAuth() {
@@ -217,10 +234,17 @@ void MyAdvertisedDeviceCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
         advertisedDevice.getServiceUUID().equals(serviceUUID)) {
         logf("- Found RPi: %s", advertisedDevice.toString().c_str());
         advertisedDevice.getScan()->stop();
+        *(this->bleServerAddrType) = advertisedDevice.getAddressType();
         strncpy(this->bleServerAddrStr, advertisedDevice.getAddress().toString().c_str(), 18);
         *(this->doConnectPtr) = true;
+    } else {
+        logf("- Device: %s", advertisedDevice.toString().c_str());
     }
 }
 
-MyAdvertisedDeviceCallbacks::MyAdvertisedDeviceCallbacks(boolean *doConnectPtr, char *bleServerAddrStr) : doConnectPtr(doConnectPtr), bleServerAddrStr(bleServerAddrStr) {
-}
+MyAdvertisedDeviceCallbacks::MyAdvertisedDeviceCallbacks(boolean *doConnectPtr,
+                                                         char *bleServerAddrStr,
+                                                         esp_ble_addr_type_t *bleServerAddrType)
+    : doConnectPtr(doConnectPtr),
+      bleServerAddrStr(bleServerAddrStr),
+      bleServerAddrType(bleServerAddrType) {}

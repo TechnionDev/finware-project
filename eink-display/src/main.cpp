@@ -40,9 +40,11 @@ RTC_DATA_ATTR int goal = 0;
 RTC_DATA_ATTR int baseSpending = 0;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
+RTC_DATA_ATTR bool shouldShowBEWarning = false;
 // doConnect should be consistent between deepSleeps, therefor need to be saved in RTC memory
 static boolean doConnect = false;
 static char bleServerAddrStr[18] = {0};  // TODO: Maybe make this RTC and skip the scanning when waking up from deep sleep
+static esp_ble_addr_type_t bleServerAddrType;
 static RTC_DATA_ATTR boolean pairedAndConnected = false;
 
 esp_sleep_wakeup_cause_t print_wakeup_reason() {
@@ -92,7 +94,7 @@ void setup() {
         pageManager.showTitle("Scanning...", "Searching for RaspberryPi", 1000);
         BLEDevice::init("");
         BLEScan* pBLEScan = BLEDevice::getScan();
-        pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks(&doConnect, bleServerAddrStr));
+        pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks(&doConnect, bleServerAddrStr, &bleServerAddrType));
         pBLEScan->setActiveScan(true);
         pBLEScan->start(SCAN_TIMEOUT_SEC);  // Scan forever
         logm("Scan done");
@@ -111,7 +113,7 @@ void showPage(int page) {
     cardsSpending bankInfo;
     switch (page % 3) {
         case 0:
-            pageManager.showSumPage(totalSum + baseSpending, daysLeft, goal);
+            pageManager.showSumPage(totalSum + baseSpending, daysLeft, goal, shouldShowBEWarning);
             break;
         case 1:
             bankInfo = blm.getBankInfo(BankInfoBuffer);
@@ -139,6 +141,7 @@ void refreshDataAndDisplay() {
     refreshRate = blm.getRefreshRate();
     baseSpending = blm.getBaseSpending();
     totalSum = 0;
+    shouldShowBEWarning = blm.getShouldShowBEWarning();
     for (const auto& it : bankInfo) {
         totalSum += it.second;
     }
@@ -148,7 +151,7 @@ void refreshDataAndDisplay() {
 boolean connectBT() {
     doConnect = false;
     BLEAddress address = BLEAddress(bleServerAddrStr);
-    if (blm.connectToServer(address)) {
+    if (blm.connectToServer(address, bleServerAddrType)) {
         logm("We are now connected to the BLE Server.");
         pairedAndConnected = waitForAuth();
         return pairedAndConnected;

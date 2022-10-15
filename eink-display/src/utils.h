@@ -101,8 +101,10 @@ static void remove_all_bonded_devices() {
     free(dev_list);
 }
 
+#define SKIP_FOR_PRODUCTION // TODO: Add `break` when going to production
 #define logf(format, ...)                                                                                                      \
     do {                                                                                                                       \
+        SKIP_FOR_PRODUCTION;                                                                                                   \
         auto timestamp = millis();                                                                                             \
         Serial.printf("[%d:%d][%s:%d] %s: ", timestamp / 1000, timestamp % 1000, __FILENAME__, __LINE__, __PRETTY_FUNCTION__); \
         Serial.printf(format, __VA_ARGS__);                                                                                    \
@@ -111,10 +113,10 @@ static void remove_all_bonded_devices() {
 
 #define logm(...)                                                                                                              \
     do {                                                                                                                       \
+        SKIP_FOR_PRODUCTION;                                                                                                   \
         auto timestamp = millis();                                                                                             \
         Serial.printf("[%d:%d][%s:%d] %s: ", timestamp / 1000, timestamp % 1000, __FILENAME__, __LINE__, __PRETTY_FUNCTION__); \
-        Serial.println(__VA_ARGS__);                                                                                                   \
+        Serial.println(__VA_ARGS__);                                                                                           \
     } while (0)
 
 #endif
-

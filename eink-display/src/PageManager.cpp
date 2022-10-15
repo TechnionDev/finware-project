@@ -62,7 +62,7 @@ int PageManager::getBatteryPercentage() {
             break;
         }
     }
-    Serial.print("Battery percentage: ");
+    logm("Battery percentage: ");
     logm(percentage);
 
     return percentage;
@@ -88,11 +88,11 @@ void PageManager::drawBattery(int x, int y, double scale) {
     uint8_t percentage = this->getBatteryPercentage();
     const int mainBattWidth = 40 * scale;
     const int tipOffsetX = mainBattWidth;
-    const int tipOffsetY = 6 * scale;
+    const int tipOffsetY = 4.5 * scale;
     const int tipWidth = 4 * scale;
     const int tipHeight = 7 * scale;
     const int graphicsWidth = tipOffsetX + tipWidth;
-    const int graphicsHeight = 15s * scale;
+    const int graphicsHeight = 15 * scale;
     const int chargeMargin = 1;
     if (x == -1) {
         // Align screen center
@@ -104,7 +104,7 @@ void PageManager::drawBattery(int x, int y, double scale) {
                 Black);
     // Battery tip fill
     gb.fillRect(x + tipOffsetX, y + tipOffsetY,
-                tipHeight, tipWidth,
+                tipWidth, tipHeight,
                 Black);
     // Battery main fill
     gb.fillRect(x + chargeMargin, y + chargeMargin,
@@ -112,7 +112,7 @@ void PageManager::drawBattery(int x, int y, double scale) {
                 Black);
 }
 
-void PageManager::drawWarningTriangle(int x, int y) {
+void PageManager::drawWarningTriangle(int x, int y, const char sym[1]) {
     this->u8g2.setFont(u8g2_font_7x13_tr);
     int warningHeight = 14;
     display.fillTriangle(x, y - 2, x - 10,
@@ -124,7 +124,7 @@ void PageManager::drawWarningTriangle(int x, int y) {
     this->u8g2.setCursor(x - 3, y + warningHeight);
     this->u8g2.setForegroundColor(GxEPD_WHITE);
     this->u8g2.setBackgroundColor(GxEPD_BLACK);
-    this->u8g2.print("!");
+    this->u8g2.print(sym);
     this->u8g2.setForegroundColor(GxEPD_BLACK);
     this->u8g2.setBackgroundColor(GxEPD_WHITE);
 }
@@ -180,22 +180,7 @@ void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
         this->u8g2.setBackgroundColor(GxEPD_WHITE);
 
     } else {
-        this->drawWarningTriangle(progIndicatorX, barY - 8);
-        // this->u8g2.setFont(u8g2_font_7x13_tr);
-        // int warningY = barY - 8;
-        // int warningHeight = 11 + barSize;
-        // display.fillTriangle(progIndicatorX, warningY - 2, progIndicatorX - 10,
-        //                      warningY + warningHeight, progIndicatorX + 10,
-        //                      warningY + warningHeight, GxEPD_WHITE);
-        // display.fillTriangle(progIndicatorX, warningY, progIndicatorX - 8,
-        //                      warningY + warningHeight, progIndicatorX + 8,
-        //                      warningY + warningHeight, GxEPD_BLACK);
-        // this->u8g2.setCursor(progIndicatorX - 3, warningY + warningHeight);
-        // this->u8g2.setForegroundColor(GxEPD_WHITE);
-        // this->u8g2.setBackgroundColor(GxEPD_BLACK);
-        // this->u8g2.print("!");
-        // this->u8g2.setForegroundColor(GxEPD_BLACK);
-        // this->u8g2.setBackgroundColor(GxEPD_WHITE);
+        this->drawWarningTriangle(progIndicatorX, barY - 8, "!");
     }
 
     this->u8g2.setFont(u8g2_font_6x10_mr);
@@ -225,7 +210,7 @@ void resetDisplay(GxDEPG0213BN &display) {
     display.setBackgroundColor(GxEPD_WHITE);
 }
 
-void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
+void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal, bool backendError) {
     logm("Printing Total Sum page");
     resetDisplay(display);
     printPageMenu(0, 3);
@@ -233,6 +218,10 @@ void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal) {
     printTotalSum(totalSum);
     printProgressAndGoal(totalSum, monthlyGoal);
     this->drawBattery(BATTERY_DEFAULT_X, BATTERY_DEFAULT_Y);
+    // Print check configuration portal warning indicator
+    if (backendError) {
+        this->drawWarningTriangle(BATTERY_DEFAULT_X + 8, BATTERY_DEFAULT_Y + 15, "*");
+    }
     display.update();
 }
 
