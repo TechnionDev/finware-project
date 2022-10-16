@@ -7,13 +7,14 @@ C = IL
 L = Haifa
 O = Finware LTD
 OU = Web Portal
-CN = raspberrypi.local
+CN = finware.local
 [v3_req]
 keyUsage = critical, digitalSignature, keyAgreement
 extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 [alt_names]
-DNS.1 = raspberrypi.local
+DNS.1 = finware.local
 DNS.2 = localhost
 DNS.3 = localhost.local
+DNS.4 = raspberrypi.local
 

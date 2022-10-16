@@ -44,6 +44,13 @@ The main (and some secondary that we're proud of) features are:
 10. Attention symbol on the E-Ink to indicate an error that requires user intervention
 11. Multiple instances of the project in the same area
 
+## Known Issues
+
+Like everything in life, the project isn't perfect. There are a few missing/problematic things:
+
+1. A base model RPi can be overloaded by manually force scraping many accounts
+2. 
+
 # Project Structure
 
 The folder hierarchy is as follows:

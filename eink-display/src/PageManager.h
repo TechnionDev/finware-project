@@ -22,6 +22,8 @@
 
 #include <map>
 
+#define BAT_TEST GPIO_NUM_35
+
 typedef std::map<std::string, int> cardsSpending;
 
 // class financialData{
@@ -37,28 +39,31 @@ typedef std::map<std::string, int> cardsSpending;
 //   };
 
 class PageManager {
- private:
-  GxEPD_Class& display;
-  U8G2_FOR_ADAFRUIT_GFX& u8g2;
-  GraphBuilder& gb;
-  short currentCourser = 0;
-  void printPageMenu(int pageNum, int totalPages);
-  void printDaysLeft(int daysLeft);
-  void printTotalSum(int totalSum);
-  void printProgressAndGoal(int totalSum, int monthlyGoal);
-  void printCardSpending(const cardsSpending& cardMap);
+   private:
+    GxEPD_Class& display;
+    U8G2_FOR_ADAFRUIT_GFX& u8g2;
+    GraphBuilder& gb;
+    short currentCourser = 0;
+    void printPageMenu(int pageNum, int totalPages);
+    void printDaysLeft(int daysLeft);
+    void printTotalSum(int totalSum);
+    void printProgressAndGoal(int totalSum, int monthlyGoal);
+    void printCardSpending(const cardsSpending& cardMap);
+    int getBatteryPercentage();
+    void drawBattery(int x, int y, double scale = 0.5);
+    void drawWarningTriangle(int x, int y, const char sym[1]);
 
- public:
-  explicit PageManager(U8G2_FOR_ADAFRUIT_GFX& u8g2, GxEPD_Class& display,
-                       GraphBuilder& gb);
-  void showSumPage(int totalSum, int daysLeft, int monthlyGoal);
-  void showCardSpendingPage(const cardsSpending& cardMap);
-  void showTopFivePurchase();
-  void showPassKey(uint32_t pass_key);
-  void showGraphPage(String cycleStartDate, String cycleEndDate,
-                     int daysInCycle, JsonArray dataPoints);
-  void showTitle(String title, String subtitle, int delayAfter = 0);
-  // void printNextPage(int pageNum, financialData data );
+   public:
+    explicit PageManager(U8G2_FOR_ADAFRUIT_GFX& u8g2, GxEPD_Class& display,
+                         GraphBuilder& gb);
+    void showSumPage(int totalSum, int daysLeft, int monthlyGoal, bool backendError = false);
+    void showCardSpendingPage(const cardsSpending& cardMap);
+    void showTopFivePurchase();
+    void showPassKey(uint32_t pass_key);
+    void showGraphPage(String cycleStartDate, String cycleEndDate,
+                       int daysInCycle, JsonArray dataPoints);
+    void showTitle(String title, String subtitle, int delayAfter = 0);
+    // void printNextPage(int pageNum, financialData data );
 };
 
 #endif  // DISPLAY_SRC_PAGEMANAGER_H_

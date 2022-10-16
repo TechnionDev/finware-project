@@ -1,4 +1,4 @@
 {
-    "raspberryPiHostname": "raspberrypi.local",
+    "raspberryPiHostname": "finware.local",
     "raspberryPiPort": 8080
 }

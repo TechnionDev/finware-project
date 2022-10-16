@@ -1,3 +1,13 @@
+type IBankInfo = { [key in string]: number };
+
+type IGattInfo = {
+    bankInfo: IBankInfo,
+    refreshRate: number,
+    goal: number,
+    graphData: any,
+    sumDiff: number
+};
+
 class BluetoothController {
     private resolvePairingRequest;
     private rejectPairingRequest;
@@ -5,11 +15,11 @@ class BluetoothController {
     private connection = "PAIRING";
 
     public totalAmount: number = 0;
-    public gattInformation = { bankInfo: {}, refreshRate: 0, goal: 0, graphData: {}, sumDiff: 0};
+    public gattInformation: IGattInfo = { bankInfo: {}, refreshRate: 0, goal: 0, graphData: {}, sumDiff: 0 };
 
 
     constructor() {
-        setTimeout(()=>console.log("Gatt information: ", this.gattInformation), 15000);
+        setTimeout(() => console.log("Gatt information: ", this.gattInformation), 15000);
     }
 
     fetchState(req, res) {
@@ -17,12 +27,12 @@ class BluetoothController {
     }
 
     reset(req, res) {
-        setTimeout(()=>this.connection="ADVERTISING", 3500)
+        setTimeout(() => this.connection = "ADVERTISING", 3500)
         res.json({ status: "SUCCESS" });
     }
 
     acceptPairing(req, res) {
-        setTimeout(()=>this.connection="CONNECTED", 3500);
+        setTimeout(() => this.connection = "CONNECTED", 3500);
         res.json({ status: "SUCCESS" });
     }
 

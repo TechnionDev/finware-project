@@ -14,19 +14,31 @@ const FA_SCRAPE_TEMPLATE = "/api/financial-account/{id}/scrape";
 const FE_LOGOS_ENDPOINTS = "/fe-logos";
 
 const POLLING_INTERVAL = 1000;
+let awaitingResponse = false;
+let lastRequest = new Date();
 
 const ValidationStatus = {
     VALIDATED: "VALIDATED",
     FAILED: "FAILED",
-    INPROGRESS: "INPROGRESS"
+    INPROGRESS: "INPROGRESS",
+    QUEUED: "QUEUED",
 }
 
 function useFinancialAccountsState(navigate: NavigateFunction) {
     const [FAState, setFAState]: [any[], any] = useState([]);
     useEffect(() => {
         function updateFAState() {
+            // Check we're not awaiting a response from the last 20 seconds
+            if (awaitingResponse && lastRequest > new Date(new Date().getTime() - 20000)) {
+                return;
+            }
+            awaitingResponse = true;
+            lastRequest = new Date();
             RedirectFetch(CREDIT_STATE_ENDPOINT, {}, navigate)
-                .then((data) => { setFAState(data); });
+                .then((data) => {
+                    awaitingResponse = false;
+                    setFAState(data);
+                });
         }
         updateFAState();
         const int = setInterval(updateFAState, POLLING_INTERVAL);
@@ -55,12 +67,15 @@ function FinancialAccount({ _id, name, company, last_scrape, validation_status, 
         case ValidationStatus.INPROGRESS:
             status = <><Spinner color="info" /> <div className="ml-2 text-blue-800">Validating</div></>
             break;
-        case ValidationStatus.VALIDATED:
-            status = <>
+            case ValidationStatus.VALIDATED:
+                status = <>
                 <CheckIcon className="text-green-700 h-7 w-6" />
                 <div className="ml-1 text-green-600">Validated</div>
             </>
             break;
+        case ValidationStatus.QUEUED:
+            status = <><Spinner color="gray" /> <div className="ml-2 text-yellow-800">Queued</div></>;
+                break;
         case ValidationStatus.FAILED:
             status = <>
                 <div>
