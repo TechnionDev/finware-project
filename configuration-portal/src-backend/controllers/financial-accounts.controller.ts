@@ -13,6 +13,15 @@ const SCRAPING_FREQUENCY_MAXIMUM = 24;
 class FinanceAccountsController {
     private bluetoothController: BluetoothController;
 
+    private getAmountCharged(txn) {
+        let realAmount = txn.chargedAmount;
+        if (txn.status === "pending" && txn.originalCurrency === "ILS") {
+            let installments = txn.installments?.total || 1;
+            realAmount = txn.originalAmount / installments;
+        }
+        return realAmount;
+    }
+
     constructor(bluetoothController) {
         this.bluetoothController = bluetoothController;
     }
@@ -69,14 +78,14 @@ class FinanceAccountsController {
             }
             bankInfo[fbe.name] = fbe.scrape_result.accounts.reduce((companySum, account) => {
                 return companySum + account.txns.reduce((accountSum, txn) => {
-                    return accountSum + txn.chargedAmount;
+                    return accountSum + this.getAmountCharged(txn);
                 }, 0);
             }, 0);
 
             for (let account of fbe.scrape_result.accounts) {
                 for (let txn of account.txns) {
                     const txnCycleIndex = getDateIndexInCycle(cycleStartDate, new Date(txn.date));
-                    graphData.data[txnCycleIndex] += -txn.chargedAmount;
+                    graphData.data[txnCycleIndex] += -this.getAmountCharged(txn);
                 }
             }
         }
@@ -100,7 +109,7 @@ class FinanceAccountsController {
             let scrapeJobs = [];
             for (let fbe of fbes) {
                 if (target_fbe_id && target_fbe_id != fbe._id) {
-                    console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`)
+                    console.log(`Specific fbe scrape requested (${target_fbe_id}), skipping fbe: ${fbe._id}`);
                     continue;
                 }
                 // Check the difference in time (rounded up)
@@ -114,25 +123,20 @@ class FinanceAccountsController {
                 fbe.last_scrape = now;
                 fbe.validation_status = ValidationStatus.INPROGRESS;
                 await fbe.save();
-
-                scrapeJobs.push(
-                    scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then(async (scrapeResult: ScaperScrapingResult) => {
-                        console.log('Scraping done for', fbe.name);
-                        // Update account
-                        if (scrapeResult.success) {
-                            fbe.validation_status = ValidationStatus.VALIDATED;
-                            console.log('results: ', scrapeResult);
-                        } else {
-                            fbe.validation_status = ValidationStatus.FAILED;
-                            console.log('failed with: ', scrapeResult);
-                        }
-                        fbe.scrape_result = scrapeResult;
-                        await fbe.save();
-                    })
-                );
+                await scrapeFinancialBE(fbe, fbe.company, cycleStartDate, slugify(fbe.name)).then(async (scrapeResult: ScaperScrapingResult) => {
+                    console.log('Scraping done for', fbe.name);
+                    // Update account
+                    if (scrapeResult.success) {
+                        fbe.validation_status = ValidationStatus.VALIDATED;
+                        console.log('results: ', scrapeResult);
+                    } else {
+                        fbe.validation_status = ValidationStatus.FAILED;
+                        console.log('failed with: ', scrapeResult);
+                    }
+                    fbe.scrape_result = scrapeResult;
+                    await fbe.save();
+                })
             }
-            await Promise.all(scrapeJobs);
-
         } catch (err) {
             console.log('There was an error while scraping: ', err);
         };
