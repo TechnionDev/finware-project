@@ -44,7 +44,7 @@ async function doLogin(req, res) {
         let sessionKey = CryptoJS.lib.WordArray.random(128 / 8).toString();
         let session = new SessionModel({ 'key': sessionKey });
         // Set cookie with expiration with settings.session_timeout_hours
-        res.cookie('session_key', sessionKey, { maxAge: settings.session_timeout_hours * 60 * 60 * 1000 });
+        res.cookie('sessionKey', sessionKey, { maxAge: settings.session_timeout_hours * 60 * 60 * 1000 });
         res.status(StatusCodes.ACCEPTED).json({ success: true });
         session.save();
     } else {

@@ -51,7 +51,7 @@ export const emailOverBudgetNotification = async (settings, currentSpending: num
         If you got this notice, it means that you overspent this month.<br><br>
         You should probably tone it down or adjust your budget in the settings of the app.<br><br>
         You can go to <a href="https://finware.local/">Finware Settings</a> to get to the configuration portal.<br><br>
-        Your budget is set to ${settings.expense_budget} and you spesnt ${Math.round(currentSpending * 100) / 100} this month.<br><br>
+        Your budget is set to ${settings.expense_budget} and you spent ${Math.round(currentSpending * 100) / 100} this month.<br><br>
         This means that you're ${Math.round((currentSpending - settings.expense_budget) * 100) / 100} over budget`
     };
     let transporter = nodemailer.createTransport({
