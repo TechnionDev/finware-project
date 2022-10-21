@@ -35,10 +35,10 @@ The main (and some secondary that we're proud of) features are:
    2. Bluetooth pairing
 7. Security and Privacy (!!!)
    1. The web configuration is encrypted under an unique SSL certificate (generated during initial setup of the RPi).
-      The certificate can be added to the user's devices to trust the portal as the valid page.
-   2. Bluetooth secure pairing using pairing code on the E-Ink and manually entering it on the RPi's config page.
+      The certificate can be added to the user's devices to trust the portal as the valid page
+   2. Bluetooth secure pairing using pairing code on the E-Ink and manually entering it on the RPi's config page
    3. Data is saved completely locally and not shared with any centralized server
-   4. Data is 
+   4. Only relevant data is stored (within the dates range)
 8. Email notification on over budget expenses
 9. Battery percentage indicator
 10. Attention symbol on the E-Ink to indicate an error that requires user intervention

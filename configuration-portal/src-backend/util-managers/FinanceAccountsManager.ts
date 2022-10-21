@@ -3,7 +3,7 @@ import { ScaperScrapingResult } from 'israeli-bank-scrapers/lib/scrapers/base-sc
 // Import path
 import path from 'path';
 
-const FAILURE_SCREENSHOT_DIR = path.resolve("../build/static/media");
+const FAILURE_SCREENSHOT_DIR = path.resolve(__dirname, "../../build/static/media");
 
 export default async function scrapeFinancialBE(financialBE, company: String, startDate: Date, failureScreenshotPath = null): Promise<ScaperScrapingResult> {
     let options: ScraperOptions;
