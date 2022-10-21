@@ -49,6 +49,12 @@ The main (and some secondary that we're proud of) features are:
 Like everything in life, the project isn't perfect. There are a few missing/problematic things:
 
 1. A base model RPi can be overloaded by manually force scraping many accounts
+2. Pairing errors are hard to decipher
+3. Only the first bit of the scanning process actually discovers new devices (if a device becomes discoverable about 5 seconds after scan starts, it wouldn't be detected by the E-Ink)
+
+## Handled Edge Cases
+
+1. Scheduled scraping will queue scraping tasks to mitigate load on the RPi
 2. 
 
 # Project Structure
@@ -72,4 +78,29 @@ The folder hierarchy is as follows:
     * `routes` - routers to redirect requests to the correct handlers (login authorization checks)
     * `util-managers` - things that didn't fit within any of the controllers.
 * `eink-display` - code base for the E-Ink LilyGo display
+  * `main.cpp` - 
+  * `PageManager.cpp` - 
   * <!--TODO…-->
+
+## Examples For Adding Features
+
+### Rescan button
+
+The absolute majority of the time the E-Ink is in deep sleep to preserve battery.
+
+You can read about deep sleep to understand the mechanism better.
+
+To add another button you'd need another RTC GPIO pin.
+
+`void handleClick(int gpiopin)` is the function that handles button clicks. It is being called for handling both wakeup clicks and clicks when the E-Ink is running fully awake.
+
+So in that function a new `else if` for the new button needs to be added. The `else if` would call the handler of that rescan action.
+
+Lastly, to make sure that the new GPIO can also wake up the E-Ink, you'd need to add it to the mask for the deep sleep wakeup (`BUTTON_PIN_BITMASK`).
+
+### Multiple E-Ink for One RPi
+
+Assuming a feature for multiple E-Ink displays for a single RPi such that each display would have a different set of accounts it watches.
+
+#### Backend Changes
+
