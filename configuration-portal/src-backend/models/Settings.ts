@@ -108,7 +108,7 @@ const settingsSchema = new Schema<ISettings>({
             expense_budget: "Budget (e.g. 5000)",
             currency_symbol: "Currency symbol (e.g. ₪)",
             session_timeout_hours: "Hours before logout from configuration portal",
-            should_send_over_budget_notification: "Send notifications if budget is exceeded? (0 for no, 1 for yes)",
+            should_send_over_budget_notification: "Send notifications if budget is exceeded? (false for no, true for yes)",
             smtp_account_email: "Account email to send email from",
             smtp_account_password: "Account password to send email from",
             smtp_account_server: "The server to use SMTP with (e.g. smtp.gmail.com)",
