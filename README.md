@@ -12,8 +12,6 @@
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 # Overview
 
-This is a guide to help developers who want to modify and extend this project.
-
 The purpose of the guide is to detail the structure of the project and explain where things are placed in the heirarchy and thus save time for the poor developer who's already probably on their 3rd cup of coffee today.
 
 # Project Overview
@@ -31,6 +29,8 @@ The RPi saves the user's credentials to their credit card companies (100% locall
 The RPi sums the expenses and creates graphs for the E-Ink to pull and display to the user.
 
 The user is also able to hide/unhide the information on the E-Ink using a dedicated button. There's also the button to switch views (and ofc the "reset" button to refresh and force pull from the RPi).
+
+This project was created by ([SaarOfek](https://github.com/saar111),[GurTelem](https://github.com/gur111), [Daniel Bondar](https://github.com/danibondar),) in the Technion University with guidance from the The Interdisciplinary Center for Smart Technologies.
 
 # Feature List
 
