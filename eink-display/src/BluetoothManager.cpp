@@ -65,8 +65,8 @@ bool BluetoothManager::connectToServer(BLEAddress &pAddress, esp_ble_addr_type_t
     BLEClient *pClient = BLEDevice::createClient();
     logm(" - Created client");
 
-    logf(" - Connecting with address type %d", addrType, BLE_ADDR_TYPE_PUBLIC);
-    if (pClient->connect(pAddress, BLE_ADDR_TYPE_PUBLIC) == false) {
+    logf(" - Connecting with address type %d", addrType);
+    if (pClient->connect(pAddress, addrType) == false) {
         logm("Failed to connect to server");
         return false;
     }
