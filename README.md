@@ -4,10 +4,6 @@
   * [Known Issues](#known-issues)
   * [Handled Edge Cases](#handled-edge-cases)
 - [Project Structure](#project-structure)
-  * [Examples For Adding Features](#examples-for-adding-features)
-    + [Rescan button](#rescan-button)
-    + [Multiple E-Ink for One RPi](#multiple-e-ink-for-one-rpi)
-      - [Backend Changes](#backend-changes)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
