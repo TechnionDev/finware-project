@@ -54,8 +54,7 @@ The main (and some secondary that we're proud of) features are:
 Like everything in life, the project isn't perfect. There are a few missing/problematic things:
 
 1. A base model RPi can be overloaded by manually force scraping many accounts
-2. Pairing errors are hard to decipher
-3. Only the first bit of the scanning process actually discovers new devices (if a device becomes discoverable about 5 seconds after scan starts, it wouldn't be detected by the E-Ink)
+2. Pairing errors are hard to decipher, we tried really hard to find an explanation for each error code but could not find anything 
 
 # Project Structure
 
