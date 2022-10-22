@@ -58,14 +58,15 @@ bool BluetoothManager::connectToServer(BLEAddress &pAddress, esp_ble_addr_type_t
     BLEDevice::setSecurityCallbacks(new MySecurity(pageManager));
 
     BLESecurity *pSecurity = new BLESecurity();
-    pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
+    pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM);
 
     pSecurity->setCapability(ESP_IO_CAP_OUT);
     pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
     BLEClient *pClient = BLEDevice::createClient();
     logm(" - Created client");
 
-    if (pClient->connect(pAddress, addrType) == false) {
+    logf(" - Connecting with address type %d", addrType, BLE_ADDR_TYPE_PUBLIC);
+    if (pClient->connect(pAddress, BLE_ADDR_TYPE_PUBLIC) == false) {
         logm("Failed to connect to server");
         return false;
     }
