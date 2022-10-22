@@ -15,7 +15,7 @@
 
 The Finware project is intended to help raise financial awareness and help households maintain and track a budget.
 
-Simply put, Finware puts the monthly expenses in clear sight.
+Simply put, the Finware project is an E-ink display that puts the monthly expenses in clear sight (like on the fridge door).
 
 The project is made of two parts, the E-Ink display (LilyGo T5) and the Raspberry Pi as (the brain of the operation). The E-Ink uses BLE to achieve low power consumption.
 
@@ -27,7 +27,7 @@ The RPi sums the expenses and creates graphs for the E-Ink to pull and display t
 
 The user is also able to hide/unhide the information on the E-Ink using a dedicated button. There's also the button to switch views (and ofc the "reset" button to refresh and force pull from the RPi).
 
-This project was created by ([Saar Ofek](https://github.com/saar111), [Gur Telem](https://github.com/gur111), [Daniel Bondar](https://github.com/danibondar)) in the Technion University with guidance from the Interdisciplinary Center for Smart Technologies.
+This project was created by ([Saar Ofek](https://github.com/saar111), [Gur Telem](https://github.com/gur111), [Daniel Bondar](https://github.com/danibondar)) in the Technion University with guidance from the [Interdisciplinary Center for Smart Technologies](https://icst.cs.technion.ac.il/).
 
 # Feature List
 
@@ -89,26 +89,4 @@ The folder hierarchy is as follows:
     * `BluetoothManager.cpp` - a class the manages the communication and information gathering with the RPI.
     * `utils.cpp` - a util file
 
-## Examples For Adding Features
 
-### Rescan button
-
-The absolute majority of the time the E-Ink is in deep sleep to preserve battery.
-
-You can read about deep sleep to understand the mechanism better.
-
-To add another button you'd need another RTC GPIO pin.
-
-`void handleClick(int gpiopin)` is the function that handles button clicks. It is being called for handling both wakeup clicks and clicks when the E-Ink is running fully awake.
-
-So in that function a new `else if` for the new button needs to be added. The `else if` would call the handler of that rescan action.
-
-Lastly, to make sure that the new GPIO can also wake up the E-Ink, you'd need to add it to the mask for the deep sleep wakeup (`BUTTON_PIN_BITMASK`).
-
-### Multiple E-Ink for One RPi
-
-Assuming a feature for multiple E-Ink displays for a single RPi such that each display would have a different set of accounts it watches.
-
-#### Backend Changes
-
-    * <!--TODO…-->
