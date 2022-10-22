@@ -66,7 +66,10 @@ The folder hierarchy is as follows:
   * `scripts` - Scripts for developers to use manually (not used in production)
   * `security` - SSL related files
   * `src` - react (frontend) sources
-    * <!--TODO…-->
+    * `pages` - specific components for each page
+    * `assets` - public assets that can be used by the components
+    * `shared` - shared components between the entire website
+    * `App.tsx` - main app logic
   * `src-backend` - well.... it's the source for the backend.
     * `controllers` - (conceptual) singletons to handlers
       * `bluetooth-mock.controller.ts`
