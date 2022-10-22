@@ -1,11 +1,8 @@
-- [Overview](#overview)
 - [Project Overview](#project-overview)
 - [Feature List](#feature-list)
   * [Known Issues](#known-issues)
-  * [Handled Edge Cases](#handled-edge-cases)
 - [Project Structure](#project-structure)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Project Overview
 
