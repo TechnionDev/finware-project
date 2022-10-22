@@ -13,15 +13,15 @@ The Finware project is intended to help raise financial awareness and help house
 
 Simply put, the Finware project is an E-ink display that puts the monthly expenses in clear sight (like on the fridge door).
 
-The project is made of two parts, the E-Ink display (LilyGo T5) and the Raspberry Pi as (the brain of the operation). The E-Ink uses BLE to achieve low power consumption.
+The project is made of two parts, the E-Ink display (LilyGo T5) and the Raspberry Pi as the brain of the operation. The E-Ink uses BLE to achieve low power consumption.
 
-The E-Ink periodically (every 24 hours) pulls information from the nearby Raspberry Pi (we'll short it to RPi from now) and updates the received information on the screen.
+The E-Ink periodically (every 24 hours) pulls information from the nearby Raspberry Pi (RPi) and updates the received information on the screen.
 
 The RPi saves the user's credentials to their credit card companies (100% locally) and scans (scrapes) for transactions to analyze.
 
 The RPi sums the expenses and creates graphs for the E-Ink to pull and display to the user.
 
-The user is also able to hide/unhide the information on the E-Ink using a dedicated button. There's also the button to switch views (and ofc the "reset" button to refresh and force pull from the RPi).
+The user is also able to hide/unhide the information on the E-Ink using a dedicated button. There's also the button to switch views anda  "reset" button used to refresh and forcefully pull information from the RPi.
 
 This project was created by ([Saar Ofek](https://github.com/saar111), [Gur Telem](https://github.com/gur111), [Daniel Bondar](https://github.com/danibondar)) in the Technion University with guidance from the [Interdisciplinary Center for Smart Technologies](https://icst.cs.technion.ac.il/).
 
