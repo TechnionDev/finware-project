@@ -6,6 +6,10 @@
 
 # Project Overview
 
+[Presentation Slides](https://docs.google.com/presentation/d/1H3bI_r-XPCCJw7Dv9TPZqFuTw5eu9hV8gbQ5N3LKVGg/edit?usp=sharing)
+
+[Video Overview](https://youtu.be/QnbULGhYziA)
+
 The Finware project is intended to help raise financial awareness and help households maintain and track a budget.
 
 Simply put, the Finware project is an E-ink display that puts the monthly expenses in clear sight (like on the fridge door).
