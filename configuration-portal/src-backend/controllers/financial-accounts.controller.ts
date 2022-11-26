@@ -104,7 +104,7 @@ class FinanceAccountsController {
             let [settings, financialBackends] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
             const cycleStartDate = getCycleStartDate(settings.month_cycle_start_day);
-            console.log(`Scraping started for financial backends. Scraping from date: ${cycleStartDate.toDateString()}`);
+            console.log(`Scraping started for financial backends. Scraping from date: ${cycleStartDate.toTimeString()}. Current time: ${now.toISOString()}`);
 
             let scrapeJobsQueue = [];
             for (let financialBE of financialBackends) {
@@ -114,7 +114,7 @@ class FinanceAccountsController {
                 }
                 // Check the difference in time (rounded up)
                 let hours_since_last_scrape = (now.getTime() - financialBE.last_scrape.getTime()) / 1000 / 60 / 60;
-                if (!forceUpdate && hours_since_last_scrape < SCRAPING_FREQUENCY_MAXIMUM) {
+                if (!forceUpdate && !financialBE.scrape_result?.success == false && hours_since_last_scrape < SCRAPING_FREQUENCY_MAXIMUM) {
                     console.log('Account', financialBE.name, `was updated ${Math.round(hours_since_last_scrape)} (<${SCRAPING_FREQUENCY_MAXIMUM}) hours ago. Skipping.`);
                     continue;
                 }

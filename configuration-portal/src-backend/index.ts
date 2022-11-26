@@ -31,7 +31,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/finware").then(async () => {
     const financeAccountsController = new FinancialAccountsController(bluetoothController);
 
     new CronJob(
-        `0 0 4 * * *`, // Once every 24 hours at 04:00:00
+        `0 */19 2 * * *`, // Once every 24 hours at 04:00:00
         financeAccountsController.updateFinancialData.bind(financeAccountsController, true),
         null,
         true, /* start */
