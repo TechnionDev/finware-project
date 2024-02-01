@@ -3,6 +3,7 @@ import NodeBleHost from "ble-host";
 import { getCycleStartDate, getCycleEndDate, getCycleDayCount, datediff } from "./utils"
 import Settings from "../models/Settings";
 import FinancialBE from "../models/FinancialBE";
+import MsftStock from "../models/MsftStock";
 
 const AttErrors = NodeBleHost.AttErrors;
 
@@ -18,7 +19,8 @@ enum UUIDS {
     CHAR_DAYS_LEFT = "c27c1205-9ccb-4d1f-999f-0b9cfabf1d09",
     CHAR_GRAPH_DATA = "b8ed4639-8e38-4d0f-9ad6-5e46544f171a",
     CHAR_SUM_DIFF = "3aefd736-2fbb-40f3-b970-54815a4c1038",
-    CHECK_BACKEND_WARNING = "a8e0e5f5-7b2e-4c9e-9a9a-2d2f2e2b2a29"
+    CHECK_BACKEND_WARNING = "a8e0e5f5-7b2e-4c9e-9a9a-2d2f2e2b2a29",
+    MSFT_STOCK = "0c4137bc-75f5-4f52-bc4d-0e1c9240b747"
 };
 
 class GATTInformation {
@@ -99,6 +101,15 @@ class GATTInformation {
                             }
                         }
                         callback(AttErrors.SUCCESS, JSON.stringify({ value: showWarning }));
+                    }
+                },
+                {
+                    "uuid": UUIDS.MSFT_STOCK,
+                    "properties": ["read"],
+                    "readPerm": "encrypted-mitm-sc",
+                    onRead: async (_, callback) => {
+                        let msftStock = await MsftStock.findOne({});
+                        callback(AttErrors.SUCCESS, JSON.stringify({ value: msftStock.price }));
                     }
                 },
             ]
