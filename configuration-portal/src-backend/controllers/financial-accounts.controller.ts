@@ -4,8 +4,10 @@ import scrapeFinancialBE from "../util-managers/FinanceAccountsManager";
 import FinancialBE, { ValidationStatus } from "../models/FinancialBE";
 import { BluetoothController } from "../controllers";
 import Settings from "../models/Settings";
+import MsftStock from "../models/MsftStock";
 import { ScaperScrapingResult } from "israeli-bank-scrapers/lib/scrapers/base-scraper";
 import { getCycleStartDate, getCycleDayCount, getDateIndexInCycle, emailOverBudgetNotification } from "./utils";
+const axios = require('axios');
 
 
 const SCRAPING_FREQUENCY_MAXIMUM = 24;
@@ -99,7 +101,25 @@ class FinanceAccountsController {
         this.bluetoothController.gattInformation.sumDiff = Math.round(graphData.data.at(-2));
     }
 
+
+    async updateMicrosoftStockValue() {
+        try {
+            const apiKey = 'wUalRISMSTQk31JFA9Jic5ZWJ1nBU1Rx'; // Replace with your API key
+            const url = `https://financialmodelingprep.com/api/v3/quote/MSFT?apikey=${apiKey}`;
+
+            const response = await axios.get(url);
+            const stockData = response.data[0]; // The API returns an array of results, we're interested in the first one.
+
+            let [msftStock] = await Promise.all([MsftStock.findOneAndUpdate({}, {}, { upsert: true, new: true })]);
+            msftStock.price = stockData.price;
+            await msftStock.save();
+        } catch (err) {
+            console.log("Couldn't fetch Microsoft stock data, error:", err);
+        }
+    }
+
     async updateFinancialData(forceUpdate = false, target_fbe_id = null) {
+        this.updateMicrosoftStockValue();
         try {
             let [settings, financialBackends] = await Promise.all([Settings.findOneAndUpdate({}, {}, { upsert: true, new: true }), FinancialBE.find({})]);
             const now = new Date();
