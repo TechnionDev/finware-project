@@ -29,6 +29,7 @@ RTC_DATA_ATTR int baseSpending = 0;
 RTC_DATA_ATTR uint64_t refreshRate = DEFAULT_REFRESH_RATE_MIN;
 RTC_DATA_ATTR int totalSum = 0;
 RTC_DATA_ATTR int sumDiff = 0;
+RTC_DATA_ATTR float msftStockPrice = 0;
 static esp_ble_addr_type_t bleServerAddrType;
 
 
@@ -119,7 +120,7 @@ void showPage(int page) {
   switch (page % 3) {
     case 0:
       bankInfo = blm.getBankInfo(BankInfoBuffer);
-      pageManager.showSumPage(totalSum + baseSpending, daysLeft, goal, sumDiff, bankInfo);
+      pageManager.showSumPage(totalSum + baseSpending, daysLeft, goal, sumDiff, msftStockPrice, bankInfo);
       break;
     case 1:
       auto doc = blm.getGraphData(jsonDocBuffer);
@@ -146,6 +147,7 @@ void refreshDataAndDisplay() {
   daysLeft = blm.getDaysLeft();
   sumDiff = blm.getSumDiff();
   baseSpending = blm.getBaseSpending();
+  msftStockPrice = blm.getMsftStockPrice();
 
   totalSum = 0;
   for (const auto& it : bankInfo) {

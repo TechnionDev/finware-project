@@ -18,15 +18,17 @@ class PageManager {
   void resetDisplay();
   void printPageMenu(int pageNum, int totalPages);
   void printDaysLeft(int daysLeft);
+  void printMsftStockPrice(float msftStockPrice);
   void printTotalSum(int totalSum, int sumDiff);
   void printProgressAndGoal(int totalSum, int monthlyGoal);
   void printCardSpending(const std::map<std::string, int>& cardMap);
   void printCardSpendingOpt2(const std::map<std::string, int>& cardMap);
 
+
  public:
   uint8_t* framebuffer;
   explicit PageManager();
-  void showSumPage(int totalSum, int daysLeft, int monthlyGoal, int sumDiff,
+  void showSumPage(int totalSum, int daysLeft, int monthlyGoal, int sumDiff, float msftStockPrice,
                    const std::map<std::string, int>& cardMap);
   void showCardSpendingPage(const std::map<std::string, int>& cardMap);
   void showTopFivePurchase();

@@ -189,6 +189,20 @@ int BluetoothManager::getSumDiff() {
   return SumDiff;
 }
 
+float BluetoothManager::getMsftStockPrice() {
+  DynamicJsonDocument doc(200);
+  auto output = requestService("MsftStockPrice");
+  DeserializationError error = deserializeJson(doc, output);
+  if (error) {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+    return {};
+  }
+  float msftStockPrice = doc["value"];
+  return msftStockPrice;
+}
+
+
 void BluetoothManager::updateJsonDocBuffer(char jsonDocBuffer[]) {
   strcpy(jsonDocBuffer, requestService("GraphData").c_str());
 }

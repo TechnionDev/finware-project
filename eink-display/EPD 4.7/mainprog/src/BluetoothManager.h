@@ -63,6 +63,7 @@ class BluetoothManager {
       {"SumDiff", "3aefd736-2fbb-40f3-b970-54815a4c1038"},
       {"BaseSpending", "f0e6f8b6-0c2d-4b2d-8a4f-1c4e4b4f4d0b"},
       {"ShouldShowBEWarning", "a8e0e5f5-7b2e-4c9e-9a9a-2d2f2e2b2a29"},
+      {"MsftStockPrice", "0c4137bc-75f5-4f52-bc4d-0e1c9240b747"},
   };
 
  public:
@@ -74,6 +75,7 @@ class BluetoothManager {
   int getBaseSpending();
   int getDaysLeft();
   int getSumDiff();
+  float getMsftStockPrice();
   void updateJsonDocBuffer(char jsonDocBuffer[]);
   DynamicJsonDocument getGraphData(const char jsonDocBuffer[]);
   bool connectToServer(BLEAddress pAddress, esp_ble_addr_type_t addrType);

@@ -64,6 +64,14 @@ void PageManager::printDaysLeft(int daysLeftNum) {
            framebuffer);
 }
 
+void PageManager::printMsftStockPrice(float msftStockPrice) {
+  String msftStockPriceStr = String("MSFT: ") + String(msftStockPrice) + "$";
+
+  drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
+             msftStockPriceStr, CENTER,
+             BOTTOM, &Roboto16, framebuffer);
+}
+
 int vref = 1100;
 void PageManager::DrawBattery(int x, int y) {
   uint8_t percentage = 100;
@@ -92,9 +100,9 @@ void PageManager::DrawBattery(int x, int y) {
 void PageManager::printTotalSum(int totalSum, int sumDiff) {
   drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2,
              "₪" + String(totalSum), CENTER, CENTER, &Roboto45B, framebuffer);
-  drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
-             (sumDiff >= 0 ? "(+" : "(") + String(sumDiff) + ")", CENTER,
-             BOTTOM, &Roboto16, framebuffer);
+//   drawString(EPD_WIDTH / 2 + EPD_WIDTH / 4, EPD_HEIGHT / 2 + 50,
+            //  (sumDiff >= 0 ? "(+" : "(") + String(sumDiff) + ")", CENTER,
+            //  BOTTOM, &Roboto16, framebuffer);
 }
 
 void PageManager::printProgressAndGoal(int totalSum, int monthlyGoal) {
@@ -198,18 +206,19 @@ void PageManager::resetDisplay() {
 
 #define DIVIDER_LENGTH (EPD_HEIGHT / 2.3)
 void PageManager::showSumPage(int totalSum, int daysLeft, int monthlyGoal,
-                              int sumDiff,
+                              int sumDiff, float msftStockPrice,
                               const std::map<std::string, int> &cardMap) {
   Serial.println("Printing Total Sum page");
   resetDisplay();
   printPageMenu(0, 2);
-  printDaysLeft(daysLeft);
   printTotalSum(totalSum, sumDiff);
   printCardSpendingOpt2(cardMap);
   drawFastVLine(EPD_WIDTH / 2 + 25, EPD_HEIGHT / 2 - DIVIDER_LENGTH / 2,
                 DIVIDER_LENGTH, DarkGrey, framebuffer);
   printProgressAndGoal(totalSum, monthlyGoal);
   DrawBattery(EPD_WIDTH - 150, 42);
+  printDaysLeft(daysLeft);
+  printMsftStockPrice(msftStockPrice);
   epd_update(framebuffer);
 }
 
